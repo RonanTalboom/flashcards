@@ -3,12 +3,12 @@ interface DashboardProps {
   dueCount: number;
   learnedCount: number;
   totalCards: number;
-  studyCount: number;
-  categoryBreakdown: { name: string; total: number; learned: number }[];
   xp: number;
   level: number;
   levelProgress: number;
-  onStartStudy: () => void;
+  onLearn: () => void;
+  onReview: () => void;
+  studyCount: number;
 }
 
 export function Dashboard({
@@ -16,17 +16,17 @@ export function Dashboard({
   dueCount,
   learnedCount,
   totalCards,
-  studyCount,
-  categoryBreakdown,
   xp,
   level,
   levelProgress,
-  onStartStudy,
+  onLearn,
+  onReview,
+  studyCount,
 }: DashboardProps) {
   return (
     <div className="container">
       <header>
-        <h1>Flashcards</h1>
+        <h1>LearnPath</h1>
         <div className="streak">
           {streak > 0 ? `${streak}d streak` : ""}
         </div>
@@ -57,27 +57,23 @@ export function Dashboard({
         </div>
       </div>
 
-      {dueCount > 0 ? (
-        <button className="btn-start" onClick={onStartStudy}>
-          Study {studyCount} cards
+      <div className="dashboard-actions">
+        <button className="btn-learn" onClick={onLearn}>
+          Learn
         </button>
-      ) : (
+        {dueCount > 0 && (
+          <button className="btn-review" onClick={onReview}>
+            Review {studyCount}
+          </button>
+        )}
+      </div>
+
+      {dueCount === 0 && (
         <div className="done-message">
           <p className="done-icon">&#10003;</p>
           <p>All caught up! Come back tomorrow.</p>
         </div>
       )}
-
-      <div className="category-list">
-        {categoryBreakdown.map((cat) => (
-          <div key={cat.name} className="category-item">
-            <span className="category-name">{cat.name}</span>
-            <span className="category-progress">
-              {cat.learned}/{cat.total}
-            </span>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

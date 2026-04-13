@@ -8,6 +8,7 @@ interface StudyCardProps {
   queueLength: number;
   onFlip: () => void;
   onRate: (grade: number) => void;
+  onBack?: () => void;
 }
 
 export function StudyCard({
@@ -17,20 +18,27 @@ export function StudyCard({
   queueLength,
   onFlip,
   onRate,
+  onBack,
 }: StudyCardProps) {
   const [selfAnswer, setSelfAnswer] = useState("");
 
   return (
     <div className="container">
       <header>
-        <span className="progress">
-          {currentIndex + 1} / {queueLength}
-        </span>
+        {onBack ? (
+          <button className="back-btn" onClick={onBack} aria-label="Back">
+            &#8592;
+          </button>
+        ) : (
+          <span className="progress">
+            {currentIndex + 1} / {queueLength}
+          </span>
+        )}
         <span className="category-badge">{card.category}</span>
       </header>
 
-      <div className="card-container" onClick={onFlip}>
-        <div className={`card-inner${isFlipped ? " flipped" : ""}`}>
+      <div className="card-container" onClick={!isFlipped ? onFlip : undefined}>
+        {!isFlipped ? (
           <div className="card-front">
             <p className="card-text">{card.front}</p>
             <textarea
@@ -41,6 +49,7 @@ export function StudyCard({
               onClick={(e) => e.stopPropagation()}
             />
           </div>
+        ) : (
           <div className="card-back">
             {selfAnswer && (
               <div className="self-answer-review">
@@ -55,7 +64,7 @@ export function StudyCard({
               ))}
             </ul>
           </div>
-        </div>
+        )}
       </div>
 
       <div id="controls">
