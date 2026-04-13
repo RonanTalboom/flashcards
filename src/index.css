@@ -456,6 +456,14 @@ header h1 {
   transition: width 0.3s ease;
 }
 
+/* Loading */
+
+.loading-text {
+  text-align: center;
+  color: var(--text-muted);
+  margin-top: 40vh;
+}
+
 /* Mobile adjustments */
 
 @media (max-height: 700px) {

@@ -7,11 +7,19 @@ import "./index.css";
 export function App() {
   const fc = useFlashcards();
 
+  if (fc.loading) {
+    return (
+      <div className="container">
+        <p className="loading-text">Loading...</p>
+      </div>
+    );
+  }
+
   switch (fc.view) {
     case "dashboard":
       return (
         <Dashboard
-          streak={fc.state.stats.streak}
+          streak={fc.streak}
           dueCount={fc.dueCount}
           learnedCount={fc.learnedCount}
           totalCards={fc.totalCards}
@@ -40,9 +48,9 @@ export function App() {
     case "done":
       return (
         <DoneScreen
-          streak={fc.state.stats.streak}
+          streak={fc.streak}
           learnedCount={fc.learnedCount}
-          totalReviews={fc.state.stats.totalReviews}
+          totalReviews={fc.totalReviews}
           sessionXp={fc.sessionXp}
           onBack={fc.backToDashboard}
         />

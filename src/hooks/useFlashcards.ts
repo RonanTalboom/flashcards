@@ -1,20 +1,21 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import type { Card, AppState } from "../types";
-import { CARDS } from "../data/cards";
 import { sm2, today, yesterday } from "../lib/sm2";
-import { initState, saveState } from "../lib/storage";
+import { initApp, saveState } from "../lib/storage";
 
 const MAX_NEW_PER_SESSION = 10;
 
 export type View = "dashboard" | "study" | "done";
 
 export function useFlashcards() {
-  const [state, setState] = useState<AppState>(initState);
+  const [cards, setCards] = useState<Card[]>([]);
+  const [state, setState] = useState<AppState | null>(null);
   const [queue, setQueue] = useState<Card[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [view, setView] = useState<View>("dashboard");
   const [sessionXp, setSessionXp] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   const XP_PER_GRADE: Record<number, number> = { 0: 2, 2: 5, 4: 10, 5: 15 };
 
@@ -23,36 +24,50 @@ export function useFlashcards() {
 
   const levelThreshold = (n: number) => 25 * n * (n - 1);
 
+  useEffect(() => {
+    initApp().then(({ cards: c, state: s }) => {
+      setCards(c);
+      setState(s);
+      setLoading(false);
+    });
+  }, []);
+
   const getDueCards = useCallback(() => {
+    if (!state) return [];
     const t = today();
-    return CARDS.filter((card) => state.cards[card.id].nextReviewDate <= t);
-  }, [state]);
+    return cards.filter((card) => state.cards[card.id]?.nextReviewDate <= t);
+  }, [cards, state]);
 
   const getNewCards = useCallback(() => {
-    return CARDS.filter((card) => {
+    if (!state) return [];
+    return cards.filter((card) => {
       const s = state.cards[card.id];
-      return s.repetitions === 0 && s.interval === 0;
+      return s && s.repetitions === 0 && s.interval === 0;
     });
-  }, [state]);
+  }, [cards, state]);
 
   const getLearnedCount = useCallback(() => {
-    return CARDS.filter((card) => state.cards[card.id].repetitions > 0).length;
-  }, [state]);
+    if (!state) return 0;
+    return cards.filter((card) => state.cards[card.id]?.repetitions > 0)
+      .length;
+  }, [cards, state]);
 
   const getCategoryBreakdown = useCallback(() => {
+    if (!state) return [];
     const cats: Record<string, { total: number; learned: number }> = {};
-    for (const card of CARDS) {
+    for (const card of cards) {
       if (!cats[card.category]) cats[card.category] = { total: 0, learned: 0 };
       cats[card.category].total++;
-      if (state.cards[card.id].repetitions > 0) cats[card.category].learned++;
+      if (state.cards[card.id]?.repetitions > 0) cats[card.category].learned++;
     }
     return Object.entries(cats).map(([name, data]) => ({
       name,
       ...data,
     }));
-  }, [state]);
+  }, [cards, state]);
 
   const startStudy = useCallback(() => {
+    if (!state) return;
     const due = getDueCards();
     const newCards = due.filter((c) => {
       const s = state.cards[c.id];
@@ -65,12 +80,14 @@ export function useFlashcards() {
 
     const cappedNew = newCards.slice(0, MAX_NEW_PER_SESSION);
 
-    // Adaptive difficulty: sort review cards by easeFactor ascending (harder cards first)
-    reviewCards.sort((a, b) => state.cards[a.id].easeFactor - state.cards[b.id].easeFactor);
+    // Adaptive difficulty: harder cards first
+    reviewCards.sort(
+      (a, b) => state.cards[a.id].easeFactor - state.cards[b.id].easeFactor
+    );
 
     const newQueue = [...reviewCards, ...cappedNew];
 
-    // Interleave: shuffle within chunks of 4 to mix categories while preserving difficulty bias
+    // Interleave: shuffle within chunks of 4
     for (let i = 0; i < newQueue.length; i += 4) {
       const end = Math.min(i + 4, newQueue.length);
       for (let j = end - 1; j > i; j--) {
@@ -81,7 +98,6 @@ export function useFlashcards() {
 
     if (newQueue.length === 0) return;
 
-    // Update streak
     const t = today();
     const y = yesterday();
     const newState = { ...state, stats: { ...state.stats } };
@@ -110,28 +126,32 @@ export function useFlashcards() {
 
   const rateCard = useCallback(
     (grade: number) => {
+      if (!state) return;
       const card = queue[currentIndex];
       const updated = sm2(state.cards[card.id], grade);
 
+      const earned = XP_PER_GRADE[grade] ?? 5;
       const newState: AppState = {
         ...state,
         cards: { ...state.cards, [card.id]: updated },
-        stats: { ...state.stats, totalReviews: state.stats.totalReviews + 1 },
+        stats: {
+          ...state.stats,
+          totalReviews: state.stats.totalReviews + 1,
+          xp: state.stats.xp + earned,
+        },
       };
-      const earned = XP_PER_GRADE[grade] ?? 5;
-      newState.stats = { ...newState.stats, xp: newState.stats.xp + earned };
       saveState(newState);
       setState(newState);
       setSessionXp((prev) => prev + earned);
 
-      const newQueue = [...queue];
+      const newQ = [...queue];
       if (grade < 3) {
-        newQueue.push(card);
-        setQueue(newQueue);
+        newQ.push(card);
+        setQueue(newQ);
       }
 
       const nextIndex = currentIndex + 1;
-      if (nextIndex >= newQueue.length) {
+      if (nextIndex >= newQ.length) {
         setView("done");
       } else {
         setCurrentIndex(nextIndex);
@@ -150,14 +170,14 @@ export function useFlashcards() {
 
   const currentCard = queue[currentIndex] ?? null;
   const dueCards = getDueCards();
-
-  const currentLevel = getLevel(state.stats.xp);
+  const xp = state?.stats.xp ?? 0;
+  const currentLevel = getLevel(xp);
   const lvlStart = levelThreshold(currentLevel);
   const lvlSize = 50 * currentLevel;
 
   return {
+    loading,
     view,
-    state,
     currentCard,
     isFlipped,
     currentIndex,
@@ -165,17 +185,19 @@ export function useFlashcards() {
     dueCount: dueCards.length,
     newCount: getNewCards().length,
     learnedCount: getLearnedCount(),
-    totalCards: CARDS.length,
+    totalCards: cards.length,
     categoryBreakdown: getCategoryBreakdown(),
     studyCount: Math.min(
       dueCards.length,
       MAX_NEW_PER_SESSION +
-        dueCards.filter((c) => state.cards[c.id].repetitions > 0).length
+        dueCards.filter((c) => (state?.cards[c.id]?.repetitions ?? 0) > 0).length
     ),
     sessionXp,
-    xp: state.stats.xp,
+    xp,
     level: currentLevel,
-    levelProgress: lvlSize > 0 ? (state.stats.xp - lvlStart) / lvlSize : 0,
+    levelProgress: lvlSize > 0 ? (xp - lvlStart) / lvlSize : 0,
+    streak: state?.stats.streak ?? 0,
+    totalReviews: state?.stats.totalReviews ?? 0,
     startStudy,
     flipCard,
     rateCard,
