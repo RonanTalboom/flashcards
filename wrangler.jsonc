@@ -1,7 +1,15 @@
 {
   "name": "flashcards",
+  "main": "worker/index.ts",
   "compatibility_date": "2025-04-13",
   "assets": {
     "not_found_handling": "single-page-application"
-  }
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "flashcards-db",
+      "database_id": "f0cfb3bc-4b6d-4424-9c08-ba1f201ecfbc"
+    }
+  ]
 }

@@ -1,32 +1,39 @@
-import type { AppState } from "../types";
-import { CARDS } from "../data/cards";
+import type { AppState, Card } from "../types";
 import { today } from "./sm2";
 
-const STORAGE_KEY = "flashcards_state";
+export async function loadCards(): Promise<Card[]> {
+  const res = await fetch("/api/cards");
+  if (!res.ok) return [];
+  return res.json();
+}
 
-export function loadState(): AppState | null {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (raw) {
-    try {
-      return JSON.parse(raw) as AppState;
-    } catch {
-      return null;
-    }
+async function loadState(): Promise<AppState | null> {
+  try {
+    const res = await fetch("/api/state");
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
   }
-  return null;
 }
 
-export function saveState(state: AppState): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+export async function saveState(state: AppState): Promise<void> {
+  await fetch("/api/state", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(state),
+  });
 }
 
-export function initState(): AppState {
-  const existing = loadState();
-  if (existing) return existing;
+export async function initApp(): Promise<{ cards: Card[]; state: AppState }> {
+  const [cards, existingState] = await Promise.all([
+    loadCards(),
+    loadState(),
+  ]);
 
-  const cards: AppState["cards"] = {};
-  for (const card of CARDS) {
-    cards[card.id] = {
+  const cardStates: AppState["cards"] = {};
+  for (const card of cards) {
+    cardStates[card.id] = existingState?.cards[card.id] ?? {
       easeFactor: 2.5,
       interval: 0,
       repetitions: 0,
@@ -35,8 +42,8 @@ export function initState(): AppState {
   }
 
   const state: AppState = {
-    cards,
-    stats: {
+    cards: cardStates,
+    stats: existingState?.stats ?? {
       streak: 0,
       lastReviewDate: null,
       totalReviews: 0,
@@ -44,6 +51,12 @@ export function initState(): AppState {
     },
   };
 
-  saveState(state);
-  return state;
+  if (
+    !existingState ||
+    Object.keys(cardStates).length !== Object.keys(existingState.cards).length
+  ) {
+    await saveState(state);
+  }
+
+  return { cards, state };
 }
