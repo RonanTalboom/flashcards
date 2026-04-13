@@ -381,4 +381,102 @@ export const CARDS: Card[] = [
       "The common thread: all effective platforms make you do something — type, solve, recall — before showing the answer",
     ],
   },
+
+  // === Quantitative Finance ===
+  {
+    id: 32,
+    category: "Quant",
+    front: "What does the Black-Scholes model price, and what are its key assumptions?",
+    back: "Black-Scholes prices European options by modeling the underlying as geometric Brownian motion. It assumes constant volatility, no dividends, continuous trading, and no arbitrage.",
+    keyPoints: [
+      "C = S·N(d₁) − K·e^(−rT)·N(d₂) where d₁ = [ln(S/K) + (r + σ²/2)T] / (σ√T)",
+      "Key insight: you can perfectly hedge an option by delta-hedging the underlying — the option price is the cost of this hedge",
+      "Constant volatility assumption is the weakest — real markets show volatility smile/skew",
+      "Won Scholes and Merton the 1997 Nobel; still the lingua franca of options pricing despite limitations",
+    ],
+  },
+  {
+    id: 33,
+    category: "Quant",
+    front: "What are the four main Greeks, and what does each measure?",
+    back: "Delta (∂V/∂S), Gamma (∂²V/∂S²), Theta (∂V/∂t), and Vega (∂V/∂σ). They quantify an option's sensitivity to underlying price, convexity, time decay, and volatility.",
+    keyPoints: [
+      "Delta: how much the option price moves per $1 move in the underlying (0 to 1 for calls, −1 to 0 for puts)",
+      "Gamma: rate of change of delta — highest for ATM options near expiry; measures hedging frequency needed",
+      "Theta: time decay — options lose value every day, accelerating near expiry (the 'rent' of owning options)",
+      "Vega: sensitivity to implied vol — a 1% vol increase changes the option price by vega dollars",
+    ],
+  },
+  {
+    id: 34,
+    category: "Quant",
+    front: "What is risk-neutral pricing and why does it work?",
+    back: "In a complete market with no arbitrage, you can price derivatives by assuming all assets grow at the risk-free rate (the 'risk-neutral measure'). The fair price is the discounted expected payoff under this measure.",
+    keyPoints: [
+      "The fundamental theorem of asset pricing: no arbitrage ↔ existence of a risk-neutral measure",
+      "You don't need to know the real-world probability of stock going up — only the replicating portfolio cost matters",
+      "Risk-neutral ≠ investors are risk-neutral; it's a mathematical trick that gives the same price as hedging arguments",
+      "Breaks down in incomplete markets (e.g., stochastic vol) where perfect replication is impossible",
+    ],
+  },
+  {
+    id: 35,
+    category: "Quant",
+    front: "What is Itô's Lemma and why is it central to quantitative finance?",
+    back: "Itô's Lemma is the chain rule for stochastic calculus. For a function f(S,t) where S follows a diffusion, df includes an extra ½σ²S²f″ term that doesn't exist in ordinary calculus.",
+    keyPoints: [
+      "df = (∂f/∂t + μS·∂f/∂S + ½σ²S²·∂²f/∂S²)dt + σS·∂f/∂S·dW",
+      "The extra ½σ²S²f″ term arises because (dW)² = dt — Brownian motion has non-zero quadratic variation",
+      "Applying Itô's Lemma to ln(S) derives geometric Brownian motion: S(T) = S(0)·exp((μ−σ²/2)T + σW(T))",
+      "Foundation for deriving Black-Scholes PDE, pricing formulas, and stochastic volatility models",
+    ],
+  },
+  {
+    id: 36,
+    category: "Quant",
+    front: "What is Value at Risk (VaR) and what are its limitations?",
+    back: "VaR estimates the maximum loss over a time horizon at a given confidence level (e.g., '1-day 99% VaR = $10M' means 99% of days the loss won't exceed $10M). It says nothing about how bad losses can be beyond that threshold.",
+    keyPoints: [
+      "Three methods: historical simulation, variance-covariance (parametric), Monte Carlo simulation",
+      "Critical flaw: VaR is not subadditive — combining portfolios can increase VaR, violating diversification logic",
+      "Expected Shortfall (CVaR) fixes this: it's the average loss beyond the VaR threshold and is coherent",
+      "Basel III requires banks to use Expected Shortfall at 97.5% confidence for market risk capital",
+    ],
+  },
+  {
+    id: 37,
+    category: "Quant",
+    front: "What is the Sharpe Ratio and when does it mislead?",
+    back: "Sharpe = (R_p − R_f) / σ_p — excess return per unit of total risk. It's the most used risk-adjusted performance metric, but assumes returns are normally distributed.",
+    keyPoints: [
+      "A Sharpe > 1 is good, > 2 is very good, > 3 is exceptional (and should trigger suspicion of data issues)",
+      "Misleading for non-normal returns: a strategy selling deep OTM options has high Sharpe until it blows up",
+      "Annualize by multiplying by √252 (daily) or √12 (monthly) — assumes i.i.d. returns, which is often wrong",
+      "Alternatives: Sortino ratio (downside deviation only), Calmar ratio (return / max drawdown)",
+    ],
+  },
+  {
+    id: 38,
+    category: "Quant",
+    front: "What is mean-variance optimization and why did Markowitz's insight matter?",
+    back: "Markowitz showed that portfolio risk depends on correlations, not just individual asset risks. Mean-variance optimization finds the portfolio weights that maximize return for a given risk level (the efficient frontier).",
+    keyPoints: [
+      "The key insight: diversification is a 'free lunch' — combining imperfectly correlated assets reduces total risk",
+      "Efficient frontier: the set of portfolios with maximum expected return for each level of variance",
+      "In practice, highly sensitive to estimated inputs — small changes in expected returns produce wildly different weights",
+      "Black-Litterman model fixes this by blending market equilibrium with investor views as a Bayesian prior",
+    ],
+  },
+  {
+    id: 39,
+    category: "Quant",
+    front: "What is the volatility smile/skew and what does it reveal about Black-Scholes limitations?",
+    back: "Implied volatility varies by strike price — OTM puts are priced with higher vol than ATM options (the 'skew'). This contradicts Black-Scholes' constant-vol assumption and reflects market pricing of tail risk and jumps.",
+    keyPoints: [
+      "Post-1987 crash: markets permanently price downside protection higher — the skew is a crash premium",
+      "The smile means the market implicitly uses a fatter-tailed distribution than lognormal for the underlying",
+      "Local volatility (Dupire): deterministic vol surface that fits the smile but has unrealistic dynamics",
+      "Stochastic volatility (Heston, SABR): vol itself is random — better dynamics but harder to calibrate",
+    ],
+  },
 ];
