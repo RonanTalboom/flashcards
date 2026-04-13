@@ -369,6 +369,93 @@ header h1 {
   margin: 0 auto 16px;
 }
 
+/* Generation - Self Answer */
+
+.self-answer-input {
+  width: 100%;
+  margin-top: 20px;
+  padding: 12px;
+  background: rgba(56, 178, 172, 0.05);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: none;
+  min-height: 60px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.self-answer-input:focus {
+  border-color: var(--accent);
+}
+
+.self-answer-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.self-answer-review {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(56, 178, 172, 0.05);
+  border-radius: 8px;
+  border-left: 3px solid var(--accent);
+}
+
+.self-answer-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.self-answer-text {
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* XP Bar */
+
+.xp-bar {
+  margin-bottom: 24px;
+}
+
+.xp-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.xp-level {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.xp-amount {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.xp-track {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.xp-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
 /* Mobile adjustments */
 
 @media (max-height: 700px) {

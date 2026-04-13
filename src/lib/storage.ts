@@ -40,6 +40,7 @@ export function initState(): AppState {
       streak: 0,
       lastReviewDate: null,
       totalReviews: 0,
+      xp: 0,
     },
   };
 

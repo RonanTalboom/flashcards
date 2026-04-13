@@ -5,6 +5,9 @@ interface DashboardProps {
   totalCards: number;
   studyCount: number;
   categoryBreakdown: { name: string; total: number; learned: number }[];
+  xp: number;
+  level: number;
+  levelProgress: number;
   onStartStudy: () => void;
 }
 
@@ -15,6 +18,9 @@ export function Dashboard({
   totalCards,
   studyCount,
   categoryBreakdown,
+  xp,
+  level,
+  levelProgress,
   onStartStudy,
 }: DashboardProps) {
   return (
@@ -38,6 +44,16 @@ export function Dashboard({
         <div className="stat">
           <span className="stat-value">{totalCards}</span>
           <span className="stat-label">Total</span>
+        </div>
+      </div>
+
+      <div className="xp-bar">
+        <div className="xp-header">
+          <span className="xp-level">Level {level}</span>
+          <span className="xp-amount">{xp} XP</span>
+        </div>
+        <div className="xp-track">
+          <div className="xp-fill" style={{ width: `${levelProgress * 100}%` }} />
         </div>
       </div>
 

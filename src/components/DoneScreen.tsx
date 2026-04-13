@@ -2,6 +2,7 @@ interface DoneScreenProps {
   streak: number;
   learnedCount: number;
   totalReviews: number;
+  sessionXp: number;
   onBack: () => void;
 }
 
@@ -9,6 +10,7 @@ export function DoneScreen({
   streak,
   learnedCount,
   totalReviews,
+  sessionXp,
   onBack,
 }: DoneScreenProps) {
   return (
@@ -31,6 +33,10 @@ export function DoneScreen({
           <div className="stat">
             <span className="stat-value">{totalReviews}</span>
             <span className="stat-label">Total reviews</span>
+          </div>
+          <div className="stat">
+            <span className="stat-value">+{sessionXp}</span>
+            <span className="stat-label">XP earned</span>
           </div>
         </div>
         <button className="btn-start" onClick={onBack}>
