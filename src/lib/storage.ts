@@ -49,6 +49,7 @@ export async function initApp(): Promise<{ cards: Card[]; state: AppState }> {
       totalReviews: 0,
       xp: 0,
     },
+    lessonProgress: existingState?.lessonProgress ?? {},
   };
 
   if (

@@ -16,7 +16,7 @@ export function DoneScreen({
   return (
     <div className="container">
       <header>
-        <h1>Flashcards</h1>
+        <h1>LearnPath</h1>
       </header>
       <div className="done-screen">
         <p className="done-icon">&#10003;</p>
