@@ -638,6 +638,218 @@ const evLesson: Lesson = {
 
 ---
 
+---
+
+## Language Learning Features (French)
+
+> Extends the app from concept cards to language learning. Designed for French but language-agnostic in implementation. Each feature maps to a learning science principle.
+
+### Gap: concept cards vs language cards
+
+| Dimension | Current (concept cards) | Needed (language cards) |
+|---|---|---|
+| Card model | `{ front, back, keyPoints[] }` | `{ word, sentence, translation, gender, pronunciation, audio, image, type }` |
+| Card types | Basic (front/back) | Vocabulary, sentence, cloze, reverse, listening, conjugation |
+| Media | Text only | Audio (TTS/recordings), images |
+| Metadata | `category` | `language`, `cefrLevel`, `gender`, `partOfSpeech`, `tags[]` |
+| Direction | One-way (Q→A) | Bidirectional (FR→EN recognition + EN→FR production) |
+| Grammar | Not applicable | Conjugation tables, agreement rules, cloze patterns |
+
+---
+
+### LP0 — Core Language Card Model
+
+#### L1. Extended Card Types
+**Science**: Different card types test different retrieval pathways.
+**What to build**:
+- Extend `Card` interface with optional language fields: `type`, `gender`, `article`, `pronunciation`, `sentence`, `sentenceTranslation`, `cefrLevel`, `clozeText`
+- Type aliases: `CardType = 'basic' | 'vocabulary' | 'cloze'`, `CEFRLevel`, `Gender`
+- Card renderer switches layout based on `type`:
+  - **vocabulary**: article + word with gender color coding (masculine = blue, feminine = pink), pronunciation (IPA), example sentence, TTS button
+  - **cloze**: parse `{{c1::answer}}` syntax, show blanks, typed answer with accent-lenient matching
+- Gender color coding: masculine = `--blue`, feminine = `#ec4899`
+- Article always shown with noun (never learn "maison", always "la maison")
+
+```typescript
+type CardType = 'basic' | 'vocabulary' | 'cloze';
+type CEFRLevel = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
+type Gender = 'masculine' | 'feminine';
+
+// Added as optional fields to existing Card interface
+interface Card {
+  // ... existing fields ...
+  type?: CardType;
+  deck?: string;
+  gender?: Gender;
+  article?: string;           // "la", "le", "l'", "un", "une"
+  pronunciation?: string;     // IPA: /mɛ.zɔ̃/
+  sentence?: string;          // "La maison est grande."
+  sentenceTranslation?: string; // "The house is big."
+  cefrLevel?: CEFRLevel;
+  clozeText?: string;         // "La {{c1::maison}} est grande."
+}
+```
+
+#### L2. Audio / Text-to-Speech
+**Science**: Connecting written and spoken forms strengthens encoding. Listening before reading prevents false pronunciation patterns.
+**What to build**:
+- `src/lib/tts.ts` — Web Speech API wrapper, zero dependencies
+  - `speak(text, lang = 'fr-FR', rate = 1.0)` using `speechSynthesis`
+  - `stopSpeaking()` to cancel
+- Play button on every card with French text (small speaker icon)
+- Auto-play audio on card front for listening cards (audio-only front)
+- Playback speed control: 0.75x / 1x / 1.25x
+- Future: option to use recorded audio files per card
+
+#### L3. Reverse / Bidirectional Cards
+**Science**: Recognition (FR→EN) and production (EN→FR) use different neural pathways. Production is harder but more useful for speaking.
+**What to build**:
+- Toggle per deck: "Generate reverse cards automatically"
+- For each vocabulary card, auto-generate a reverse card:
+  - **Recognition**: front = "la maison" → back = "the house"
+  - **Production**: front = "the house" → back = "la maison"
+- Reverse cards have independent SRS state
+- Badge both cards with a link icon so user knows they're paired
+
+#### L4. Cloze Deletion for Grammar
+**Science**: Producing the missing word from context forces deeper processing than recognition.
+**What to build**:
+- `src/components/ClozeCard.tsx` — cloze deletion card component
+- Parse `{{c1::answer}}` syntax from `card.clozeText`
+- Front: sentence with blank(s) styled as underlines
+- Input field for typing answer (integrates AccentKeyboard)
+- Accent-lenient comparison: `francais` matches `français` with warning
+- Multiple clozes per card: `{{c1::...}}`, `{{c2::...}}`
+- Pre-built cloze templates for grammar patterns:
+  - Article agreement: `"{{c1::La}} maison est grande"`
+  - Verb conjugation: `"Je {{c1::suis}} français"`
+  - Passé composé: `"Elle est {{c1::allée}} au cinéma"`
+
+---
+
+### LP1 — Content Organization
+
+#### L5. CEFR Level Tagging & Filtering
+**What to build**:
+- Every language card tagged with CEFR level (A1-C2)
+- Filter by level in study session
+- Dashboard shows progress per CEFR level: "A1: 85% learned, A2: 32% learned"
+- Visual CEFR badge on each card during review
+- Study mode: "Only A1 cards" or "A1 + A2" or "All"
+
+#### L6. Pre-Built French Decks (Starter Content)
+**What to build**:
+- **A1 Starter Deck**: ~120 cards organized by theme:
+  - Greetings & Politeness (15 cards)
+  - Numbers & Time (11 cards)
+  - Food & Restaurant (15 cards)
+  - Family & People (10 cards)
+  - Directions & Transport (8 cards)
+  - Essential Verbs (16 cards)
+  - Essential Phrases & Adjectives (32 cards)
+  - Places & Everyday (8 cards)
+- Mix of exerciseTypes: flashcard, mcq, fill-blank, cloze
+- Card format: vocabulary cards with sentence examples, gender, pronunciation, IPA
+- Integrated into learning path as a new "French A1" section with 7 lessons
+- IDs starting at 1000 to avoid conflicts
+- Future: A2, B1, B2 decks added progressively
+
+#### L7. Thematic Deck Organization
+**What to build**:
+- French section in learning path with themed lessons (Greetings, Food, Verbs, etc.)
+- Cross-lesson study: interleave cards from multiple lessons
+- Per-lesson progress: % of cards in "review" or "learned" state
+
+---
+
+### LP2 — Enhanced Study Modes
+
+#### L8. Listening Mode
+**Science**: Comprehension requires processing speech at speed.
+**What to build**:
+- Card type: `listening` — front shows only a play button (no text)
+- User listens, types or thinks of the meaning, then flips to see text + translation
+- Optional: typed answer comparison (fuzzy match for accents)
+- Playback speed selector: slow (0.7x) for beginners, normal for intermediate
+
+#### L9. Conjugation Drill Mode
+**What to build**:
+- Card type: `conjugation` — shows verb + tense + subject pronoun
+- Front: "aller — présent — je" → Back: "vais"
+- Drill mode: random pronoun for a given verb+tense
+- Pre-built conjugation data for top 50 French verbs × common tenses
+- Tenses: présent, passé composé, imparfait, futur simple, conditionnel, subjonctif
+
+#### L10. Typing Answer Mode
+**Science**: Typing forces generation, not just recognition.
+**What to build**:
+- Typing answer toggle (per session or global)
+- Answer comparison: exact match, accent-lenient mode, partial match highlighting
+- French accent keyboard toolbar: é è ê ë à â ç ù û ô î ï œ æ
+
+#### L11. French Accent Keyboard
+**What to build**:
+- `src/components/AccentKeyboard.tsx` — compact toolbar
+- Buttons for: é è ê ë à â ç ù û ô î ï œ æ
+- Tap to insert at cursor position
+- Auto-show when input is focused for French cards
+- Integrated into FillBlankCard and ClozeCard
+
+---
+
+### LP3 — Content Pipeline
+
+#### L12. AI Card Generation
+**What to build**:
+- "Generate cards" button in deck editor
+- Input: topic, level, count (e.g., "Food vocabulary, A1, 20 cards")
+- Uses Claude API to generate vocabulary + sentence cards
+- User reviews and edits before adding
+
+#### L13. Sentence Mining Import
+**What to build**:
+- Paste French text → highlight unknown words → generate cards with context
+- Import from subtitle files (.srt)
+
+#### L14. Frequency List Import
+**What to build**:
+- Built-in French frequency list (top 5000 words)
+- One-click "Add next 50 words from frequency list"
+- Skips words already in user's decks
+- Progress: "You know 1,247 / 5,000 most common French words"
+
+---
+
+### Language Feature Implementation Order
+
+| Priority | Feature | Depends on | Effort |
+|---|---|---|---|
+| **LP0** | L1. Extended card types | — | M |
+| **LP0** | L2. Audio / TTS | — | S |
+| **LP0** | L3. Reverse cards | L1 | M |
+| **LP0** | L4. Cloze deletion | — | M |
+| **LP1** | L5. CEFR tagging | L1 | S |
+| **LP1** | L6. French A1 starter deck | L1, L2 | L |
+| **LP1** | L7. Thematic organization | L6 | S |
+| **LP2** | L8. Listening mode | L2 | M |
+| **LP2** | L9. Conjugation drills | L1 | M |
+| **LP2** | L10. Typing answer mode | — | M |
+| **LP2** | L11. Accent keyboard | L10 | S |
+| **LP3** | L12. AI card generation | L1 | L |
+| **LP3** | L13. Sentence mining | L1 | L |
+| **LP3** | L14. Frequency list import | L6 | M |
+
+**S** = small (~1-2 hours), **M** = medium (~3-5 hours), **L** = large (~8+ hours)
+
+### Language Feature Sources
+- [Migaku — Flashcard Best Practices for Language Learning](https://migaku.com/blog/language-fun/flashcard-best-practices-language-learning)
+- [Speakada — How to Use Anki for French](https://speakada.com/how-to-use-anki-for-french/)
+- [Language Atlas — Best French Anki Decks 2025](https://languageatlas.com/anki/best-french-anki-decks/)
+- [Taalhammer — Best Language Learning Apps with Flashcards 2026](https://www.taalhammer.com/best-language-learning-apps-with-flashcards-in-2026-taalhammer-vs-anki-memrise-and-quizlet/)
+- [Joy of French — French Flashcard Guide 2026](https://joyoffrench.com/french-flashcards/)
+
+---
+
 ## Research Sources
 
 - Dunlosky et al. (2013). "Improving Students' Learning With Effective Learning Techniques" — [PubMed](https://pubmed.ncbi.nlm.nih.gov/26173288/)
