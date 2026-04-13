@@ -276,6 +276,108 @@ export const SECTIONS: Section[] = [
       },
     ],
   },
+
+  // === Section 7: French A1 ===
+  {
+    id: "french-a1",
+    title: "French A1",
+    description: "Survival French — greetings to everyday communication",
+    icon: "&#127467;&#127479;",
+    color: "#2563eb",
+    lessons: [
+      {
+        id: "fr-greetings",
+        sectionId: "french-a1",
+        title: "Greetings & Politeness",
+        description: "Hello, goodbye, please, thank you — the essentials",
+        cards: [1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014],
+        prerequisites: [],
+        concepts: [
+          "Bonjour, bonsoir, au revoir, salut",
+          "Merci, s'il vous plaît, excusez-moi",
+          "Introducing yourself: je m'appelle...",
+        ],
+      },
+      {
+        id: "fr-numbers",
+        sectionId: "french-a1",
+        title: "Numbers & Time",
+        description: "Counting, days, months, and telling time",
+        cards: [1015, 1016, 1017, 1018, 1019, 1020, 1021, 1022, 1023, 1024, 1025],
+        prerequisites: ["fr-greetings"],
+        concepts: [
+          "Numbers 1-100 (including 70, 80, 90 — the tricky ones)",
+          "Days of the week and months",
+          "Asking and telling time",
+        ],
+      },
+      {
+        id: "fr-food",
+        sectionId: "french-a1",
+        title: "Food & Restaurant",
+        description: "Ordering food, drinks, and asking for the check",
+        cards: [1026, 1027, 1028, 1029, 1030, 1031, 1032, 1033, 1034, 1035, 1036, 1037, 1038, 1039, 1040],
+        prerequisites: ["fr-greetings"],
+        concepts: [
+          "Common food vocabulary with gender (le/la)",
+          "Ordering: je voudrais..., s'il vous plaît",
+          "Asking for the check: l'addition",
+        ],
+      },
+      {
+        id: "fr-family",
+        sectionId: "french-a1",
+        title: "Family & People",
+        description: "Family members, describing people",
+        cards: [1041, 1042, 1043, 1044, 1045, 1046, 1047, 1048, 1049, 1050],
+        prerequisites: ["fr-greetings"],
+        concepts: [
+          "Family members: père, mère, frère, sœur",
+          "Gender pairs: un ami / une amie",
+          "Possessives: mon, ma, mes",
+        ],
+      },
+      {
+        id: "fr-directions",
+        sectionId: "french-a1",
+        title: "Directions & Transport",
+        description: "Getting around — where is...?, left, right, metro",
+        cards: [1051, 1052, 1053, 1054, 1055, 1056, 1057, 1058],
+        prerequisites: ["fr-numbers"],
+        concepts: [
+          "Asking: où est... ?",
+          "Directions: à gauche, à droite, tout droit",
+          "Transport: le métro, la gare, un billet",
+        ],
+      },
+      {
+        id: "fr-verbs",
+        sectionId: "french-a1",
+        title: "Essential Verbs",
+        description: "être, avoir, aller, faire — the foundation verbs",
+        cards: [1059, 1060, 1061, 1062, 1063, 1064, 1065, 1066, 1067, 1068, 1069, 1070, 1071, 1072, 1073, 1074],
+        prerequisites: ["fr-greetings"],
+        concepts: [
+          "être (to be) and avoir (to have) — full present tense",
+          "aller (to go) and faire (to do/make)",
+          "Regular -er verbs: parler, manger, aimer, habiter",
+        ],
+      },
+      {
+        id: "fr-phrases",
+        sectionId: "french-a1",
+        title: "Essential Phrases & Adjectives",
+        description: "Survival phrases, descriptions, and everyday expressions",
+        cards: [1075, 1076, 1077, 1078, 1079, 1080, 1081, 1082, 1083, 1084, 1085, 1086, 1087, 1088, 1089, 1090, 1091, 1092, 1093, 1094, 1095, 1096, 1097, 1098, 1099, 1100, 1101, 1102, 1103, 1104, 1105, 1106],
+        prerequisites: ["fr-verbs", "fr-food", "fr-directions"],
+        concepts: [
+          "Survival: je ne comprends pas, parlez-vous anglais ?",
+          "Descriptions: grand/petit, bon/mauvais, beau/belle",
+          "Places: la maison, la boulangerie, le supermarché",
+        ],
+      },
+    ],
+  },
 ];
 
 // All lessons flattened for easy lookup

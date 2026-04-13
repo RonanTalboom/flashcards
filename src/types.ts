@@ -1,4 +1,8 @@
-// === Cards (existing, extended) ===
+// === Card Types ===
+
+export type CardType = "basic" | "vocabulary" | "cloze";
+export type CEFRLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
+export type Gender = "masculine" | "feminine";
 
 export interface Card {
   id: number;
@@ -6,10 +10,23 @@ export interface Card {
   front: string;
   back: string;
   keyPoints: string[];
-  exerciseType?: "flashcard" | "mcq" | "fill-blank";
+
+  // Exercise variants
+  exerciseType?: "flashcard" | "mcq" | "fill-blank" | "cloze";
   choices?: string[];
-  correctAnswer?: number | string; // index for MCQ, string for fill-blank
-  image?: string; // inline SVG or URL
+  correctAnswer?: number | string;
+  image?: string;
+
+  // Language learning fields
+  type?: CardType;
+  deck?: string;
+  gender?: Gender;
+  article?: string;
+  pronunciation?: string;
+  sentence?: string;
+  sentenceTranslation?: string;
+  cefrLevel?: CEFRLevel;
+  clozeText?: string;
 }
 
 export interface CardState {
@@ -39,7 +56,7 @@ export interface Section {
   title: string;
   description: string;
   icon: string;
-  color: string; // CSS color for theming
+  color: string;
   lessons: Lesson[];
 }
 
@@ -48,10 +65,10 @@ export interface Lesson {
   sectionId: string;
   title: string;
   description: string;
-  image?: string; // SVG string for lesson header
-  cards: number[]; // card IDs
-  prerequisites: string[]; // lesson IDs
-  concepts: string[]; // key concepts shown in intro
+  image?: string;
+  cards: number[];
+  prerequisites: string[];
+  concepts: string[];
 }
 
 export interface LessonProgress {
