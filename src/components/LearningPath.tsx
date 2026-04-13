@@ -4,6 +4,7 @@ interface LearningPathProps {
   sections: Section[];
   lessonMastery: Record<string, MasteryLevel>;
   onSelectLesson: (lessonId: string) => void;
+  onBack?: () => void;
 }
 
 function MasteryNode({
@@ -104,11 +105,18 @@ export function LearningPath({
   sections,
   lessonMastery,
   onSelectLesson,
+  onBack,
 }: LearningPathProps) {
   return (
     <div className="container">
       <header>
+        {onBack && (
+          <button className="back-btn" onClick={onBack} aria-label="Back">
+            &#8592;
+          </button>
+        )}
         <h1>Learning Path</h1>
+        <span />
       </header>
 
       <div className="path-map">

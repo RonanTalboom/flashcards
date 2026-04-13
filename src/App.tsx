@@ -45,6 +45,7 @@ export function App() {
           sections={SECTIONS}
           lessonMastery={fc.lessonMastery}
           onSelectLesson={fc.selectLesson}
+          onBack={fc.backToDashboard}
         />
       );
 

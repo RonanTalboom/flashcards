@@ -19,10 +19,14 @@
   --green: #38a169;
   --blue: #4299e1;
   --radius: 12px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
 }
 
 html {
   font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -31,12 +35,16 @@ body {
   color: var(--text);
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .container {
   max-width: 480px;
   margin: 0 auto;
   padding: 24px 20px;
+  padding-top: calc(24px + var(--safe-top));
+  padding-bottom: calc(24px + var(--safe-bottom));
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -260,6 +268,8 @@ header h1 {
 .card-container {
   flex: 1;
   margin-bottom: 24px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .card-front,
@@ -270,6 +280,7 @@ header h1 {
   padding: 32px 24px;
   display: flex;
   flex-direction: column;
+  word-break: break-word;
 }
 
 .card-front {
@@ -324,6 +335,7 @@ header h1 {
 
 #controls {
   flex-shrink: 0;
+  padding-bottom: var(--safe-bottom);
 }
 
 .hint {
@@ -554,6 +566,9 @@ header h1 {
 .path-map {
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
 }
 
 .path-section {
@@ -998,6 +1013,8 @@ header h1 {
 
 .mcq-feedback {
   margin-top: 20px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .mcq-result {
@@ -1396,11 +1413,13 @@ header h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   padding: 10px 14px;
   background: rgba(56, 178, 172, 0.05);
   border-radius: 8px;
   margin-top: 12px;
+  word-break: break-word;
+  flex-wrap: wrap;
 }
 
 .vocab-sentence-text {
@@ -1422,11 +1441,11 @@ header h1 {
   background: none;
   border: 1px solid var(--border);
   color: var(--accent);
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   cursor: pointer;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1451,19 +1470,20 @@ header h1 {
 .accent-keyboard {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 6px;
   justify-content: center;
+  padding: 8px 0;
 }
 
 .accent-key {
-  width: 36px;
-  height: 34px;
+  min-width: 40px;
+  height: 40px;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 8px;
   background: var(--surface);
   color: var(--text);
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.1s;
   padding: 0;
@@ -1536,9 +1556,50 @@ header h1 {
 
 /* Mobile adjustments */
 
+@media (max-width: 480px) {
+  /* Pin action buttons to bottom on mobile for MCQ, fill-blank, cloze */
+  .mcq-continue,
+  .fill-continue,
+  .fill-check {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    margin-bottom: var(--safe-bottom);
+  }
+
+  /* Prevent text selection on buttons */
+  button {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Better active states for touch */
+  .rate-btn:active,
+  .mcq-choice:active:not(:disabled),
+  .btn-learn:active,
+  .btn-review:active,
+  .btn-start:active,
+  .path-node:active:not(:disabled),
+  .intro-start:active {
+    transform: scale(0.97);
+  }
+
+  /* Vocab sentence text wrap */
+  .vocab-sentence {
+    flex-wrap: wrap;
+    text-align: center;
+  }
+
+  .vocab-sentence-text {
+    word-break: break-word;
+  }
+}
+
 @media (max-width: 380px) {
   .container {
     padding: 16px 12px;
+    padding-top: calc(16px + var(--safe-top));
+    padding-bottom: calc(16px + var(--safe-bottom));
   }
 
   .card-text {
@@ -1547,6 +1608,22 @@ header h1 {
 
   .rate-label {
     font-size: 0.75rem;
+  }
+
+  .rate-btn {
+    padding: 12px 6px;
+  }
+
+  .stat {
+    padding: 12px 8px;
+  }
+
+  .stat-value {
+    font-size: 1.4rem;
+  }
+
+  .stat-label {
+    font-size: 0.65rem;
   }
 
   .path-node-circle {
@@ -1560,7 +1637,85 @@ header h1 {
     font-size: 0.85rem;
   }
 
+  .mcq-prompt {
+    font-size: 1rem;
+  }
+
   .intro-title {
     font-size: 1.3rem;
+  }
+
+  .intro-desc {
+    font-size: 0.85rem;
+  }
+
+  .intro-concept {
+    font-size: 0.8rem;
+    padding: 8px 12px;
+  }
+
+  .vocab-term {
+    font-size: 1.2rem;
+  }
+
+  .cloze-sentence {
+    font-size: 1rem;
+  }
+
+  .accent-key {
+    min-width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+  }
+
+  .dashboard-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .complete-stats {
+    gap: 24px;
+  }
+
+  .complete-score-value,
+  .complete-pct-value {
+    font-size: 1.5rem;
+  }
+}
+
+/* Extra small — iPhone SE, very narrow */
+@media (max-width: 340px) {
+  .stats-row {
+    gap: 8px;
+  }
+
+  .stat {
+    padding: 10px 6px;
+  }
+
+  .stat-value {
+    font-size: 1.2rem;
+  }
+
+  .rating-buttons {
+    gap: 6px;
+  }
+
+  .rate-btn {
+    padding: 10px 4px;
+  }
+
+  .rate-label {
+    font-size: 0.7rem;
+  }
+
+  .accent-keyboard {
+    gap: 4px;
+  }
+
+  .accent-key {
+    min-width: 32px;
+    height: 34px;
+    font-size: 0.85rem;
   }
 }
