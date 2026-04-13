@@ -1,0 +1,7 @@
+{
+  "name": "flashcards",
+  "compatibility_date": "2025-04-13",
+  "assets": {
+    "not_found_handling": "single-page-application"
+  }
+}
