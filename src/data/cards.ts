@@ -1,4 +1,6 @@
-export const CARDS = [
+import type { Card } from "../types";
+
+export const CARDS: Card[] = [
   // === DDIA — Data Systems ===
   {
     id: 1,
