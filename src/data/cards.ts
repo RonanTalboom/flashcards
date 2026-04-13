@@ -12,6 +12,14 @@ export const CARDS: Card[] = [
       "Tradeoffs are unavoidable: consistency vs. availability, latency vs. throughput, simplicity vs. flexibility",
       "Making tradeoffs explicit separates architecture from accidental complexity",
     ],
+    exerciseType: "mcq",
+    choices: [
+      "Follow industry best practices consistently",
+      "System design is fundamentally about tradeoffs",
+      "Always choose the most scalable solution",
+      "Optimize for performance above all else",
+    ],
+    correctAnswer: 1,
   },
   {
     id: 2,
@@ -23,6 +31,14 @@ export const CARDS: Card[] = [
       "Scalability: handles growth — not binary, but 'what are our options for coping?'",
       "Maintainability: operability (easy to run), simplicity (easy to understand), evolvability (easy to change)",
     ],
+    exerciseType: "mcq",
+    choices: [
+      "Speed, Security, and Simplicity",
+      "Reliability, Scalability, and Maintainability",
+      "Consistency, Availability, and Partition tolerance",
+      "Latency, Throughput, and Durability",
+    ],
+    correctAnswer: 1,
   },
   {
     id: 3,
@@ -34,6 +50,8 @@ export const CARDS: Card[] = [
       "Partitioning: split data so each machine holds a subset — key selection determines query patterns",
       "Usually combined: each partition is replicated across multiple nodes",
     ],
+    exerciseType: "fill-blank",
+    correctAnswer: "replication",
   },
   {
     id: 4,
@@ -72,6 +90,14 @@ export const CARDS: Card[] = [
       "It's not 'pick 2 of 3' — it's 'during a partition, sacrifice C or A'",
       "CAP says nothing about normal operation — that's where PACELC matters",
     ],
+    exerciseType: "mcq",
+    choices: [
+      "Pick any 2 of Consistency, Availability, and Partition tolerance",
+      "During a partition, choose between Consistency and Availability",
+      "You can have all three if you use the right database",
+      "Consistency and Availability are always in conflict",
+    ],
+    correctAnswer: 1,
   },
   {
     id: 7,
@@ -96,6 +122,8 @@ export const CARDS: Card[] = [
       "A 2f+1 cluster tolerates f failures (5 nodes → 2 can fail)",
       "Used by: etcd, Consul, TiKV, CockroachDB, Kafka metadata",
     ],
+    exerciseType: "fill-blank",
+    correctAnswer: "consensus",
   },
 
   // === Architectural Patterns ===
@@ -146,6 +174,14 @@ export const CARDS: Card[] = [
       "Challenges: schema evolution, eventual consistency, unbounded log growth, GDPR conflicts",
       "Best for: financial systems, order management, compliance — overkill for simple CRUD",
     ],
+    exerciseType: "mcq",
+    choices: [
+      "Store the latest state snapshot in a mutable database",
+      "Store state as a chronological, append-only sequence of events",
+      "Cache frequently accessed data in memory",
+      "Replicate state across multiple data centers",
+    ],
+    correctAnswer: 1,
   },
   {
     id: 13,
@@ -222,6 +258,8 @@ export const CARDS: Card[] = [
       "Unused budget means the team could be shipping faster",
       "Aligns incentives: product teams and ops teams share the same number",
     ],
+    exerciseType: "fill-blank",
+    correctAnswer: "error budget",
   },
   {
     id: 19,
@@ -272,6 +310,14 @@ export const CARDS: Card[] = [
       "Both are high utility because they generalize across ages, materials, and testing formats",
       "Combined in flashcard apps like Anki: each review is both a recall event and a spacing event",
     ],
+    exerciseType: "mcq",
+    choices: [
+      "Highlighting and re-reading",
+      "Spaced repetition and active recall",
+      "Summarization and note-taking",
+      "Imagery and keyword mnemonics",
+    ],
+    correctAnswer: 1,
   },
   {
     id: 23,
@@ -394,6 +440,14 @@ export const CARDS: Card[] = [
       "Constant volatility assumption is the weakest — real markets show volatility smile/skew",
       "Won Scholes and Merton the 1997 Nobel; still the lingua franca of options pricing despite limitations",
     ],
+    exerciseType: "mcq",
+    choices: [
+      "Constant volatility, no dividends, continuous trading, no arbitrage",
+      "Variable volatility, dividends included, discrete trading, no arbitrage",
+      "Constant volatility, dividends included, continuous trading, arbitrage allowed",
+      "Stochastic volatility, no dividends, continuous trading, no arbitrage",
+    ],
+    correctAnswer: 0,
   },
   {
     id: 33,
@@ -406,6 +460,8 @@ export const CARDS: Card[] = [
       "Theta: time decay — options lose value every day, accelerating near expiry (the 'rent' of owning options)",
       "Vega: sensitivity to implied vol — a 1% vol increase changes the option price by vega dollars",
     ],
+    exerciseType: "fill-blank",
+    correctAnswer: "delta",
   },
   {
     id: 34,
