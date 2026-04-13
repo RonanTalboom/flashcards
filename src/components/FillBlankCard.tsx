@@ -1,11 +1,16 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import type { Card } from "../types";
+import { AccentKeyboard } from "./AccentKeyboard";
 
 interface FillBlankCardProps {
   card: Card;
   currentIndex: number;
   queueLength: number;
   onAnswer: (correct: boolean) => void;
+}
+
+function normalizeAccents(s: string): string {
+  return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 }
 
 export function FillBlankCard({
@@ -17,15 +22,17 @@ export function FillBlankCard({
   const [input, setInput] = useState("");
   const [answered, setAnswered] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const correctAnswer =
     typeof card.correctAnswer === "string" ? card.correctAnswer : "";
+  const isFrench = card.deck?.startsWith("french") || card.cefrLevel != null;
 
   function handleCheck() {
     if (!input.trim() || answered) return;
-    const correct =
-      input.trim().toLowerCase() === correctAnswer.trim().toLowerCase();
-    setIsCorrect(correct);
+    const exact = input.trim().toLowerCase() === correctAnswer.trim().toLowerCase();
+    const lenient = isFrench && normalizeAccents(input.trim()) === normalizeAccents(correctAnswer.trim());
+    setIsCorrect(exact || lenient);
     setAnswered(true);
   }
 
@@ -39,13 +46,31 @@ export function FillBlankCard({
     }
   }
 
+  function handleAccentInsert(char: string) {
+    if (!inputRef.current) return;
+    const el = inputRef.current;
+    const start = el.selectionStart ?? input.length;
+    const end = el.selectionEnd ?? input.length;
+    const newVal = input.slice(0, start) + char + input.slice(end);
+    setInput(newVal);
+    requestAnimationFrame(() => {
+      el.focus();
+      el.setSelectionRange(start + 1, start + 1);
+    });
+  }
+
   return (
     <div className="container">
       <header>
         <span className="progress">
           {currentIndex + 1} / {queueLength}
         </span>
-        <span className="category-badge">{card.category}</span>
+        <div className="header-badges">
+          {card.cefrLevel && (
+            <span className="cefr-badge">{card.cefrLevel}</span>
+          )}
+          <span className="category-badge">{card.category}</span>
+        </div>
       </header>
 
       <div className="fill-question">
@@ -54,6 +79,7 @@ export function FillBlankCard({
 
       <div className="fill-input-area">
         <input
+          ref={inputRef}
           type="text"
           className={`fill-input${answered ? (isCorrect ? " fill-input--correct" : " fill-input--incorrect") : ""}`}
           placeholder="Type your answer..."
@@ -63,6 +89,7 @@ export function FillBlankCard({
           disabled={answered}
           autoFocus
         />
+        {!answered && isFrench && <AccentKeyboard onInsert={handleAccentInsert} />}
         {!answered && (
           <button
             className="fill-check"
