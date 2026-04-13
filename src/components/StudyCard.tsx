@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Card } from "../types";
 
 interface StudyCardProps {
@@ -17,6 +18,8 @@ export function StudyCard({
   onFlip,
   onRate,
 }: StudyCardProps) {
+  const [selfAnswer, setSelfAnswer] = useState("");
+
   return (
     <div className="container">
       <header>
@@ -30,8 +33,21 @@ export function StudyCard({
         <div className={`card-inner${isFlipped ? " flipped" : ""}`}>
           <div className="card-front">
             <p className="card-text">{card.front}</p>
+            <textarea
+              className="self-answer-input"
+              placeholder="Type your thoughts..."
+              value={selfAnswer}
+              onChange={(e) => setSelfAnswer(e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+            />
           </div>
           <div className="card-back">
+            {selfAnswer && (
+              <div className="self-answer-review">
+                <span className="self-answer-label">Your answer</span>
+                <p className="self-answer-text">{selfAnswer}</p>
+              </div>
+            )}
             <p className="card-answer">{card.back}</p>
             <ul className="key-points">
               {card.keyPoints.map((point, i) => (

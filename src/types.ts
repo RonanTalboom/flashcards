@@ -17,6 +17,7 @@ export interface Stats {
   streak: number;
   lastReviewDate: string | null;
   totalReviews: number;
+  xp: number;
 }
 
 export interface AppState {

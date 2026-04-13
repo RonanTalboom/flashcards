@@ -17,6 +17,9 @@ export function App() {
           totalCards={fc.totalCards}
           studyCount={fc.studyCount}
           categoryBreakdown={fc.categoryBreakdown}
+          xp={fc.xp}
+          level={fc.level}
+          levelProgress={fc.levelProgress}
           onStartStudy={fc.startStudy}
         />
       );
@@ -24,6 +27,7 @@ export function App() {
     case "study":
       return fc.currentCard ? (
         <StudyCard
+          key={fc.currentCard.id}
           card={fc.currentCard}
           isFlipped={fc.isFlipped}
           currentIndex={fc.currentIndex}
@@ -39,6 +43,7 @@ export function App() {
           streak={fc.state.stats.streak}
           learnedCount={fc.learnedCount}
           totalReviews={fc.state.stats.totalReviews}
+          sessionXp={fc.sessionXp}
           onBack={fc.backToDashboard}
         />
       );

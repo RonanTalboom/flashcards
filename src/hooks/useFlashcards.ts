@@ -14,6 +14,14 @@ export function useFlashcards() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [view, setView] = useState<View>("dashboard");
+  const [sessionXp, setSessionXp] = useState(0);
+
+  const XP_PER_GRADE: Record<number, number> = { 0: 2, 2: 5, 4: 10, 5: 15 };
+
+  const getLevel = (xp: number) =>
+    Math.floor((1 + Math.sqrt(1 + (4 * xp) / 25)) / 2);
+
+  const levelThreshold = (n: number) => 25 * n * (n - 1);
 
   const getDueCards = useCallback(() => {
     const t = today();
@@ -56,7 +64,20 @@ export function useFlashcards() {
     });
 
     const cappedNew = newCards.slice(0, MAX_NEW_PER_SESSION);
+
+    // Adaptive difficulty: sort review cards by easeFactor ascending (harder cards first)
+    reviewCards.sort((a, b) => state.cards[a.id].easeFactor - state.cards[b.id].easeFactor);
+
     const newQueue = [...reviewCards, ...cappedNew];
+
+    // Interleave: shuffle within chunks of 4 to mix categories while preserving difficulty bias
+    for (let i = 0; i < newQueue.length; i += 4) {
+      const end = Math.min(i + 4, newQueue.length);
+      for (let j = end - 1; j > i; j--) {
+        const k = i + Math.floor(Math.random() * (j - i + 1));
+        [newQueue[j], newQueue[k]] = [newQueue[k], newQueue[j]];
+      }
+    }
 
     if (newQueue.length === 0) return;
 
@@ -79,6 +100,7 @@ export function useFlashcards() {
     setQueue(newQueue);
     setCurrentIndex(0);
     setIsFlipped(false);
+    setSessionXp(0);
     setView("study");
   }, [getDueCards, state]);
 
@@ -96,8 +118,11 @@ export function useFlashcards() {
         cards: { ...state.cards, [card.id]: updated },
         stats: { ...state.stats, totalReviews: state.stats.totalReviews + 1 },
       };
+      const earned = XP_PER_GRADE[grade] ?? 5;
+      newState.stats = { ...newState.stats, xp: newState.stats.xp + earned };
       saveState(newState);
       setState(newState);
+      setSessionXp((prev) => prev + earned);
 
       const newQueue = [...queue];
       if (grade < 3) {
@@ -126,6 +151,10 @@ export function useFlashcards() {
   const currentCard = queue[currentIndex] ?? null;
   const dueCards = getDueCards();
 
+  const currentLevel = getLevel(state.stats.xp);
+  const lvlStart = levelThreshold(currentLevel);
+  const lvlSize = 50 * currentLevel;
+
   return {
     view,
     state,
@@ -143,6 +172,10 @@ export function useFlashcards() {
       MAX_NEW_PER_SESSION +
         dueCards.filter((c) => state.cards[c.id].repetitions > 0).length
     ),
+    sessionXp,
+    xp: state.stats.xp,
+    level: currentLevel,
+    levelProgress: lvlSize > 0 ? (state.stats.xp - lvlStart) / lvlSize : 0,
     startStudy,
     flipCard,
     rateCard,
