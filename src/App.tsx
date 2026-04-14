@@ -10,6 +10,11 @@ import { LessonComplete } from "./components/LessonComplete";
 import { ClozeCard } from "./components/ClozeCard";
 import { MathCard } from "./components/MathCard";
 import { InteractiveCard } from "./components/InteractiveCard";
+import { SpeedReview } from "./components/SpeedReview";
+import { MatchGame } from "./components/MatchGame";
+import { QuizMode } from "./components/QuizMode";
+import { StatsView } from "./components/StatsView";
+import { SessionProgressBar } from "./components/SessionProgressBar";
 import { SECTIONS, getSectionByLessonId } from "./data/lessons";
 import "./index.css";
 
@@ -29,6 +34,8 @@ export function App() {
       return (
         <Dashboard
           streak={fc.streak}
+          longestStreak={fc.longestStreak}
+          streakFreezes={fc.streakFreezes}
           dueCount={fc.dueCount}
           learnedCount={fc.learnedCount}
           totalCards={fc.totalCards}
@@ -38,6 +45,15 @@ export function App() {
           levelProgress={fc.levelProgress}
           onLearn={fc.viewPath}
           onReview={() => fc.startStudy()}
+          todayReviewCount={fc.todayReviewCount}
+          dailyGoal={fc.dailyGoal}
+          difficultCount={fc.difficultCount}
+          reviewLog={fc.reviewLog}
+          onDifficultReview={fc.startDifficultReview}
+          onSpeedReview={fc.startSpeedReview}
+          onMatchGame={fc.startMatchGame}
+          onQuizMode={fc.startQuizMode}
+          onStats={fc.viewStats}
         />
       );
 
@@ -73,49 +89,61 @@ export function App() {
 
       if (exerciseType === "mcq") {
         return (
-          <MCQCard
-            key={fc.currentCard.id}
-            card={fc.currentCard}
-            currentIndex={fc.currentIndex}
-            queueLength={fc.queueLength}
-            onAnswer={fc.answerCard}
-          />
+          <>
+            <SessionProgressBar current={fc.currentIndex} total={fc.queueLength} />
+            <MCQCard
+              key={fc.currentCard.id}
+              card={fc.currentCard}
+              currentIndex={fc.currentIndex}
+              queueLength={fc.queueLength}
+              onAnswer={fc.answerCard}
+            />
+          </>
         );
       }
 
       if (exerciseType === "fill-blank") {
         return (
-          <FillBlankCard
-            key={fc.currentCard.id}
-            card={fc.currentCard}
-            currentIndex={fc.currentIndex}
-            queueLength={fc.queueLength}
-            onAnswer={fc.answerCard}
-          />
+          <>
+            <SessionProgressBar current={fc.currentIndex} total={fc.queueLength} />
+            <FillBlankCard
+              key={fc.currentCard.id}
+              card={fc.currentCard}
+              currentIndex={fc.currentIndex}
+              queueLength={fc.queueLength}
+              onAnswer={fc.answerCard}
+            />
+          </>
         );
       }
 
       if (exerciseType === "cloze") {
         return (
-          <ClozeCard
-            key={fc.currentCard.id}
-            card={fc.currentCard}
-            currentIndex={fc.currentIndex}
-            queueLength={fc.queueLength}
-            onAnswer={fc.answerCard}
-          />
+          <>
+            <SessionProgressBar current={fc.currentIndex} total={fc.queueLength} />
+            <ClozeCard
+              key={fc.currentCard.id}
+              card={fc.currentCard}
+              currentIndex={fc.currentIndex}
+              queueLength={fc.queueLength}
+              onAnswer={fc.answerCard}
+            />
+          </>
         );
       }
 
       if (exerciseType === "math") {
         return (
-          <MathCard
-            key={fc.currentCard.id}
-            card={fc.currentCard}
-            currentIndex={fc.currentIndex}
-            queueLength={fc.queueLength}
-            onAnswer={fc.answerCard}
-          />
+          <>
+            <SessionProgressBar current={fc.currentIndex} total={fc.queueLength} />
+            <MathCard
+              key={fc.currentCard.id}
+              card={fc.currentCard}
+              currentIndex={fc.currentIndex}
+              queueLength={fc.queueLength}
+              onAnswer={fc.answerCard}
+            />
+          </>
         );
       }
 
@@ -139,12 +167,63 @@ export function App() {
           isFlipped={fc.isFlipped}
           currentIndex={fc.currentIndex}
           queueLength={fc.queueLength}
+          comboCount={fc.comboCount}
           onFlip={fc.flipCard}
           onRate={fc.rateCard}
           onBack={fc.isLessonMode ? fc.backToPath : undefined}
         />
       );
     }
+
+    case "speed-review": {
+      return (
+        <SpeedReview
+          cards={fc.allCards.filter((c) => {
+            const s = fc.cardStates[c.id];
+            return s && s.nextReviewDate <= new Date().toISOString().slice(0, 10);
+          }).slice(0, 20)}
+          onRate={fc.rateCard}
+          onBack={fc.backToDashboard}
+          currentIndex={fc.currentIndex}
+          queueLength={fc.queueLength}
+        />
+      );
+    }
+
+    case "match-game":
+      return (
+        <MatchGame
+          cards={fc.allCards.filter((c) => fc.cardStates[c.id]?.repetitions > 0).slice(0, 30)}
+          onBack={fc.backToDashboard}
+          onComplete={fc.updateMatchBestTime}
+          bestTime={fc.matchBestTime}
+        />
+      );
+
+    case "quiz-mode":
+      return (
+        <QuizMode
+          cards={fc.allCards.filter((c) => fc.cardStates[c.id]?.repetitions > 0)}
+          onBack={fc.backToDashboard}
+        />
+      );
+
+    case "stats":
+      return (
+        <StatsView
+          reviewLog={fc.reviewLog}
+          retentionRate={fc.retentionRate}
+          cardStateCounts={fc.cardStateCounts}
+          hardestCards={fc.hardestCards}
+          cardStates={fc.cardStates}
+          reviewForecast={fc.reviewForecast}
+          streak={fc.streak}
+          longestStreak={fc.longestStreak}
+          totalReviews={fc.totalReviews}
+          leechCount={fc.leechCount}
+          onBack={fc.backToDashboard}
+        />
+      );
 
     case "lesson-complete":
       return (
@@ -164,6 +243,7 @@ export function App() {
           learnedCount={fc.learnedCount}
           totalReviews={fc.totalReviews}
           sessionXp={fc.sessionXp}
+          bestCombo={fc.bestCombo}
           onBack={fc.backToDashboard}
         />
       );

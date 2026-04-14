@@ -1,13 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Card } from "../types";
 import { speak } from "../lib/tts";
 import { Latex } from "./Latex";
+import { ComboCounter } from "./ComboCounter";
+import { SessionProgressBar } from "./SessionProgressBar";
 
 interface StudyCardProps {
   card: Card;
   isFlipped: boolean;
   currentIndex: number;
   queueLength: number;
+  comboCount: number;
   onFlip: () => void;
   onRate: (grade: number) => void;
   onBack?: () => void;
@@ -34,6 +37,7 @@ export function StudyCard({
   isFlipped,
   currentIndex,
   queueLength,
+  comboCount,
   onFlip,
   onRate,
   onBack,
@@ -41,6 +45,29 @@ export function StudyCard({
   const [selfAnswer, setSelfAnswer] = useState("");
   const isVocab = card.type === "vocabulary";
   const genderClass = card.gender === "feminine" ? "card-feminine" : card.gender === "masculine" ? "card-masculine" : "";
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      // Don't capture when typing in an input
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+
+      if (e.code === "Space") {
+        e.preventDefault();
+        if (!isFlipped) onFlip();
+      } else if (isFlipped) {
+        if (e.key === "1") onRate(0);      // Again
+        else if (e.key === "2") onRate(2); // Hard
+        else if (e.key === "3") onRate(4); // Good
+        else if (e.key === "4") onRate(5); // Easy
+      } else if (e.key === "Escape" && onBack) {
+        onBack();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [isFlipped, onFlip, onRate, onBack]);
 
   return (
     <div className="container">
@@ -55,12 +82,15 @@ export function StudyCard({
           </span>
         )}
         <div className="header-badges">
+          <ComboCounter count={comboCount} />
           {card.cefrLevel && (
             <span className="cefr-badge">{card.cefrLevel}</span>
           )}
           <span className="category-badge">{card.category}</span>
         </div>
       </header>
+
+      <SessionProgressBar current={currentIndex} total={queueLength} />
 
       <div className="card-container" onClick={!isFlipped ? onFlip : undefined}>
         {!isFlipped ? (
@@ -130,19 +160,23 @@ export function StudyCard({
           <div className="rating-buttons">
             <button className="rate-btn rate-again" onClick={() => onRate(0)}>
               <span className="rate-label">Again</span>
+              <span className="rate-key">1</span>
             </button>
             <button className="rate-btn rate-hard" onClick={() => onRate(2)}>
               <span className="rate-label">Hard</span>
+              <span className="rate-key">2</span>
             </button>
             <button className="rate-btn rate-good" onClick={() => onRate(4)}>
               <span className="rate-label">Good</span>
+              <span className="rate-key">3</span>
             </button>
             <button className="rate-btn rate-easy" onClick={() => onRate(5)}>
               <span className="rate-label">Easy</span>
+              <span className="rate-key">4</span>
             </button>
           </div>
         ) : (
-          <p className="hint">{isVocab ? "Tap to see translation" : "Tap to reveal"}</p>
+          <p className="hint">{isVocab ? "Tap to see translation" : "Tap or press Space to reveal"}</p>
         )}
       </div>
     </div>
