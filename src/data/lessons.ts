@@ -290,7 +290,7 @@ export const SECTIONS: Section[] = [
         sectionId: "pm-trading",
         title: "Expected Value",
         description: "The single most important formula in trading",
-        cards: [100, 200, 201, 202, 203],
+        cards: [100, 300, 200, 201, 202, 203],
         prerequisites: [],
         concepts: [
           "EV = (win_prob x profit) - (loss_prob x loss)",
@@ -303,7 +303,7 @@ export const SECTIONS: Section[] = [
         sectionId: "pm-trading",
         title: "Kelly Criterion",
         description: "Optimal position sizing for maximum growth",
-        cards: [101, 204, 205, 206],
+        cards: [101, 301, 204, 205, 206],
         prerequisites: ["pm-expected-value"],
         concepts: [
           "f* = (p*b - q) / b",
@@ -316,7 +316,7 @@ export const SECTIONS: Section[] = [
         sectionId: "pm-trading",
         title: "Bayesian Updates",
         description: "Update beliefs with evidence, not emotion",
-        cards: [102, 103, 207, 208, 209],
+        cards: [102, 103, 302, 207, 208, 209],
         prerequisites: ["pm-expected-value"],
         concepts: [
           "P(H|E) = P(E|H) * P(H) / P(E)",
@@ -329,7 +329,7 @@ export const SECTIONS: Section[] = [
         sectionId: "pm-trading",
         title: "Calibration & Scoring",
         description: "Measure how good your predictions actually are",
-        cards: [105, 142, 210, 211],
+        cards: [105, 303, 142, 210, 211],
         prerequisites: ["pm-bayes"],
         concepts: [
           "Brier Score: 0 = perfect, 0.25 = coin flip",
@@ -342,7 +342,7 @@ export const SECTIONS: Section[] = [
         sectionId: "pm-trading",
         title: "Market Structure & VPIN",
         description: "How order books and toxic flow work",
-        cards: [120, 121, 130, 212, 213],
+        cards: [120, 121, 304, 130, 212, 213],
         prerequisites: ["pm-expected-value"],
         concepts: [
           "CLOB: bid/ask matching with YES + NO = $1.00",

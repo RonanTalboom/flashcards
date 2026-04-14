@@ -1,0 +1,76 @@
+import type { Card } from "../types";
+
+export const QUANT_INTERACTIVE_CARDS: Card[] = [
+  {
+    id: 300,
+    category: "Interactive",
+    exerciseType: "interactive",
+    plotType: "ev-calculator",
+    front: "Explore: How does changing the contract price and your model probability affect Expected Value? At what point does EV cross zero?",
+    back: "EV crosses zero when your model probability equals the contract price. Above that line, you have edge. Below it, you're giving money away.",
+    keyPoints: [
+      "The breakeven probability always equals the contract price",
+      "Cheap contracts (low price) need less conviction to be +EV",
+      "Expensive contracts (high price) need very high probability to justify entry",
+      "The slope of the EV line tells you how sensitive your edge is to probability errors",
+    ],
+  },
+  {
+    id: 301,
+    category: "Interactive",
+    exerciseType: "interactive",
+    plotType: "kelly-curve",
+    front: "Explore: What happens to the Kelly Criterion as you increase the payout ratio? What happens at 2x Kelly?",
+    back: "Higher payouts increase the optimal Kelly fraction, but the growth curve becomes steeper on both sides — more upside, but more catastrophic downside. At 2x Kelly, expected growth drops to zero.",
+    keyPoints: [
+      "The growth curve is always concave — there's exactly one peak (Kelly)",
+      "Right of the peak, growth drops rapidly — overbetting destroys wealth",
+      "At 2x Kelly, growth rate = 0 (you keep what you started with, on average)",
+      "Beyond 2x Kelly, you're mathematically guaranteed to go broke long-term",
+      "Quarter-Kelly (the peak divided by 4) sacrifices ~25% growth for much higher survival",
+    ],
+  },
+  {
+    id: 302,
+    category: "Interactive",
+    exerciseType: "interactive",
+    plotType: "bayes-updater",
+    front: "Explore: How does the strength of evidence affect a Bayesian update? What happens when the false positive rate is high?",
+    back: "Strong evidence (high sensitivity, low false positive) causes large updates. Weak evidence barely moves the needle. The likelihood ratio \\(\\frac{P(E|H)}{P(E|\\neg H)}\\) is what determines update strength.",
+    keyPoints: [
+      "High sensitivity + low false positive = strong evidence → large update",
+      "If false positive rate equals sensitivity, the evidence is useless (likelihood ratio = 1)",
+      "A low prior requires much stronger evidence to reach high posterior",
+      "This is why smart traders don't panic-buy on rumors — they check the likelihood ratio first",
+    ],
+  },
+  {
+    id: 303,
+    category: "Interactive",
+    exerciseType: "interactive",
+    plotType: "brier-score",
+    front: "Explore: How does the Brier Score penalty change as you move your forecast? Why does high confidence on a wrong prediction hurt so much?",
+    back: "Brier Score is quadratic — the penalty grows as the square of your error. Being 80% confident and wrong (score: 0.64) is 16x worse than being 80% confident and right (score: 0.04).",
+    keyPoints: [
+      "The green curve (event happens) rewards high-probability forecasts",
+      "The red curve (event doesn't happen) punishes high-probability forecasts",
+      "At 50%, both curves meet at 0.25 — the coin-flip baseline",
+      "Overconfidence on wrong predictions is catastrophically expensive",
+      "Good calibration means your 70% forecasts happen ~70% of the time",
+    ],
+  },
+  {
+    id: 304,
+    category: "Interactive",
+    exerciseType: "interactive",
+    plotType: "vpin-gauge",
+    front: "Explore: How does the balance between buy and sell volume affect VPIN? When should a market maker exit?",
+    back: "VPIN measures order flow imbalance. When one side dominates (informed traders moving aggressively), VPIN spikes above 0.70 — the kill-switch threshold for market makers.",
+    keyPoints: [
+      "Equal buy/sell volume → VPIN = 0 (perfectly balanced, safe)",
+      "All volume on one side → VPIN = 1.0 (maximally toxic)",
+      "0.70 threshold: above this, informed traders are likely active — exit immediately",
+      "VPIN predicted the 2010 Flash Crash an hour before it happened",
+    ],
+  },
+];

@@ -3,6 +3,7 @@ import { today } from "./sm2";
 import { FRENCH_A1_CARDS } from "../data/french-a1";
 import { QUANT_CARDS } from "../data/quant-cards";
 import { QUANT_MATH_CARDS } from "../data/quant-math-cards";
+import { QUANT_INTERACTIVE_CARDS } from "../data/quant-interactive-cards";
 
 export async function loadCards(): Promise<Card[]> {
   const res = await fetch("/api/cards");
@@ -12,7 +13,8 @@ export async function loadCards(): Promise<Card[]> {
   const frenchCards = FRENCH_A1_CARDS.filter((c) => !apiIds.has(c.id));
   const quantCards = QUANT_CARDS.filter((c) => !apiIds.has(c.id));
   const mathCards = QUANT_MATH_CARDS.filter((c) => !apiIds.has(c.id));
-  return [...apiCards, ...frenchCards, ...quantCards, ...mathCards];
+  const interactiveCards = QUANT_INTERACTIVE_CARDS.filter((c) => !apiIds.has(c.id));
+  return [...apiCards, ...frenchCards, ...quantCards, ...mathCards, ...interactiveCards];
 }
 
 async function loadState(): Promise<AppState | null> {
