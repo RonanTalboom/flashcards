@@ -378,6 +378,56 @@ export const SECTIONS: Section[] = [
       },
     ],
   },
+
+  // === Section 8: Interactive Playground ===
+  {
+    id: "interactive",
+    title: "Interactive Playground",
+    description: "Math sliders and live simulators — play with the numbers",
+    icon: "&#128200;",
+    color: "#f59e0b",
+    lessons: [
+      {
+        id: "interactive-quant",
+        sectionId: "interactive",
+        title: "Quant Simulators",
+        description: "Expected value, Kelly sizing, and compound growth",
+        cards: [2001, 2002, 2003],
+        prerequisites: [],
+        concepts: [
+          "Drag the sliders to flip EV from negative to positive",
+          "Kelly maximizes log-wealth growth; 2× Kelly destroys it",
+          "Compound growth is exponential, not linear",
+        ],
+      },
+      {
+        id: "interactive-systems",
+        sectionId: "interactive",
+        title: "Systems Math",
+        description: "Replica availability and tail-latency amplification",
+        cards: [2004, 2006],
+        prerequisites: [],
+        concepts: [
+          "Each replica adds roughly one 'nine' of availability",
+          "Tail latency dominates at high fan-out",
+          "P(any slow) = 1 − (1 − p)ⁿ",
+        ],
+      },
+      {
+        id: "interactive-stats",
+        sectionId: "interactive",
+        title: "Statistical Intuition",
+        description: "Binomial distribution and the Law of Large Numbers",
+        cards: [2005],
+        prerequisites: [],
+        concepts: [
+          "Mean = np, variance = np(1−p)",
+          "Short sequences have huge variance",
+          "Normal approximation kicks in as n grows",
+        ],
+      },
+    ],
+  },
 ];
 
 // All lessons flattened for easy lookup

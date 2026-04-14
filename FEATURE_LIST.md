@@ -400,6 +400,40 @@ interface Settings {
 - Enter: submit answer / start study
 - Escape: back to dashboard
 
+#### M1. Multiple Choice Questions (MCQ) — **implemented**
+**Science**: Practice testing (d=0.56, high-utility) + immediate elaborated feedback. Forces discrimination between confusable options, which is stronger retrieval than free recall alone.
+**What's built**:
+- `exerciseType: "mcq"` on any `Card`, with `choices: string[]` and `correctAnswer: number` (index of correct option)
+- `src/components/MCQCard.tsx`: A/B/C/D options, tap-to-select, green/red feedback, correct option always revealed on answer
+- Incorrect first try still shows the correct choice alongside the user's pick (dimmed) plus the card's `back` as elaborated explanation
+- `useFlashcards.answerCard(correct)` maps result to SM-2 grade (4 if correct, 1 if incorrect) and awards 10 / 2 XP
+- Wired into `App.tsx` exerciseType switch alongside `fill-blank`, `cloze`, and default `flashcard`
+- Available in both review mode and lesson mode (lesson correctness counter updated)
+**Authoring**: mix MCQ cards freely with flashcard/fill-blank/cloze in the same lesson — exercise type is per-card, so a single lesson can interleave concept recall, recognition, and production.
+
+#### M2. Interactive Widgets — Stats, Math Sliders, Simulators
+**Science**: Brilliant-style interactive manipulation produces stronger intuition than passive text. Dual coding (visual + numeric) + generation (moving a slider is a lightweight form of "what if?" generation) + immediate feedback on every frame. Converts abstract formulas into grabbable objects.
+**What to build**:
+- New `exerciseType: "interactive"` on `Card`, with a `widget` discriminator that names the simulation to render
+- Shared `InteractiveCard.tsx` shell: prompt + widget body + "Got it" button; completion is self-rated (no wrong answer, just exploration), awarding fixed XP
+- Built-in widget library (pure React, no deps):
+
+| Widget | Sliders | Live Outputs | Learning Goal |
+|---|---|---|---|
+| `expected-value` | win_prob (0-1), win_payoff ($), loss_payoff ($) | EV = p·win − (1−p)·loss, colored green/red; break-even probability | Quant / prediction markets intuition |
+| `kelly` | edge probability, odds | Optimal fraction f* = p − (1−p)/b; growth rate under full / half / double Kelly | Position sizing, why 2× Kelly ruins |
+| `compound-growth` | principal, annual rate (%), years | Final value, CAGR table, inline sparkline of growth curve | Exponential vs. linear intuition |
+| `availability` | per-node availability (0.9-0.9999), replica count N | P(system up) for parallel replicas (1 − (1−A)ⁿ), expected downtime/year | DDIA redundancy math |
+| `binomial` | n trials, success probability p | Probability mass bar chart, mean np, stddev √(np(1−p)) | Practice-testing statistical intuition |
+| `latency-percentile` | p50, p99 ratio, fan-out N | Tail amplification: P(any slow) = 1 − (1−p99)ⁿ | Why tail latency dominates |
+
+- Widgets are **data-driven presets** selected by name in the card (`card.widget = "kelly"`), with optional `initial` values overriding defaults
+- Each widget: range inputs styled with a custom CSS thumb, numbers update instantly, SVG sparkline/bar chart rendered inline (no chart library)
+- Can be placed standalone in a deck or as a step inside a lesson — same `Card` shape, so spaced review / mastery calculations still work (interactive cards count toward lesson completion but never as "wrong")
+- Keyboard: ←/→ nudge the focused slider; Enter marks complete
+
+**Why this is additive, not a rebuild**: Interactive cards slot into the existing `exerciseType` switch in `App.tsx` beside `flashcard` / `mcq` / `fill-blank` / `cloze`. No changes to SM-2, storage, or the learning path engine.
+
 ---
 
 ### P3 — Content Pipeline & Backend

@@ -1,6 +1,13 @@
 // === Card Types ===
 
 export type CardType = "basic" | "vocabulary" | "cloze";
+export type InteractiveWidgetKind =
+  | "expected-value"
+  | "kelly"
+  | "compound-growth"
+  | "availability"
+  | "binomial"
+  | "latency-percentile";
 export type CEFRLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
 export type Gender = "masculine" | "feminine";
 
@@ -12,10 +19,14 @@ export interface Card {
   keyPoints: string[];
 
   // Exercise variants
-  exerciseType?: "flashcard" | "mcq" | "fill-blank" | "cloze";
+  exerciseType?: "flashcard" | "mcq" | "fill-blank" | "cloze" | "interactive";
   choices?: string[];
   correctAnswer?: number | string;
   image?: string;
+
+  // Interactive widget variant
+  widget?: InteractiveWidgetKind;
+  widgetInitial?: Record<string, number>;
 
   // Language learning fields
   type?: CardType;

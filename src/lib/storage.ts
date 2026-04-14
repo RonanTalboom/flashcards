@@ -1,14 +1,16 @@
 import type { AppState, Card } from "../types";
 import { today } from "./sm2";
 import { FRENCH_A1_CARDS } from "../data/french-a1";
+import { INTERACTIVE_CARDS } from "../data/interactive-cards";
 
 export async function loadCards(): Promise<Card[]> {
   const res = await fetch("/api/cards");
   const apiCards: Card[] = res.ok ? await res.json() : [];
-  // Merge API cards with built-in French deck (French cards live client-side for now)
+  // Merge API cards with client-side decks (French + interactive widgets).
   const apiIds = new Set(apiCards.map((c) => c.id));
   const frenchCards = FRENCH_A1_CARDS.filter((c) => !apiIds.has(c.id));
-  return [...apiCards, ...frenchCards];
+  const interactiveCards = INTERACTIVE_CARDS.filter((c) => !apiIds.has(c.id));
+  return [...apiCards, ...frenchCards, ...interactiveCards];
 }
 
 async function loadState(): Promise<AppState | null> {
