@@ -1219,6 +1219,137 @@ header h1 {
 }
 
 /* ========================================
+   KaTeX Overrides (dark theme)
+   ======================================== */
+
+.katex { color: var(--text); }
+.katex-display { margin: 0.75em 0; overflow-x: auto; overflow-y: hidden; }
+.katex-display > .katex { text-align: left; }
+
+/* ========================================
+   Math Card
+   ======================================== */
+
+.math-question {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.math-prompt {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.math-input-area {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+}
+
+.math-input-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.math-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1.1rem;
+  font-family: "Outfit", system-ui, sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.math-input:focus {
+  border-color: var(--accent);
+}
+
+.math-input--correct {
+  border-color: var(--green);
+  background: rgba(56, 161, 105, 0.1);
+}
+
+.math-input--incorrect {
+  border-color: var(--red);
+  background: rgba(229, 62, 62, 0.1);
+}
+
+.math-unit {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  min-width: 1.5rem;
+}
+
+.math-sign-toggle {
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.math-sign-toggle:hover {
+  border-color: var(--accent);
+}
+
+.math-sign-toggle.negative {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.math-hints {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.math-hint {
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius);
+  background: rgba(66, 153, 225, 0.1);
+  border: 1px solid rgba(66, 153, 225, 0.2);
+  color: var(--text);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.math-show-hint {
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.math-show-hint:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+.math-answer-display {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* ========================================
    Lesson Complete
    ======================================== */
 

@@ -12,10 +12,16 @@ export interface Card {
   keyPoints: string[];
 
   // Exercise variants
-  exerciseType?: "flashcard" | "mcq" | "fill-blank" | "cloze";
+  exerciseType?: "flashcard" | "mcq" | "fill-blank" | "cloze" | "math";
   choices?: string[];
   correctAnswer?: number | string;
   image?: string;
+
+  // Math exercise fields
+  mathAnswer?: number;
+  tolerance?: number;
+  unit?: string;
+  hints?: string[];
 
   // Language learning fields
   type?: CardType;
