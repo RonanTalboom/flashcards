@@ -436,6 +436,142 @@ interface Settings {
 - Import from JSON, CSV, markdown
 - Deck selector on dashboard
 
+### P1.5 — Research-Informed Engagement Features (New)
+
+> Features selected from competitive analysis of Duolingo, Khan Academy, Brilliant.org, Anki, Memrise, Quizlet, Udemy, and Coursera. Evaluated on a board for impact vs. feasibility in a client-side React SPA.
+
+#### R1. Keyboard Shortcuts
+**Source**: Anki power users, Quizlet
+**Science**: Reducing friction between intent and action increases session length.
+**What to build**:
+- Space: flip card / advance step
+- 1/2/3/4: rate Again/Hard/Good/Easy
+- Enter: start study from dashboard
+- Escape: back to dashboard
+- useEffect with keydown listener, guard against input focus
+
+#### R2. Session Progress Bar
+**Source**: Duolingo (progress bar at top of every lesson)
+**Science**: Progress visualization increases completion rate by 20-40%.
+**What to build**:
+- Thin bar at top of study view showing cards completed / total in session
+- CSS transition for smooth fill
+- Shows in all study modes (review, lesson, speed review)
+
+#### R3. Answer Streak / Combo Counter
+**Source**: Quizlet answer streaks, Duolingo combo counter
+**Science**: Variable reward schedules (correct streak → bonus) increase engagement.
+**What to build**:
+- Track consecutive correct answers (grade >= 3) during session
+- Show combo counter with pulse animation when streak >= 3
+- Bonus XP at streak milestones (5, 10, 20 correct in a row)
+- Reset on incorrect answer with brief "streak broken" indicator
+
+#### R4. Enhanced Streak System (Freeze + Milestones)
+**Source**: Duolingo streak freeze, streak society, milestone celebrations
+**Science**: Streaks increase commitment by 60%. Users with 7-day streaks are 3.6x more likely to stay engaged. Streak freeze reduces anxiety-driven churn.
+**What to build**:
+- **Streak freeze**: earn 1 freeze after 7-day streak, auto-protects 1 missed day
+- **Streak milestones**: celebration at 7, 30, 100, 365 days
+- **Longest streak**: track and display personal best
+- **Streak calendar**: visual indicator of active days (part of heatmap)
+
+#### R5. Celebration Animations
+**Source**: Duolingo (confetti, sounds, character reactions), Khan Academy (level-up celebrations)
+**Science**: Immediate positive reinforcement strengthens habit loops. Dopamine on completion drives return behavior.
+**What to build**:
+- CSS-only confetti burst on session complete
+- Milestone celebration overlay for streak milestones
+- "Perfect session" special animation (all correct)
+- Smooth fade-in for done screen stats
+
+#### R6. Daily Goal Progress Ring
+**Source**: Duolingo daily goal ring, Apple Watch activity rings
+**Science**: Micro-goals with visual progress increase daily return rate. 89% completion rate for sessions under 10 min.
+**What to build**:
+- SVG circular progress ring on dashboard
+- Cards reviewed today vs daily goal (default 10, configurable)
+- Ring fills with animation as progress increases
+- Color changes: grey → accent → green when complete
+- "Goal met!" indicator with optional "keep going" prompt
+
+#### R7. Activity Heatmap
+**Source**: Anki Review Heatmap add-on, GitHub contribution graph
+**Science**: Progress visualization reinforces habit formation. Seeing consistency builds identity ("I'm someone who studies every day").
+**What to build**:
+- GitHub-style 90-day contribution heatmap on dashboard
+- CSS grid: 13 columns (weeks) × 7 rows (days)
+- Color intensity = cards reviewed that day (4 levels)
+- Tooltip on hover showing date and count
+- Data from review log stored in AppState
+
+#### R8. Difficult Cards Mode
+**Source**: Memrise "Difficult Words", Anki filtered decks
+**Science**: Targeted practice on weak items is 2-3x more efficient than mixed review.
+**What to build**:
+- Auto-detect difficult cards: easeFactor < 1.8 OR failed 4+ times
+- "Practice Difficult" button on dashboard when difficult cards exist
+- Creates focused session of only weak cards
+- Visual indicator on difficult cards during review (flame icon)
+
+#### R9. Leech Detection
+**Source**: Anki leech system
+**Science**: Cards failed 8+ times indicate a fundamental misunderstanding that flashcard review alone won't fix.
+**What to build**:
+- Track failure count per card (lapses field in CardState)
+- Flag as leech after 8 failures
+- Visual leech indicator during review
+- Leech count shown in stats
+
+#### R10. Speed Review Mode
+**Source**: Memrise Speed Review, Quizlet Match timer
+**Science**: Time pressure activates System 1 processing, strengthening automatic recall pathways.
+**What to build**:
+- Timed flashcard review: 8-second countdown per card
+- Timer bar depletes visually from left to right
+- Auto-advance on timeout (counts as "Again" grade)
+- 3 lives: lose one on timeout or "Again"
+- Game over when lives exhausted, show score
+- Cards show front only → must decide correct/incorrect quickly
+
+#### R11. Match Game
+**Source**: Quizlet Match
+**Science**: Active matching between related concepts strengthens associative memory networks.
+**What to build**:
+- Grid of 12 tiles (6 front/back pairs from cards)
+- Tap two tiles to match front↔back
+- Correct match: tiles fade out with green flash
+- Incorrect match: tiles shake with red flash, +1s penalty
+- Timer tracks completion speed
+- Score = time + penalties
+- Personal best tracking
+
+#### R12. Quiz / Test Mode
+**Source**: Quizlet Test Mode, Khan Academy unit tests
+**Science**: Practice testing is the #1 learning technique (d=0.56). Varied question formats test different retrieval pathways.
+**What to build**:
+- Auto-generate quiz from current deck (10-20 questions)
+- Mix of question types:
+  - **MCQ**: card front as question, correct back + 3 wrong backs as options
+  - **True/False**: card front + random back, user judges if pairing is correct
+  - **Typed answer**: card front shown, user types answer, fuzzy-matched
+- Score at end with percentage and review of incorrect answers
+- Does not affect SRS scheduling
+
+#### R13. Review Statistics Dashboard
+**Source**: Anki statistics (reviews graph, retention, intervals, forecast), Khan Academy mastery dashboard
+**Science**: Metacognition — students who monitor their own learning patterns show 15-20% higher retention.
+**What to build**:
+- New "Stats" view accessible from dashboard
+- **Cards per day**: 30-day bar chart (CSS/SVG, no library)
+- **Retention rate**: percentage of reviews graded Good or Easy
+- **Card states**: pie/bar showing new vs learning vs mature
+- **Hardest cards**: top 5 lowest easeFactor cards
+- **Review forecast**: estimated reviews due in next 7 days
+- **Streak history**: longest streak, current streak
+
+---
+
 #### 18. Interactive Explorable Visualizations (Brilliant-style)
 **Science**: Direct manipulation of parameters builds mathematical intuition faster than static formulas. Bret Victor's "Explorable Explanations" principle: the reader changes an assumption and instantly sees consequences propagate. Brilliant.org's core pattern — one slider, one visual effect — produces deeper understanding than passive reading.
 **Inspiration**: Brilliant.org (guided exploration → synthesis), Desmos (parameter sliders on functions), 3Blue1Brown (animate the process, not the result), Khan Academy (scaffolded interactive exercises).
