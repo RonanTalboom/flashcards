@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import type { Card } from "../types";
 import { AccentKeyboard } from "./AccentKeyboard";
+import { Latex } from "./Latex";
 
 interface ClozeCardProps {
   card: Card;
@@ -84,7 +85,7 @@ export function ClozeCard({
       </header>
 
       <div className="cloze-question">
-        <p className="cloze-prompt">{card.front}</p>
+        <Latex text={card.front} className="cloze-prompt" as="p" />
         <p className="cloze-sentence">
           <span>{cloze.before}</span>
           {!answered ? (
@@ -132,7 +133,7 @@ export function ClozeCard({
               Answer: <strong>{correctAnswer}</strong>
             </p>
           )}
-          {card.back && <p className="fill-explanation">{card.back}</p>}
+          {card.back && <Latex text={card.back} className="fill-explanation" as="p" />}
           <button className="fill-continue" onClick={handleContinue}>
             Continue
           </button>

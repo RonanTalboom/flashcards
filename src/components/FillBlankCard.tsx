@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import type { Card } from "../types";
 import { AccentKeyboard } from "./AccentKeyboard";
+import { Latex } from "./Latex";
 
 interface FillBlankCardProps {
   card: Card;
@@ -74,7 +75,7 @@ export function FillBlankCard({
       </header>
 
       <div className="fill-question">
-        <p className="fill-prompt">{card.front}</p>
+        <Latex text={card.front} className="fill-prompt" as="p" />
       </div>
 
       <div className="fill-input-area">
@@ -113,7 +114,7 @@ export function FillBlankCard({
               Answer: <strong>{correctAnswer}</strong>
             </p>
           )}
-          <p className="fill-explanation">{card.back}</p>
+          <Latex text={card.back} className="fill-explanation" as="p" />
           <button className="fill-continue" onClick={handleContinue}>
             Continue
           </button>

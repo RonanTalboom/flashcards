@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Card } from "../types";
+import { Latex } from "./Latex";
 
 interface MCQCardProps {
   card: Card;
@@ -56,7 +57,7 @@ export function MCQCard({
       </header>
 
       <div className="mcq-question">
-        <p className="mcq-prompt">{card.front}</p>
+        <Latex text={card.front} className="mcq-prompt" as="p" />
       </div>
 
       <div className="mcq-choices">
@@ -70,7 +71,7 @@ export function MCQCard({
             <span className="mcq-choice-letter">
               {String.fromCharCode(65 + i)}
             </span>
-            <span className="mcq-choice-text">{choice}</span>
+            <span className="mcq-choice-text"><Latex text={choice} /></span>
           </button>
         ))}
       </div>
@@ -82,7 +83,7 @@ export function MCQCard({
           >
             {selectedIndex === correctIndex ? "Correct" : "Incorrect"}
           </div>
-          <p className="mcq-explanation">{card.back}</p>
+          <Latex text={card.back} className="mcq-explanation" as="p" />
           <button className="mcq-continue" onClick={handleContinue}>
             Continue
           </button>

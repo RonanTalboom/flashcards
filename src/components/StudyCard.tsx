@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Card } from "../types";
 import { speak } from "../lib/tts";
+import { Latex } from "./Latex";
 
 interface StudyCardProps {
   card: Card;
@@ -90,7 +91,7 @@ export function StudyCard({
               </>
             ) : (
               <>
-                <p className="card-text">{card.front}</p>
+                <Latex text={card.front} className="card-text" as="p" />
                 <textarea
                   className="self-answer-input"
                   placeholder="Type your thoughts..."
@@ -109,14 +110,14 @@ export function StudyCard({
                 <p className="self-answer-text">{selfAnswer}</p>
               </div>
             )}
-            <p className="card-answer">{card.back}</p>
+            <Latex text={card.back} className="card-answer" as="p" />
             {isVocab && card.sentenceTranslation && (
               <p className="vocab-sentence-translation">{card.sentenceTranslation}</p>
             )}
             {card.keyPoints.length > 0 && (
               <ul className="key-points">
                 {card.keyPoints.map((point, i) => (
-                  <li key={i}>{point}</li>
+                  <li key={i}><Latex text={point} /></li>
                 ))}
               </ul>
             )}
