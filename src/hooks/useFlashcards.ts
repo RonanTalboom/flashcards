@@ -1,12 +1,15 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import type { Card, AppState, CardState, Lesson, LessonProgress, MasteryLevel } from "../types";
-import { sm2, today, yesterday } from "../lib/sm2";
+import { sm2, today, yesterday, addDays } from "../lib/sm2";
 import { initApp, saveState } from "../lib/storage";
 import { ALL_LESSONS, getLessonById } from "../data/lessons";
 
 const MAX_NEW_PER_SESSION = 10;
+const LEECH_THRESHOLD = 8;
+const DIFFICULT_EASE_THRESHOLD = 1.8;
+const DIFFICULT_LAPSE_THRESHOLD = 4;
 
-export type View = "dashboard" | "path" | "lesson-intro" | "study" | "lesson-complete" | "done";
+export type View = "dashboard" | "path" | "lesson-intro" | "study" | "lesson-complete" | "done" | "speed-review" | "match-game" | "quiz-mode" | "stats";
 
 // --- Mastery helpers ---
 
@@ -77,7 +80,55 @@ export function useFlashcards() {
   const [lessonCorrectCount, setLessonCorrectCount] = useState(0);
   const [lessonTotalCount, setLessonTotalCount] = useState(0);
 
+  // Combo / streak counter
+  const [comboCount, setComboCount] = useState(0);
+  const [bestCombo, setBestCombo] = useState(0);
+
   const XP_PER_GRADE: Record<number, number> = { 0: 2, 2: 5, 4: 10, 5: 15 };
+
+  const updateStreak = (s: AppState) => {
+    const t = today();
+    const y = yesterday();
+    if (s.stats.lastReviewDate === t) return; // already updated today
+
+    if (s.stats.lastReviewDate === y) {
+      s.stats.streak++;
+    } else if (s.stats.lastReviewDate && s.stats.lastReviewDate < y) {
+      // Missed at least one day — try streak freeze
+      const daysBefore = addDays(t, -2);
+      if (s.stats.lastReviewDate === daysBefore && s.stats.streakFreezes > 0) {
+        // Freeze covers exactly 1 missed day
+        s.stats.streakFreezes--;
+        s.stats.streak++;
+      } else {
+        s.stats.streak = 1;
+      }
+    } else {
+      s.stats.streak = 1;
+    }
+    // Award streak freeze at 7-day milestone
+    if (s.stats.streak === 7 && s.stats.streakFreezes < 2) {
+      s.stats.streakFreezes++;
+    }
+    if (s.stats.streak > s.stats.longestStreak) {
+      s.stats.longestStreak = s.stats.streak;
+    }
+    s.stats.lastReviewDate = t;
+  };
+
+  const recordReview = (s: AppState) => {
+    const t = today();
+    const log = [...s.stats.reviewLog];
+    const last = log[log.length - 1];
+    if (last && last.date === t) {
+      last.count++;
+    } else {
+      log.push({ date: t, count: 1 });
+    }
+    // Keep only last 90 days
+    const cutoff = addDays(t, -90);
+    s.stats.reviewLog = log.filter((e) => e.date >= cutoff);
+  };
 
   const getLevel = (xp: number) =>
     Math.floor((1 + Math.sqrt(1 + (4 * xp) / 25)) / 2);
@@ -169,26 +220,19 @@ export function useFlashcards() {
 
       if (newQueue.length === 0) return;
 
-      const t = today();
-      const y = yesterday();
       const newState = { ...state, stats: { ...state.stats } };
 
-      if (newState.stats.lastReviewDate !== t) {
-        if (newState.stats.lastReviewDate === y) {
-          newState.stats.streak++;
-        } else {
-          newState.stats.streak = 1;
-        }
-        newState.stats.lastReviewDate = t;
-        saveState(newState);
-        setState(newState);
-      }
+      updateStreak(newState);
+      saveState(newState);
+      setState(newState);
 
       setIsLessonMode(false);
       setQueue(newQueue);
       setCurrentIndex(0);
       setIsFlipped(false);
       setSessionXp(0);
+      setComboCount(0);
+      setBestCombo(0);
       setView("study");
     },
     [getDueCards, state]
@@ -224,20 +268,10 @@ export function useFlashcards() {
     if (lessonCards.length === 0) return;
 
     // Update streak on lesson start too
-    const t = today();
-    const y = yesterday();
     const newState = { ...state, stats: { ...state.stats } };
-
-    if (newState.stats.lastReviewDate !== t) {
-      if (newState.stats.lastReviewDate === y) {
-        newState.stats.streak++;
-      } else {
-        newState.stats.streak = 1;
-      }
-      newState.stats.lastReviewDate = t;
-      saveState(newState);
-      setState(newState);
-    }
+    updateStreak(newState);
+    saveState(newState);
+    setState(newState);
 
     setIsLessonMode(true);
     setQueue(lessonCards);
@@ -259,7 +293,33 @@ export function useFlashcards() {
       const card = queue[currentIndex];
       const updated = sm2(state.cards[card.id], grade);
 
-      const earned = XP_PER_GRADE[grade] ?? 5;
+      // Track lapses and leeches
+      const oldCard = state.cards[card.id];
+      if (grade < 3) {
+        updated.lapses = (oldCard.lapses ?? 0) + 1;
+        if (updated.lapses >= LEECH_THRESHOLD) {
+          updated.leech = true;
+        }
+      } else {
+        updated.lapses = oldCard.lapses ?? 0;
+        updated.leech = oldCard.leech ?? false;
+      }
+
+      // Combo tracking
+      if (grade >= 3) {
+        const newCombo = comboCount + 1;
+        setComboCount(newCombo);
+        if (newCombo > bestCombo) setBestCombo(newCombo);
+      } else {
+        setComboCount(0);
+      }
+
+      // Combo XP bonus
+      let comboBonus = 0;
+      if (grade >= 3 && (comboCount + 1) % 5 === 0) comboBonus = 5;
+      if (grade >= 3 && (comboCount + 1) % 10 === 0) comboBonus = 10;
+
+      const earned = (XP_PER_GRADE[grade] ?? 5) + comboBonus;
       const newState: AppState = {
         ...state,
         cards: { ...state.cards, [card.id]: updated },
@@ -269,6 +329,7 @@ export function useFlashcards() {
           xp: state.stats.xp + earned,
         },
       };
+      recordReview(newState);
       saveState(newState);
       setState(newState);
       setSessionXp((prev) => prev + earned);
@@ -300,7 +361,7 @@ export function useFlashcards() {
         setIsFlipped(false);
       }
     },
-    [queue, currentIndex, state, isLessonMode]
+    [queue, currentIndex, state, isLessonMode, comboCount, bestCombo]
   );
 
   const answerCard = useCallback(
@@ -312,6 +373,25 @@ export function useFlashcards() {
       const grade = correct ? 4 : 1;
       const updated = sm2(state.cards[card.id], grade);
 
+      // Track lapses
+      const oldCard = state.cards[card.id];
+      if (!correct) {
+        updated.lapses = (oldCard.lapses ?? 0) + 1;
+        if (updated.lapses >= LEECH_THRESHOLD) updated.leech = true;
+      } else {
+        updated.lapses = oldCard.lapses ?? 0;
+        updated.leech = oldCard.leech ?? false;
+      }
+
+      // Combo
+      if (correct) {
+        const newCombo = comboCount + 1;
+        setComboCount(newCombo);
+        if (newCombo > bestCombo) setBestCombo(newCombo);
+      } else {
+        setComboCount(0);
+      }
+
       const earned = correct ? 10 : 2;
       const newState: AppState = {
         ...state,
@@ -322,6 +402,7 @@ export function useFlashcards() {
           xp: state.stats.xp + earned,
         },
       };
+      recordReview(newState);
       saveState(newState);
       setState(newState);
       setSessionXp((prev) => prev + earned);
@@ -387,6 +468,139 @@ export function useFlashcards() {
     setCurrentLesson(null);
   }, []);
 
+  // --- New study modes ---
+
+  const getDifficultCards = useCallback(() => {
+    if (!state) return [];
+    return cards.filter((card) => {
+      const s = state.cards[card.id];
+      if (!s) return false;
+      return (
+        s.easeFactor < DIFFICULT_EASE_THRESHOLD ||
+        (s.lapses ?? 0) >= DIFFICULT_LAPSE_THRESHOLD ||
+        s.leech
+      );
+    });
+  }, [cards, state]);
+
+  const startDifficultReview = useCallback(() => {
+    if (!state) return;
+    const difficult = getDifficultCards();
+    if (difficult.length === 0) return;
+    // Shuffle
+    for (let i = difficult.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [difficult[i], difficult[j]] = [difficult[j], difficult[i]];
+    }
+    const newState = { ...state, stats: { ...state.stats } };
+    updateStreak(newState);
+    saveState(newState);
+    setState(newState);
+    setIsLessonMode(false);
+    setQueue(difficult);
+    setCurrentIndex(0);
+    setIsFlipped(false);
+    setSessionXp(0);
+    setComboCount(0);
+    setBestCombo(0);
+    setView("study");
+  }, [state, getDifficultCards]);
+
+  const startSpeedReview = useCallback(() => {
+    if (!state) return;
+    const due = getDueCards();
+    if (due.length === 0) return;
+    // Shuffle for speed review
+    const shuffled = [...due];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    setQueue(shuffled.slice(0, 20)); // Cap at 20 for speed review
+    setCurrentIndex(0);
+    setIsFlipped(false);
+    setSessionXp(0);
+    setComboCount(0);
+    setBestCombo(0);
+    setView("speed-review");
+  }, [state, getDueCards]);
+
+  const startMatchGame = useCallback(() => {
+    setView("match-game");
+  }, []);
+
+  const startQuizMode = useCallback(() => {
+    setView("quiz-mode");
+  }, []);
+
+  const viewStats = useCallback(() => {
+    setView("stats");
+  }, []);
+
+  const getTodayReviewCount = useCallback(() => {
+    if (!state) return 0;
+    const t = today();
+    const entry = state.stats.reviewLog.find((e) => e.date === t);
+    return entry?.count ?? 0;
+  }, [state]);
+
+  const getLeechCount = useCallback(() => {
+    if (!state) return 0;
+    return Object.values(state.cards).filter((s) => s.leech).length;
+  }, [state]);
+
+  const getReviewForecast = useCallback(() => {
+    if (!state) return [];
+    const forecast: { date: string; count: number }[] = [];
+    for (let d = 0; d < 7; d++) {
+      const date = addDays(today(), d);
+      let count = 0;
+      for (const card of cards) {
+        const s = state.cards[card.id];
+        if (s && s.nextReviewDate === date) count++;
+      }
+      forecast.push({ date, count });
+    }
+    return forecast;
+  }, [cards, state]);
+
+  const getRetentionRate = useCallback(() => {
+    if (!state) return 0;
+    const reviewed = Object.values(state.cards).filter((s) => s.repetitions > 0);
+    if (reviewed.length === 0) return 0;
+    const good = reviewed.filter((s) => s.easeFactor >= 2.0);
+    return Math.round((good.length / reviewed.length) * 100);
+  }, [state]);
+
+  const getHardestCards = useCallback(() => {
+    if (!state) return [];
+    return cards
+      .filter((c) => state.cards[c.id]?.repetitions > 0)
+      .sort((a, b) => state.cards[a.id].easeFactor - state.cards[b.id].easeFactor)
+      .slice(0, 5);
+  }, [cards, state]);
+
+  const getCardStateCounts = useCallback(() => {
+    if (!state) return { newCount: 0, learning: 0, mature: 0 };
+    let newCount = 0, learning = 0, mature = 0;
+    for (const s of Object.values(state.cards)) {
+      if (s.repetitions === 0) newCount++;
+      else if (s.interval < 21) learning++;
+      else mature++;
+    }
+    return { newCount, learning, mature };
+  }, [state]);
+
+  const updateMatchBestTime = useCallback((time: number) => {
+    if (!state) return;
+    const newState = { ...state, stats: { ...state.stats } };
+    if (!newState.stats.matchBestTime || time < newState.stats.matchBestTime) {
+      newState.stats.matchBestTime = time;
+    }
+    saveState(newState);
+    setState(newState);
+  }, [state]);
+
   const currentCard = queue[currentIndex] ?? null;
   const dueCards = getDueCards();
   const xp = state?.stats.xp ?? 0;
@@ -427,6 +641,26 @@ export function useFlashcards() {
     lessonCorrectCount,
     lessonTotalCount,
 
+    // Combo / engagement
+    comboCount,
+    bestCombo,
+    todayReviewCount: getTodayReviewCount(),
+    dailyGoal: state?.stats.dailyGoal ?? 10,
+    streakFreezes: state?.stats.streakFreezes ?? 0,
+    longestStreak: state?.stats.longestStreak ?? 0,
+    reviewLog: state?.stats.reviewLog ?? [],
+    difficultCount: getDifficultCards().length,
+    leechCount: getLeechCount(),
+    matchBestTime: state?.stats.matchBestTime ?? null,
+
+    // Stats
+    retentionRate: getRetentionRate(),
+    reviewForecast: getReviewForecast(),
+    hardestCards: getHardestCards(),
+    cardStateCounts: getCardStateCounts(),
+    allCards: cards,
+    cardStates: state?.cards ?? {},
+
     // Actions
     startStudy,
     flipCard,
@@ -440,5 +674,13 @@ export function useFlashcards() {
     startLesson,
     completeLesson,
     backToPath,
+
+    // New study mode actions
+    startDifficultReview,
+    startSpeedReview,
+    startMatchGame,
+    startQuizMode,
+    viewStats,
+    updateMatchBestTime,
   };
 }
