@@ -436,7 +436,50 @@ interface Settings {
 - Import from JSON, CSV, markdown
 - Deck selector on dashboard
 
-#### 18. PWA / Offline Support
+#### 18. Interactive Explorable Visualizations (Brilliant-style)
+**Science**: Direct manipulation of parameters builds mathematical intuition faster than static formulas. Bret Victor's "Explorable Explanations" principle: the reader changes an assumption and instantly sees consequences propagate. Brilliant.org's core pattern — one slider, one visual effect — produces deeper understanding than passive reading.
+**Inspiration**: Brilliant.org (guided exploration → synthesis), Desmos (parameter sliders on functions), 3Blue1Brown (animate the process, not the result), Khan Academy (scaffolded interactive exercises).
+**Stack**: d3-shape + d3-scale (~12KB gzipped) for math, hand-rolled SVG in React for rendering. Zero-dependency plots driven by React state from range sliders. Mobile-friendly touch via native SVG pointer events.
+
+**Design Principles** (from research):
+1. **One degree of freedom at a time** — each slider controls exactly one parameter
+2. **Tight feedback loop** — plot updates in <16ms (every frame) as user drags
+3. **Concrete before abstract** — explore the visual first, then see the formula
+4. **Linked representations** — show equation + graph + numeric output simultaneously
+5. **Failure is cheap** — exploration has no penalty, builds confidence before testing
+
+**What to build**:
+
+| Widget | Parameters | Visualization | Learning Goal |
+|---|---|---|---|
+| **Kelly Criterion Curve** | Win probability, payout ratio | Growth rate curve, optimal fraction marker, ruin zone | Feel why 2x Kelly guarantees ruin |
+| **EV Calculator** | Contract price, model probability | EV bar crossing zero, profit/loss regions | Intuition for when to enter/exit |
+| **Bayes Updater** | Prior probability, likelihood ratio | Probability bar shifting, prior→posterior animation | Feel how evidence strength affects updates |
+| **Brier Score Curve** | Forecast probability | Parabolic penalty for outcome=1 and outcome=0 | Understand calibration penalty structure |
+| **VPIN Gauge** | Buy volume, sell volume | Semicircular gauge with danger zone at 0.70 | Instant recognition of toxic flow |
+
+**Interactive Card Integration**:
+- New `exerciseType: "interactive"` with `plotType` field
+- Card front shows a guiding question (e.g., "What happens to the Kelly fraction as payout increases?")
+- User explores via sliders, sees real-time plot updates
+- Card back shows the key insight with formula
+- Self-rated (Again/Hard/Good/Easy) like flashcards — rates understanding, not correctness
+- Integrated into lessons alongside flashcards and math practice cards
+
+**Component Architecture**:
+```typescript
+interface InteractivePlotProps {
+  width: number;
+  height: number;
+}
+
+// Each plot is a standalone React component:
+// KellyCurvePlot, EVCalculatorPlot, BayesUpdaterPlot, BrierScorePlot, VPINGaugePlot
+// All use: SVG viewBox for responsive sizing, CSS custom properties for dark theme,
+// range inputs with custom styling, real-time numeric readouts
+```
+
+#### 19. PWA / Offline Support
 **What to build**:
 - Service worker for offline access
 - `manifest.json` for install-to-homescreen
