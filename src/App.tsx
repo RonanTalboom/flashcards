@@ -8,6 +8,7 @@ import { MCQCard } from "./components/MCQCard";
 import { FillBlankCard } from "./components/FillBlankCard";
 import { LessonComplete } from "./components/LessonComplete";
 import { ClozeCard } from "./components/ClozeCard";
+import { MathCard } from "./components/MathCard";
 import { SECTIONS, getSectionByLessonId } from "./data/lessons";
 import "./index.css";
 
@@ -96,6 +97,18 @@ export function App() {
       if (exerciseType === "cloze") {
         return (
           <ClozeCard
+            key={fc.currentCard.id}
+            card={fc.currentCard}
+            currentIndex={fc.currentIndex}
+            queueLength={fc.queueLength}
+            onAnswer={fc.answerCard}
+          />
+        );
+      }
+
+      if (exerciseType === "math") {
+        return (
+          <MathCard
             key={fc.currentCard.id}
             card={fc.currentCard}
             currentIndex={fc.currentIndex}
