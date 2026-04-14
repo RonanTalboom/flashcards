@@ -43,13 +43,25 @@ export interface CardState {
   interval: number;
   repetitions: number;
   nextReviewDate: string;
+  lapses: number;
+  leech: boolean;
+}
+
+export interface ReviewLogEntry {
+  date: string;
+  count: number;
 }
 
 export interface Stats {
   streak: number;
+  longestStreak: number;
   lastReviewDate: string | null;
   totalReviews: number;
   xp: number;
+  dailyGoal: number;
+  streakFreezes: number;
+  reviewLog: ReviewLogEntry[];
+  matchBestTime: number | null;
 }
 
 export interface AppState {

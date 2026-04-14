@@ -43,21 +43,36 @@ export async function initApp(): Promise<{ cards: Card[]; state: AppState }> {
 
   const cardStates: AppState["cards"] = {};
   for (const card of cards) {
-    cardStates[card.id] = existingState?.cards[card.id] ?? {
-      easeFactor: 2.5,
-      interval: 0,
-      repetitions: 0,
-      nextReviewDate: today(),
-    };
+    const existing = existingState?.cards[card.id];
+    cardStates[card.id] = existing
+      ? {
+          ...existing,
+          lapses: existing.lapses ?? 0,
+          leech: existing.leech ?? false,
+        }
+      : {
+          easeFactor: 2.5,
+          interval: 0,
+          repetitions: 0,
+          nextReviewDate: today(),
+          lapses: 0,
+          leech: false,
+        };
   }
 
+  const existingStats = existingState?.stats;
   const state: AppState = {
     cards: cardStates,
-    stats: existingState?.stats ?? {
-      streak: 0,
-      lastReviewDate: null,
-      totalReviews: 0,
-      xp: 0,
+    stats: {
+      streak: existingStats?.streak ?? 0,
+      longestStreak: existingStats?.longestStreak ?? existingStats?.streak ?? 0,
+      lastReviewDate: existingStats?.lastReviewDate ?? null,
+      totalReviews: existingStats?.totalReviews ?? 0,
+      xp: existingStats?.xp ?? 0,
+      dailyGoal: existingStats?.dailyGoal ?? 10,
+      streakFreezes: existingStats?.streakFreezes ?? 0,
+      reviewLog: existingStats?.reviewLog ?? [],
+      matchBestTime: existingStats?.matchBestTime ?? null,
     },
     lessonProgress: existingState?.lessonProgress ?? {},
   };

@@ -24,7 +24,7 @@ export function sm2(card: CardState, grade: number): CardState {
 
   const nextReviewDate = addDays(today(), interval);
 
-  return { easeFactor, interval, repetitions, nextReviewDate };
+  return { easeFactor, interval, repetitions, nextReviewDate, lapses: card.lapses ?? 0, leech: card.leech ?? false };
 }
 
 export function today(): string {
