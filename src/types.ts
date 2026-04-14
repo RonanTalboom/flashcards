@@ -12,7 +12,7 @@ export interface Card {
   keyPoints: string[];
 
   // Exercise variants
-  exerciseType?: "flashcard" | "mcq" | "fill-blank" | "cloze" | "math";
+  exerciseType?: "flashcard" | "mcq" | "fill-blank" | "cloze" | "math" | "interactive";
   choices?: string[];
   correctAnswer?: number | string;
   image?: string;
@@ -22,6 +22,9 @@ export interface Card {
   tolerance?: number;
   unit?: string;
   hints?: string[];
+
+  // Interactive plot fields
+  plotType?: "kelly-curve" | "ev-calculator" | "bayes-updater" | "brier-score" | "vpin-gauge";
 
   // Language learning fields
   type?: CardType;

@@ -9,6 +9,7 @@ import { FillBlankCard } from "./components/FillBlankCard";
 import { LessonComplete } from "./components/LessonComplete";
 import { ClozeCard } from "./components/ClozeCard";
 import { MathCard } from "./components/MathCard";
+import { InteractiveCard } from "./components/InteractiveCard";
 import { SECTIONS, getSectionByLessonId } from "./data/lessons";
 import "./index.css";
 
@@ -114,6 +115,18 @@ export function App() {
             currentIndex={fc.currentIndex}
             queueLength={fc.queueLength}
             onAnswer={fc.answerCard}
+          />
+        );
+      }
+
+      if (exerciseType === "interactive") {
+        return (
+          <InteractiveCard
+            key={fc.currentCard.id}
+            card={fc.currentCard}
+            currentIndex={fc.currentIndex}
+            queueLength={fc.queueLength}
+            onRate={fc.rateCard}
           />
         );
       }
