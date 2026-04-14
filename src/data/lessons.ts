@@ -277,7 +277,109 @@ export const SECTIONS: Section[] = [
     ],
   },
 
-  // === Section 7: French A1 ===
+  // === Section 7: Prediction Market Trading ===
+  {
+    id: "pm-trading",
+    title: "Prediction Market Trading",
+    description: "From EV to execution — the math of profitable trading",
+    icon: "&#128200;",
+    color: "#d69e2e",
+    lessons: [
+      {
+        id: "pm-expected-value",
+        sectionId: "pm-trading",
+        title: "Expected Value",
+        description: "The single most important formula in trading",
+        cards: [100, 200, 201, 202, 203],
+        prerequisites: [],
+        concepts: [
+          "EV = (win_prob x profit) - (loss_prob x loss)",
+          "Never enter a trade with EV <= 0",
+          "Calculate EV before every trade",
+        ],
+      },
+      {
+        id: "pm-kelly",
+        sectionId: "pm-trading",
+        title: "Kelly Criterion",
+        description: "Optimal position sizing for maximum growth",
+        cards: [101, 204, 205, 206],
+        prerequisites: ["pm-expected-value"],
+        concepts: [
+          "f* = (p*b - q) / b",
+          "Full Kelly is too aggressive — use 1/4 to 1/2 Kelly",
+          "2x Kelly = guaranteed ruin",
+        ],
+      },
+      {
+        id: "pm-bayes",
+        sectionId: "pm-trading",
+        title: "Bayesian Updates",
+        description: "Update beliefs with evidence, not emotion",
+        cards: [102, 103, 207, 208, 209],
+        prerequisites: ["pm-expected-value"],
+        concepts: [
+          "P(H|E) = P(E|H) * P(H) / P(E)",
+          "Base rates matter more than narratives",
+          "Update proportionally — don't overreact",
+        ],
+      },
+      {
+        id: "pm-calibration",
+        sectionId: "pm-trading",
+        title: "Calibration & Scoring",
+        description: "Measure how good your predictions actually are",
+        cards: [105, 142, 210, 211],
+        prerequisites: ["pm-bayes"],
+        concepts: [
+          "Brier Score: 0 = perfect, 0.25 = coin flip",
+          "Win rate is a trap — focus on realized PnL",
+          "If your Brier > market, switch to arbitrage",
+        ],
+      },
+      {
+        id: "pm-market-structure",
+        sectionId: "pm-trading",
+        title: "Market Structure & VPIN",
+        description: "How order books and toxic flow work",
+        cards: [120, 121, 130, 212, 213],
+        prerequisites: ["pm-expected-value"],
+        concepts: [
+          "CLOB: bid/ask matching with YES + NO = $1.00",
+          "VPIN detects informed trading — exit above 0.70",
+          "Read order book depth to find supply/demand zones",
+        ],
+      },
+      {
+        id: "pm-strategies",
+        sectionId: "pm-trading",
+        title: "Winning Strategies",
+        description: "The three strategies that survive 10,000 simulations",
+        cards: [110, 111, 112, 114, 214, 215],
+        prerequisites: ["pm-kelly", "pm-calibration"],
+        concepts: [
+          "Insurance, Sports O/U, Bayesian Arb — the only survivors",
+          "Market making: capture spread without predicting outcomes",
+          "97.1% of simulated traders went broke",
+        ],
+      },
+      {
+        id: "pm-advanced",
+        sectionId: "pm-trading",
+        title: "Advanced Topics",
+        description: "KL-divergence, pairs trading, and sentiment",
+        cards: [104, 113, 150, 151, 216, 217],
+        prerequisites: ["pm-strategies"],
+        concepts: [
+          "KL-divergence finds structural mispricings",
+          "Pairs trading on cointegrated contracts",
+          "Fear/sentiment sensitivity varies by contract",
+        ],
+      },
+    ],
+  },
+
+  // === Section 8: French A1 ===
   {
     id: "french-a1",
     title: "French A1",
