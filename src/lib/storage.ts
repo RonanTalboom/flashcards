@@ -1,20 +1,59 @@
 import type { AppState, Card } from "../types";
-import { today } from "./sm2";
+import { newCardState, migrateSM2 } from "./fsrs";
 import { FRENCH_A1_CARDS } from "../data/french-a1";
 import { QUANT_CARDS } from "../data/quant-cards";
 import { QUANT_MATH_CARDS } from "../data/quant-math-cards";
 import { QUANT_INTERACTIVE_CARDS } from "../data/quant-interactive-cards";
+import { CONJUGATION_CARDS } from "../data/conjugation-cards";
+import { ACHIEVEMENT_DEFINITIONS } from "./achievements";
 
 export async function loadCards(): Promise<Card[]> {
   const res = await fetch("/api/cards");
   const apiCards: Card[] = res.ok ? await res.json() : [];
-  // Merge API cards with built-in decks (live client-side for now)
   const apiIds = new Set(apiCards.map((c) => c.id));
   const frenchCards = FRENCH_A1_CARDS.filter((c) => !apiIds.has(c.id));
   const quantCards = QUANT_CARDS.filter((c) => !apiIds.has(c.id));
   const mathCards = QUANT_MATH_CARDS.filter((c) => !apiIds.has(c.id));
   const interactiveCards = QUANT_INTERACTIVE_CARDS.filter((c) => !apiIds.has(c.id));
-  return [...apiCards, ...frenchCards, ...quantCards, ...mathCards, ...interactiveCards];
+  const conjugationCards = CONJUGATION_CARDS.filter((c) => !apiIds.has(c.id));
+
+  const allCards = [
+    ...apiCards,
+    ...frenchCards,
+    ...quantCards,
+    ...mathCards,
+    ...interactiveCards,
+    ...conjugationCards,
+  ];
+
+  // Generate reverse cards for vocabulary cards
+  const reverseCards: Card[] = [];
+  for (const card of allCards) {
+    if (card.type === "vocabulary" && card.back && !card.reverseOf) {
+      const reverseId = card.id + 50000;
+      if (!apiIds.has(reverseId) && !allCards.some((c) => c.id === reverseId)) {
+        reverseCards.push({
+          id: reverseId,
+          category: card.category,
+          front: card.back,
+          back: card.article ? `${card.article} ${card.front}` : card.front,
+          keyPoints: card.keyPoints,
+          exerciseType: "flashcard",
+          type: "vocabulary",
+          deck: card.deck,
+          gender: card.gender,
+          article: card.article,
+          pronunciation: card.pronunciation,
+          sentence: card.sentenceTranslation,
+          sentenceTranslation: card.sentence,
+          cefrLevel: card.cefrLevel,
+          reverseOf: card.id,
+        });
+      }
+    }
+  }
+
+  return [...allCards, ...reverseCards];
 }
 
 async function loadState(): Promise<AppState | null> {
@@ -44,20 +83,12 @@ export async function initApp(): Promise<{ cards: Card[]; state: AppState }> {
   const cardStates: AppState["cards"] = {};
   for (const card of cards) {
     const existing = existingState?.cards[card.id];
-    cardStates[card.id] = existing
-      ? {
-          ...existing,
-          lapses: existing.lapses ?? 0,
-          leech: existing.leech ?? false,
-        }
-      : {
-          easeFactor: 2.5,
-          interval: 0,
-          repetitions: 0,
-          nextReviewDate: today(),
-          lapses: 0,
-          leech: false,
-        };
+    if (existing) {
+      // Migrate SM-2 state to FSRS if needed
+      cardStates[card.id] = migrateSM2(existing as unknown as Record<string, unknown>);
+    } else {
+      cardStates[card.id] = newCardState();
+    }
   }
 
   const existingStats = existingState?.stats;
@@ -73,6 +104,8 @@ export async function initApp(): Promise<{ cards: Card[]; state: AppState }> {
       streakFreezes: existingStats?.streakFreezes ?? 0,
       reviewLog: existingStats?.reviewLog ?? [],
       matchBestTime: existingStats?.matchBestTime ?? null,
+      achievements: existingStats?.achievements ?? ACHIEVEMENT_DEFINITIONS.map((a) => ({ ...a, unlockedAt: null })),
+      calibrationLog: existingStats?.calibrationLog ?? [],
     },
     lessonProgress: existingState?.lessonProgress ?? {},
   };

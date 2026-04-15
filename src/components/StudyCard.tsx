@@ -11,6 +11,7 @@ interface StudyCardProps {
   currentIndex: number;
   queueLength: number;
   comboCount: number;
+  schedulingIntervals?: Record<number, string> | null;
   onFlip: () => void;
   onRate: (grade: number) => void;
   onBack?: () => void;
@@ -38,6 +39,7 @@ export function StudyCard({
   currentIndex,
   queueLength,
   comboCount,
+  schedulingIntervals,
   onFlip,
   onRate,
   onBack,
@@ -160,18 +162,22 @@ export function StudyCard({
           <div className="rating-buttons">
             <button className="rate-btn rate-again" onClick={() => onRate(0)}>
               <span className="rate-label">Again</span>
+              {schedulingIntervals && <span className="rate-interval">{schedulingIntervals[0]}</span>}
               <span className="rate-key">1</span>
             </button>
             <button className="rate-btn rate-hard" onClick={() => onRate(2)}>
               <span className="rate-label">Hard</span>
+              {schedulingIntervals && <span className="rate-interval">{schedulingIntervals[2]}</span>}
               <span className="rate-key">2</span>
             </button>
             <button className="rate-btn rate-good" onClick={() => onRate(4)}>
               <span className="rate-label">Good</span>
+              {schedulingIntervals && <span className="rate-interval">{schedulingIntervals[4]}</span>}
               <span className="rate-key">3</span>
             </button>
             <button className="rate-btn rate-easy" onClick={() => onRate(5)}>
               <span className="rate-label">Easy</span>
+              {schedulingIntervals && <span className="rate-interval">{schedulingIntervals[5]}</span>}
               <span className="rate-key">4</span>
             </button>
           </div>

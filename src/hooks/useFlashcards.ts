@@ -1,12 +1,13 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
-import type { Card, AppState, CardState, Lesson, LessonProgress, MasteryLevel } from "../types";
-import { sm2, today, yesterday, addDays } from "../lib/sm2";
+import type { Card, AppState, CardState, Lesson, LessonProgress, MasteryLevel, Achievement, CalibrationEntry } from "../types";
+import { reviewCard, getSchedulingIntervals, today, yesterday, addDays } from "../lib/fsrs";
 import { initApp, saveState } from "../lib/storage";
 import { ALL_LESSONS, getLessonById } from "../data/lessons";
+import { checkAchievements } from "../lib/achievements";
 
 const MAX_NEW_PER_SESSION = 10;
 const LEECH_THRESHOLD = 8;
-const DIFFICULT_EASE_THRESHOLD = 1.8;
+const DIFFICULT_DIFFICULTY_THRESHOLD = 7;
 const DIFFICULT_LAPSE_THRESHOLD = 4;
 
 export type View = "dashboard" | "path" | "lesson-intro" | "study" | "lesson-complete" | "done" | "speed-review" | "match-game" | "quiz-mode" | "stats";
@@ -23,7 +24,6 @@ function getLessonMastery(
   if (visited.has(lesson.id)) return "locked";
   visited.add(lesson.id);
 
-  // Check prerequisites
   for (const prereqId of lesson.prerequisites) {
     const prereq = getLessonById(prereqId);
     if (!prereq) continue;
@@ -34,12 +34,11 @@ function getLessonMastery(
   const progress = lessonProgress[lesson.id];
   if (!progress || !progress.completed) return "available";
 
-  // Check card mastery
   const cardMasteries: number[] = lesson.cards.map((id) => {
     const s = cardStates[id];
-    if (!s || s.repetitions === 0) return 0;
-    if (s.repetitions >= 3 && s.easeFactor >= 2.3) return 3; // mastered
-    if (s.repetitions >= 2) return 2; // proficient
+    if (!s || s.reps === 0) return 0;
+    if (s.reps >= 3 && s.difficulty <= 4) return 3; // mastered (low difficulty = easy)
+    if (s.reps >= 2) return 2; // proficient
     return 1; // familiar
   });
 
@@ -84,20 +83,24 @@ export function useFlashcards() {
   const [comboCount, setComboCount] = useState(0);
   const [bestCombo, setBestCombo] = useState(0);
 
+  // Achievements
+  const [pendingAchievement, setPendingAchievement] = useState<Achievement | null>(null);
+
+  // Confidence calibration
+  const [pendingConfidence, setPendingConfidence] = useState<CalibrationEntry["confidence"] | null>(null);
+
   const XP_PER_GRADE: Record<number, number> = { 0: 2, 2: 5, 4: 10, 5: 15 };
 
   const updateStreak = (s: AppState) => {
     const t = today();
     const y = yesterday();
-    if (s.stats.lastReviewDate === t) return; // already updated today
+    if (s.stats.lastReviewDate === t) return;
 
     if (s.stats.lastReviewDate === y) {
       s.stats.streak++;
     } else if (s.stats.lastReviewDate && s.stats.lastReviewDate < y) {
-      // Missed at least one day — try streak freeze
       const daysBefore = addDays(t, -2);
       if (s.stats.lastReviewDate === daysBefore && s.stats.streakFreezes > 0) {
-        // Freeze covers exactly 1 missed day
         s.stats.streakFreezes--;
         s.stats.streak++;
       } else {
@@ -106,7 +109,6 @@ export function useFlashcards() {
     } else {
       s.stats.streak = 1;
     }
-    // Award streak freeze at 7-day milestone
     if (s.stats.streak === 7 && s.stats.streakFreezes < 2) {
       s.stats.streakFreezes++;
     }
@@ -125,9 +127,16 @@ export function useFlashcards() {
     } else {
       log.push({ date: t, count: 1 });
     }
-    // Keep only last 90 days
     const cutoff = addDays(t, -90);
     s.stats.reviewLog = log.filter((e) => e.date >= cutoff);
+  };
+
+  const triggerAchievements = (newState: AppState, context: Parameters<typeof checkAchievements>[1]) => {
+    const unlocked = checkAchievements(newState, { ...context, cards });
+    if (unlocked.length > 0) {
+      const a = newState.stats.achievements.find((x) => x.id === unlocked[0]);
+      if (a) setPendingAchievement(a);
+    }
   };
 
   const getLevel = (xp: number) =>
@@ -143,7 +152,6 @@ export function useFlashcards() {
     });
   }, []);
 
-  // Compute mastery map
   const lessonMastery = useMemo<Record<string, MasteryLevel>>(() => {
     if (!state) return {};
     return computeAllMastery(state.cards, state.lessonProgress);
@@ -159,13 +167,13 @@ export function useFlashcards() {
     if (!state) return [];
     return cards.filter((card) => {
       const s = state.cards[card.id];
-      return s && s.repetitions === 0 && s.interval === 0;
+      return s && s.cardState === "new";
     });
   }, [cards, state]);
 
   const getLearnedCount = useCallback(() => {
     if (!state) return 0;
-    return cards.filter((card) => state.cards[card.id]?.repetitions > 0).length;
+    return cards.filter((card) => state.cards[card.id]?.reps > 0).length;
   }, [cards, state]);
 
   const getCategoryBreakdown = useCallback(() => {
@@ -175,7 +183,7 @@ export function useFlashcards() {
     for (const card of cards) {
       if (!cats[card.category]) cats[card.category] = { total: 0, learned: 0, due: 0 };
       cats[card.category].total++;
-      if (state.cards[card.id]?.repetitions > 0) cats[card.category].learned++;
+      if (state.cards[card.id]?.reps > 0) cats[card.category].learned++;
       if (state.cards[card.id]?.nextReviewDate <= t) cats[card.category].due++;
     }
     return Object.entries(cats).map(([name, data]) => ({
@@ -184,7 +192,7 @@ export function useFlashcards() {
     }));
   }, [cards, state]);
 
-  // --- Review flow (existing) ---
+  // --- Review flow ---
 
   const startStudy = useCallback(
     (category?: string) => {
@@ -193,18 +201,18 @@ export function useFlashcards() {
       const due = category ? allDue.filter((c) => c.category === category) : allDue;
       const newCards = due.filter((c) => {
         const s = state.cards[c.id];
-        return s.repetitions === 0 && s.interval === 0;
+        return s.cardState === "new";
       });
       const reviewCards = due.filter((c) => {
         const s = state.cards[c.id];
-        return !(s.repetitions === 0 && s.interval === 0);
+        return s.cardState !== "new";
       });
 
       const cappedNew = newCards.slice(0, MAX_NEW_PER_SESSION);
 
-      // Adaptive difficulty: harder cards first
+      // Adaptive difficulty: harder cards first (higher difficulty = harder in FSRS)
       reviewCards.sort(
-        (a, b) => state.cards[a.id].easeFactor - state.cards[b.id].easeFactor
+        (a, b) => state.cards[b.id].difficulty - state.cards[a.id].difficulty
       );
 
       const newQueue = [...reviewCards, ...cappedNew];
@@ -221,7 +229,6 @@ export function useFlashcards() {
       if (newQueue.length === 0) return;
 
       const newState = { ...state, stats: { ...state.stats } };
-
       updateStreak(newState);
       saveState(newState);
       setState(newState);
@@ -233,6 +240,7 @@ export function useFlashcards() {
       setSessionXp(0);
       setComboCount(0);
       setBestCombo(0);
+      setPendingConfidence(null);
       setView("study");
     },
     [getDueCards, state]
@@ -248,7 +256,6 @@ export function useFlashcards() {
     (lessonId: string) => {
       const lesson = getLessonById(lessonId);
       if (!lesson) return;
-      // Don't allow selecting locked lessons
       if (lessonMastery[lessonId] === "locked") return;
       setCurrentLesson(lesson);
       setCurrentSection(lesson.sectionId);
@@ -260,14 +267,12 @@ export function useFlashcards() {
   const startLesson = useCallback(() => {
     if (!currentLesson || !state) return;
 
-    // Build queue from lesson cards
     const lessonCards = currentLesson.cards
       .map((id) => cards.find((c) => c.id === id))
       .filter((c): c is Card => c !== undefined);
 
     if (lessonCards.length === 0) return;
 
-    // Update streak on lesson start too
     const newState = { ...state, stats: { ...state.stats } };
     updateStreak(newState);
     saveState(newState);
@@ -280,6 +285,7 @@ export function useFlashcards() {
     setSessionXp(0);
     setLessonCorrectCount(0);
     setLessonTotalCount(0);
+    setPendingConfidence(null);
     setView("study");
   }, [currentLesson, cards, state]);
 
@@ -291,18 +297,21 @@ export function useFlashcards() {
     (grade: number) => {
       if (!state) return;
       const card = queue[currentIndex];
-      const updated = sm2(state.cards[card.id], grade);
+      const oldCardState = state.cards[card.id];
+      const updated = reviewCard(oldCardState, grade);
 
       // Track lapses and leeches
-      const oldCard = state.cards[card.id];
       if (grade < 3) {
-        updated.lapses = (oldCard.lapses ?? 0) + 1;
+        updated.lapses = oldCardState.lapses + 1;
         if (updated.lapses >= LEECH_THRESHOLD) {
           updated.leech = true;
         }
-      } else {
-        updated.lapses = oldCard.lapses ?? 0;
-        updated.leech = oldCard.leech ?? false;
+      }
+
+      // Deep recall detection (for achievements)
+      let ratedGoodAfterDays: number | undefined;
+      if (grade >= 3 && oldCardState.scheduledDays >= 30) {
+        ratedGoodAfterDays = oldCardState.scheduledDays;
       }
 
       // Combo tracking
@@ -314,12 +323,23 @@ export function useFlashcards() {
         setComboCount(0);
       }
 
-      // Combo XP bonus
       let comboBonus = 0;
       if (grade >= 3 && (comboCount + 1) % 5 === 0) comboBonus = 5;
       if (grade >= 3 && (comboCount + 1) % 10 === 0) comboBonus = 10;
 
       const earned = (XP_PER_GRADE[grade] ?? 5) + comboBonus;
+
+      // Confidence calibration
+      if (pendingConfidence) {
+        const entry: CalibrationEntry = {
+          confidence: pendingConfidence,
+          correct: grade >= 3,
+          timestamp: new Date().toISOString(),
+        };
+        state.stats.calibrationLog = [...(state.stats.calibrationLog ?? []), entry];
+        setPendingConfidence(null);
+      }
+
       const newState: AppState = {
         ...state,
         cards: { ...state.cards, [card.id]: updated },
@@ -330,11 +350,11 @@ export function useFlashcards() {
         },
       };
       recordReview(newState);
+      triggerAchievements(newState, { ratedGoodAfterDays });
       saveState(newState);
       setState(newState);
       setSessionXp((prev) => prev + earned);
 
-      // Track lesson correctness for flashcard-style cards
       if (isLessonMode) {
         setLessonTotalCount((prev) => prev + 1);
         if (grade >= 3) {
@@ -344,7 +364,6 @@ export function useFlashcards() {
 
       const newQ = [...queue];
       if (grade < 3 && !isLessonMode) {
-        // Only re-queue failed cards in review mode, not lesson mode
         newQ.push(card);
         setQueue(newQ);
       }
@@ -361,35 +380,39 @@ export function useFlashcards() {
         setIsFlipped(false);
       }
     },
-    [queue, currentIndex, state, isLessonMode, comboCount, bestCombo]
+    [queue, currentIndex, state, isLessonMode, comboCount, bestCombo, pendingConfidence, cards]
   );
 
   const answerCard = useCallback(
     (correct: boolean) => {
       if (!state) return;
       const card = queue[currentIndex];
-
-      // Map correct/incorrect to SM-2 grades
       const grade = correct ? 4 : 1;
-      const updated = sm2(state.cards[card.id], grade);
+      const oldCardState = state.cards[card.id];
+      const updated = reviewCard(oldCardState, grade);
 
-      // Track lapses
-      const oldCard = state.cards[card.id];
       if (!correct) {
-        updated.lapses = (oldCard.lapses ?? 0) + 1;
+        updated.lapses = oldCardState.lapses + 1;
         if (updated.lapses >= LEECH_THRESHOLD) updated.leech = true;
-      } else {
-        updated.lapses = oldCard.lapses ?? 0;
-        updated.leech = oldCard.leech ?? false;
       }
 
-      // Combo
       if (correct) {
         const newCombo = comboCount + 1;
         setComboCount(newCombo);
         if (newCombo > bestCombo) setBestCombo(newCombo);
       } else {
         setComboCount(0);
+      }
+
+      // Confidence calibration
+      if (pendingConfidence) {
+        const entry: CalibrationEntry = {
+          confidence: pendingConfidence,
+          correct,
+          timestamp: new Date().toISOString(),
+        };
+        state.stats.calibrationLog = [...(state.stats.calibrationLog ?? []), entry];
+        setPendingConfidence(null);
       }
 
       const earned = correct ? 10 : 2;
@@ -403,6 +426,7 @@ export function useFlashcards() {
         },
       };
       recordReview(newState);
+      triggerAchievements(newState, {});
       saveState(newState);
       setState(newState);
       setSessionXp((prev) => prev + earned);
@@ -420,7 +444,7 @@ export function useFlashcards() {
         setIsFlipped(false);
       }
     },
-    [queue, currentIndex, state]
+    [queue, currentIndex, state, comboCount, bestCombo, pendingConfidence]
   );
 
   const completeLesson = useCallback(() => {
@@ -440,6 +464,13 @@ export function useFlashcards() {
         [currentLesson.id]: progress,
       },
     };
+
+    triggerAchievements(newState, {
+      lessonJustCompleted: true,
+      lessonCorrect: lessonCorrectCount,
+      lessonTotal: lessonTotalCount,
+    });
+
     saveState(newState);
     setState(newState);
 
@@ -448,7 +479,7 @@ export function useFlashcards() {
     setQueue([]);
     setCurrentIndex(0);
     setIsFlipped(false);
-  }, [state, currentLesson, lessonCorrectCount, lessonTotalCount]);
+  }, [state, currentLesson, lessonCorrectCount, lessonTotalCount, cards]);
 
   const backToDashboard = useCallback(() => {
     setView("dashboard");
@@ -458,6 +489,7 @@ export function useFlashcards() {
     setIsLessonMode(false);
     setCurrentLesson(null);
     setCurrentSection(null);
+    setPendingConfidence(null);
   }, []);
 
   const backToPath = useCallback(() => {
@@ -468,7 +500,7 @@ export function useFlashcards() {
     setCurrentLesson(null);
   }, []);
 
-  // --- New study modes ---
+  // --- Study modes ---
 
   const getDifficultCards = useCallback(() => {
     if (!state) return [];
@@ -476,8 +508,8 @@ export function useFlashcards() {
       const s = state.cards[card.id];
       if (!s) return false;
       return (
-        s.easeFactor < DIFFICULT_EASE_THRESHOLD ||
-        (s.lapses ?? 0) >= DIFFICULT_LAPSE_THRESHOLD ||
+        s.difficulty > DIFFICULT_DIFFICULTY_THRESHOLD ||
+        s.lapses >= DIFFICULT_LAPSE_THRESHOLD ||
         s.leech
       );
     });
@@ -487,7 +519,6 @@ export function useFlashcards() {
     if (!state) return;
     const difficult = getDifficultCards();
     if (difficult.length === 0) return;
-    // Shuffle
     for (let i = difficult.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [difficult[i], difficult[j]] = [difficult[j], difficult[i]];
@@ -510,13 +541,12 @@ export function useFlashcards() {
     if (!state) return;
     const due = getDueCards();
     if (due.length === 0) return;
-    // Shuffle for speed review
     const shuffled = [...due];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    setQueue(shuffled.slice(0, 20)); // Cap at 20 for speed review
+    setQueue(shuffled.slice(0, 20));
     setCurrentIndex(0);
     setIsFlipped(false);
     setSessionXp(0);
@@ -566,17 +596,17 @@ export function useFlashcards() {
 
   const getRetentionRate = useCallback(() => {
     if (!state) return 0;
-    const reviewed = Object.values(state.cards).filter((s) => s.repetitions > 0);
+    const reviewed = Object.values(state.cards).filter((s) => s.reps > 0);
     if (reviewed.length === 0) return 0;
-    const good = reviewed.filter((s) => s.easeFactor >= 2.0);
+    const good = reviewed.filter((s) => s.difficulty <= 6);
     return Math.round((good.length / reviewed.length) * 100);
   }, [state]);
 
   const getHardestCards = useCallback(() => {
     if (!state) return [];
     return cards
-      .filter((c) => state.cards[c.id]?.repetitions > 0)
-      .sort((a, b) => state.cards[a.id].easeFactor - state.cards[b.id].easeFactor)
+      .filter((c) => state.cards[c.id]?.reps > 0)
+      .sort((a, b) => state.cards[b.id].difficulty - state.cards[a.id].difficulty)
       .slice(0, 5);
   }, [cards, state]);
 
@@ -584,8 +614,8 @@ export function useFlashcards() {
     if (!state) return { newCount: 0, learning: 0, mature: 0 };
     let newCount = 0, learning = 0, mature = 0;
     for (const s of Object.values(state.cards)) {
-      if (s.repetitions === 0) newCount++;
-      else if (s.interval < 21) learning++;
+      if (s.cardState === "new") newCount++;
+      else if (s.cardState === "learning" || s.cardState === "relearning") learning++;
       else mature++;
     }
     return { newCount, learning, mature };
@@ -597,8 +627,37 @@ export function useFlashcards() {
     if (!newState.stats.matchBestTime || time < newState.stats.matchBestTime) {
       newState.stats.matchBestTime = time;
     }
+    triggerAchievements(newState, { matchTime: time });
     saveState(newState);
     setState(newState);
+  }, [state, cards]);
+
+  // FSRS scheduling intervals for current card
+  const schedulingIntervals = useMemo(() => {
+    if (!state || !queue[currentIndex]) return null;
+    const cardState = state.cards[queue[currentIndex].id];
+    if (!cardState) return null;
+    return getSchedulingIntervals(cardState);
+  }, [state, queue, currentIndex]);
+
+  const setConfidence = useCallback((c: CalibrationEntry["confidence"]) => {
+    setPendingConfidence(c);
+  }, []);
+
+  const dismissAchievement = useCallback(() => {
+    setPendingAchievement(null);
+  }, []);
+
+  const getCalibrationAccuracy = useCallback(() => {
+    if (!state) return null;
+    const log = state.stats.calibrationLog ?? [];
+    if (log.length < 5) return null;
+    const byLevel = { low: { total: 0, correct: 0 }, medium: { total: 0, correct: 0 }, high: { total: 0, correct: 0 } };
+    for (const entry of log) {
+      byLevel[entry.confidence].total++;
+      if (entry.correct) byLevel[entry.confidence].correct++;
+    }
+    return byLevel;
   }, [state]);
 
   const currentCard = queue[currentIndex] ?? null;
@@ -623,7 +682,7 @@ export function useFlashcards() {
     studyCount: Math.min(
       dueCards.length,
       MAX_NEW_PER_SESSION +
-        dueCards.filter((c) => (state?.cards[c.id]?.repetitions ?? 0) > 0).length
+        dueCards.filter((c) => (state?.cards[c.id]?.reps ?? 0) > 0).length
     ),
     sessionXp,
     xp,
@@ -661,6 +720,19 @@ export function useFlashcards() {
     allCards: cards,
     cardStates: state?.cards ?? {},
 
+    // FSRS scheduling
+    schedulingIntervals,
+
+    // Achievements
+    achievements: state?.stats.achievements ?? [],
+    pendingAchievement,
+    dismissAchievement,
+
+    // Confidence calibration
+    pendingConfidence,
+    setConfidence,
+    calibrationAccuracy: getCalibrationAccuracy(),
+
     // Actions
     startStudy,
     flipCard,
@@ -675,7 +747,7 @@ export function useFlashcards() {
     completeLesson,
     backToPath,
 
-    // New study mode actions
+    // Study mode actions
     startDifficultReview,
     startSpeedReview,
     startMatchGame,

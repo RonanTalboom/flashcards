@@ -12,7 +12,7 @@ export interface Card {
   keyPoints: string[];
 
   // Exercise variants
-  exerciseType?: "flashcard" | "mcq" | "fill-blank" | "cloze" | "math" | "interactive";
+  exerciseType?: "flashcard" | "mcq" | "fill-blank" | "cloze" | "math" | "interactive" | "listening" | "conjugation";
   choices?: string[];
   correctAnswer?: number | string;
   image?: string;
@@ -36,20 +36,51 @@ export interface Card {
   sentenceTranslation?: string;
   cefrLevel?: CEFRLevel;
   clozeText?: string;
+
+  // Reverse card support
+  reverseOf?: number; // ID of the card this is a reverse of
+
+  // Conjugation fields
+  verb?: string;
+  tense?: string;
+  pronoun?: string;
 }
 
+// === Card State (FSRS v4.5) ===
+
 export interface CardState {
-  easeFactor: number;
-  interval: number;
-  repetitions: number;
-  nextReviewDate: string;
+  stability: number;
+  difficulty: number;
+  scheduledDays: number;
+  reps: number;
   lapses: number;
+  cardState: "new" | "learning" | "review" | "relearning";
+  lastReview: string | null;
+  nextReviewDate: string;
   leech: boolean;
 }
 
 export interface ReviewLogEntry {
   date: string;
   count: number;
+}
+
+// === Achievements ===
+
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  unlockedAt: string | null;
+}
+
+// === Confidence Calibration ===
+
+export interface CalibrationEntry {
+  confidence: "low" | "medium" | "high";
+  correct: boolean;
+  timestamp: string;
 }
 
 export interface Stats {
@@ -62,6 +93,8 @@ export interface Stats {
   streakFreezes: number;
   reviewLog: ReviewLogEntry[];
   matchBestTime: number | null;
+  achievements: Achievement[];
+  calibrationLog: CalibrationEntry[];
 }
 
 export interface AppState {

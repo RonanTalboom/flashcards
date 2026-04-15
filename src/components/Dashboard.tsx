@@ -1,6 +1,6 @@
 import { DailyGoalRing } from "./DailyGoalRing";
 import { Heatmap } from "./Heatmap";
-import type { ReviewLogEntry } from "../types";
+import type { ReviewLogEntry, Achievement } from "../types";
 
 interface DashboardProps {
   streak: number;
@@ -24,6 +24,8 @@ interface DashboardProps {
   onMatchGame: () => void;
   onQuizMode: () => void;
   onStats: () => void;
+  achievements: Achievement[];
+  calibrationAccuracy: { low: { total: number; correct: number }; medium: { total: number; correct: number }; high: { total: number; correct: number } } | null;
 }
 
 export function Dashboard({
@@ -48,7 +50,11 @@ export function Dashboard({
   onMatchGame,
   onQuizMode,
   onStats,
+  achievements,
+  calibrationAccuracy,
 }: DashboardProps) {
+  const unlockedAchievements = achievements.filter((a) => a.unlockedAt);
+  const lockedAchievements = achievements.filter((a) => !a.unlockedAt);
   return (
     <div className="container">
       <header>
@@ -141,6 +147,52 @@ export function Dashboard({
         <div className="dashboard-heatmap">
           <h3 className="dashboard-section-title">Activity</h3>
           <Heatmap reviewLog={reviewLog} />
+        </div>
+      )}
+
+      {/* Achievements */}
+      {achievements.length > 0 && (
+        <div className="dashboard-achievements">
+          <h3 className="dashboard-section-title">Achievements</h3>
+          <div className="achievements-grid">
+            {unlockedAchievements.map((a) => (
+              <div key={a.id} className="achievement-badge unlocked" title={a.description}>
+                <span className="achievement-icon">{a.icon}</span>
+                <span className="achievement-name">{a.title}</span>
+              </div>
+            ))}
+            {lockedAchievements.map((a) => (
+              <div key={a.id} className="achievement-badge locked" title={a.description}>
+                <span className="achievement-icon">&#128274;</span>
+                <span className="achievement-name">{a.title}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Calibration */}
+      {calibrationAccuracy && (
+        <div className="dashboard-calibration">
+          <h3 className="dashboard-section-title">Calibration</h3>
+          <div className="calibration-bars">
+            {(["low", "medium", "high"] as const).map((level) => {
+              const d = calibrationAccuracy[level];
+              const pct = d.total > 0 ? Math.round((d.correct / d.total) * 100) : 0;
+              return (
+                <div key={level} className="calibration-row">
+                  <span className="calibration-label">{level}</span>
+                  <div className="calibration-bar-track">
+                    <div
+                      className={`calibration-bar-fill calibration-${level}`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <span className="calibration-pct">{d.total > 0 ? `${pct}%` : "—"}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 

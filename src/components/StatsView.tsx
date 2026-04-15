@@ -137,7 +137,7 @@ export function StatsView({
               <div key={card.id} className="stats-hard-item">
                 <span className="stats-hard-front">{card.front.slice(0, 50)}</span>
                 <span className="stats-hard-ease">
-                  EF {cardStates[card.id]?.easeFactor.toFixed(2)}
+                  D {cardStates[card.id]?.difficulty.toFixed(1)}
                 </span>
               </div>
             ))}

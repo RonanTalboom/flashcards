@@ -2708,3 +2708,400 @@ header h1 {
   color: var(--text-muted);
   margin-top: 2px;
 }
+
+/* ========================================
+   FSRS Scheduling Intervals
+   ======================================== */
+
+.rate-interval {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--accent);
+  font-weight: 500;
+  margin-top: 1px;
+}
+
+/* ========================================
+   Achievement Toast
+   ======================================== */
+
+.achievement-toast {
+  position: fixed;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 1000;
+  transition: top 0.3s ease;
+  box-shadow: 0 4px 20px rgba(56, 178, 172, 0.3);
+}
+
+.achievement-toast-visible {
+  top: 20px;
+}
+
+.achievement-toast-icon {
+  font-size: 2rem;
+}
+
+.achievement-toast-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.achievement-toast-title {
+  font-size: 0.7rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.achievement-toast-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.achievement-toast-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ========================================
+   Achievements Grid (Dashboard)
+   ======================================== */
+
+.dashboard-achievements {
+  margin-top: 24px;
+}
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.achievement-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.achievement-badge.unlocked {
+  border-color: var(--accent);
+  background: rgba(56, 178, 172, 0.08);
+}
+
+.achievement-badge.locked {
+  opacity: 0.4;
+}
+
+.achievement-icon {
+  font-size: 1.4rem;
+}
+
+.achievement-name {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+.achievement-badge.unlocked .achievement-name {
+  color: var(--text);
+}
+
+/* ========================================
+   Confidence Prompt
+   ======================================== */
+
+.confidence-prompt {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  text-align: center;
+}
+
+.confidence-question {
+  font-size: 1.1rem;
+  color: var(--text);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.confidence-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.confidence-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.confidence-btn {
+  flex: 1;
+  max-width: 120px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.confidence-btn:hover {
+  border-color: var(--accent);
+}
+
+.confidence-low { border-color: var(--red); color: var(--red); }
+.confidence-low:hover { background: rgba(229, 62, 62, 0.1); }
+.confidence-medium { border-color: var(--orange); color: var(--orange); }
+.confidence-medium:hover { background: rgba(221, 107, 32, 0.1); }
+.confidence-high { border-color: var(--green); color: var(--green); }
+.confidence-high:hover { background: rgba(56, 161, 105, 0.1); }
+
+/* ========================================
+   Calibration (Dashboard)
+   ======================================== */
+
+.dashboard-calibration {
+  margin-top: 24px;
+}
+
+.calibration-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.calibration-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.calibration-label {
+  width: 60px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: capitalize;
+}
+
+.calibration-bar-track {
+  flex: 1;
+  height: 8px;
+  background: var(--surface);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.calibration-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.calibration-low { background: var(--red); }
+.calibration-medium { background: var(--orange); }
+.calibration-high { background: var(--green); }
+
+.calibration-pct {
+  width: 36px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+/* ========================================
+   Listening Card
+   ======================================== */
+
+.listening-front {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 240px;
+  gap: 16px;
+}
+
+.listening-play-btn {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  background: rgba(56, 178, 172, 0.1);
+  color: var(--accent);
+  font-size: 2rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.listening-play-btn:hover {
+  background: rgba(56, 178, 172, 0.2);
+  transform: scale(1.05);
+}
+
+.listening-instruction {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.listening-speed {
+  display: flex;
+  gap: 8px;
+}
+
+.speed-btn {
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.speed-btn-active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(56, 178, 172, 0.1);
+}
+
+.listening-input {
+  width: 100%;
+  max-width: 280px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.listening-input::placeholder {
+  color: var(--text-muted);
+}
+
+.listening-french {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+/* ========================================
+   Conjugation Card
+   ======================================== */
+
+.conjugation-card {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.conjugation-verb {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.conjugation-tense {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.conjugation-prompt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.2rem;
+  margin-top: 12px;
+}
+
+.conjugation-pronoun {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.conjugation-input {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1.1rem;
+  width: 180px;
+}
+
+.conjugation-input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.conjugation-answer {
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.conjugation-answer.correct {
+  color: var(--green);
+  background: rgba(56, 161, 105, 0.1);
+}
+
+.conjugation-answer.incorrect {
+  color: var(--red);
+  background: rgba(229, 62, 62, 0.1);
+  text-decoration: line-through;
+}
+
+.conjugation-correction {
+  color: var(--green);
+  font-size: 1rem;
+}
+
+.conjugation-correct-msg {
+  color: var(--green);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* ========================================
+   Reverse card indicator
+   ======================================== */
+
+.reverse-badge {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
