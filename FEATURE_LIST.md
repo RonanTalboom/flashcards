@@ -689,7 +689,8 @@ src/
     ├── quant-cards.ts              # Quant/prediction markets deck (40 cards)
     └── paths/                      # NEW: learning path definitions
         ├── prediction-markets.ts   # Path: lessons + steps + cards
-        └── software-architecture.ts
+        ├── software-architecture.ts
+        └── business-fundamentals.ts # Path: 6 domains, ~37 lessons, ~250 cards
 ```
 
 ### Key dependencies
@@ -816,6 +817,290 @@ const evLesson: Lesson = {
 ```
 
 ---
+
+---
+
+## Content: Business Fundamentals Learning Path
+
+> A structured learning path covering the core frameworks for starting, scaling, and running a business. Sources: Seth Godin, Chris Voss, Verne Harnish, Simon Sinek, Eric Ries, Peter Thiel, Michael Gerber, Kim Scott.
+> See vault note: [[Business Fundamentals — Learning Path]]
+
+### Path Structure
+
+```typescript
+const businessFundamentalsPath: LearningPath = {
+  id: "biz",
+  title: "Business Fundamentals",
+  description: "From idea to scale — strategy, marketing, negotiation, execution, leadership, and mindset",
+  icon: "🏗️",
+  lessons: [
+    // Domain 1: Vision & Strategy
+    "biz-contrarian", "biz-monopoly", "biz-why", "biz-remarkable", "biz-infinite", "biz-strategic-plan",
+    // Domain 2: Marketing & Growth
+    "biz-permission", "biz-this-is-marketing", "biz-stories", "biz-bml", "biz-mom-test", "biz-the-dip",
+    // Domain 3: Sales & Negotiation
+    "biz-tactical-empathy", "biz-mirror-label", "biz-calibrated-q", "biz-accusation-audit",
+    "biz-thats-right", "biz-ackerman", "biz-black-swans", "biz-negotiator-styles",
+    // Domain 4: Execution & Operations
+    "biz-rockefeller", "biz-meeting-rhythms", "biz-accountability", "biz-opsp", "biz-cash", "biz-eos", "biz-emyth",
+    // Domain 5: People & Leadership
+    "biz-tribes", "biz-linchpin", "biz-circle-safety", "biz-radical-candor", "biz-hiring", "biz-feedback-loops",
+    // Domain 6: Mindset & Decision-Making
+    "biz-definite-optimism", "biz-last-mover", "biz-loss-aversion", "biz-strategic-quitting", "biz-anti-trendslop",
+  ],
+  createdAt: "2026-04-16",
+};
+```
+
+### Example Lessons
+
+#### Lesson: Tactical Empathy (Chris Voss)
+
+```typescript
+const tacticalEmpathyLesson: Lesson = {
+  id: "biz-tactical-empathy",
+  pathId: "biz",
+  title: "Tactical Empathy",
+  description: "Understand feelings to increase influence — without agreeing",
+  prerequisites: [],
+  estimatedMinutes: 5,
+  steps: [
+    {
+      type: "concept",
+      title: "Empathy is not agreement",
+      content: "Tactical empathy means understanding someone's feelings and worldview in the moment to increase your influence. It's not sympathy (feeling *for* them) or agreement (conceding their point). It's intelligence gathering through emotional attention.\n\n**Source**: Chris Voss, *Never Split the Difference*",
+      diagrams: [],
+    },
+    {
+      type: "multiple-choice",
+      question: "Your supplier says 'This price increase is non-negotiable.' What's the tactical empathy response?",
+      options: [
+        "I understand, let's move on to other terms.",
+        "It seems like you're under pressure from your costs going up.",
+        "That's not fair — we've been loyal customers for years.",
+        "Can you break down the cost increase for me?",
+      ],
+      correctIndex: 1,
+      explanation: "Labeling their emotion ('It seems like...') validates their position without conceding. It opens them up to explain *why*, which reveals leverage points. Option D is a good follow-up, but empathy comes first.",
+    },
+    {
+      type: "fill-blank",
+      template: "Tactical empathy = understanding {{feelings}} + hearing what's {{behind}} those feelings → increase your {{influence}}",
+      blanks: [
+        { key: "feelings", answer: "feelings", hint: "what they're experiencing" },
+        { key: "behind", answer: "behind", hint: "the deeper motivation" },
+        { key: "influence", answer: "influence", hint: "your power in the conversation" },
+      ],
+      explanation: "Voss's formula: surface emotions → underlying needs → leverage. The sequence matters — you can't influence without first demonstrating understanding.",
+    },
+    {
+      type: "multiple-choice",
+      question: "What's the difference between tactical empathy and sympathy?",
+      options: [
+        "Tactical empathy is fake, sympathy is real",
+        "Sympathy means you feel FOR them, empathy means you understand THEIR perspective",
+        "There is no difference — both build rapport",
+        "Empathy is emotional, sympathy is rational",
+      ],
+      correctIndex: 1,
+      explanation: "Sympathy creates emotional fusion ('I feel your pain'). Tactical empathy maintains separation — you understand their world without inhabiting it. This separation is what preserves your negotiating position.",
+    },
+    {
+      type: "reflection",
+      prompt: "Think of a recent disagreement at work or in life. What was the other person's underlying feeling behind their position? How would labeling that feeling ('It seems like...') have changed the conversation?",
+    },
+  ],
+  reviewCards: ["biz-te-1", "biz-te-2", "biz-te-3"],
+};
+```
+
+#### Lesson: The Ackerman Model (Chris Voss)
+
+```typescript
+const ackermanLesson: Lesson = {
+  id: "biz-ackerman",
+  pathId: "biz",
+  title: "The Ackerman Model",
+  description: "A structured anchoring and concession strategy using calculated offers",
+  prerequisites: ["biz-tactical-empathy", "biz-mirror-label", "biz-calibrated-q"],
+  estimatedMinutes: 5,
+  steps: [
+    {
+      type: "concept",
+      title: "Never negotiate in round numbers",
+      content: "The Ackerman Model is a structured approach to making offers:\n\n1. Set your target price\n2. Open at **65%** of target (extreme anchor)\n3. Calculate three raises: **85%, 95%, 100%** of target\n4. Use decreasing increments (shows you're reaching your limit)\n5. Use **odd, precise numbers** (e.g., $37,893 not $38,000)\n6. On your final number, throw in a **non-monetary item** to signal you're at your limit\n\n**Why odd numbers?** They signal careful calculation. $37,893 implies you've done precise analysis. $38,000 implies you're guessing.",
+      diagrams: [],
+    },
+    {
+      type: "calculation",
+      question: "Your target salary is $120,000. What should your opening offer be using the Ackerman model?",
+      answer: 78000,
+      tolerance: 1000,
+      unit: "$",
+      explanation: "Opening anchor = 65% of target = 0.65 × $120,000 = $78,000. This feels extreme, but the Ackerman model relies on the anchor dragging the negotiation toward your actual target through calibrated concessions.",
+    },
+    {
+      type: "ordering",
+      question: "Put the Ackerman concession steps in order:",
+      items: [
+        "Set your target price",
+        "Open at 65% of target",
+        "Raise to 85% of target",
+        "Raise to 95% of target",
+        "Raise to 100% + non-monetary item",
+      ],
+      explanation: "The decreasing increments (20% → 10% → 5%) signal diminishing capacity. Each concession 'costs' you visibly more, making the counterpart feel they're squeezing your limit.",
+    },
+    {
+      type: "multiple-choice",
+      question: "Why should you include a non-monetary item with your final offer?",
+      options: [
+        "It adds value for the other side at no cost to you",
+        "It signals you've reached your absolute limit",
+        "It creates reciprocity pressure",
+        "All of the above",
+      ],
+      correctIndex: 3,
+      explanation: "The non-monetary item does triple duty: it's cheap for you but valuable to them, it signals 'I have no more money to give', and it triggers reciprocal generosity. Voss: 'throw in something unrelated to the price.'",
+    },
+    {
+      type: "reflection",
+      prompt: "Think of an upcoming negotiation (salary, vendor, lease, etc.). What's your target number? What would your 65% anchor be? Does it feel uncomfortably low? That's the point.",
+    },
+  ],
+  reviewCards: ["biz-ack-1", "biz-ack-2"],
+};
+```
+
+#### Lesson: Be Remarkable (Seth Godin)
+
+```typescript
+const remarkableLesson: Lesson = {
+  id: "biz-remarkable",
+  pathId: "biz",
+  title: "Be Remarkable",
+  description: "Why safe is risky and remarkable is the only marketing that works",
+  prerequisites: ["biz-why"],
+  estimatedMinutes: 5,
+  steps: [
+    {
+      type: "concept",
+      title: "The Purple Cow",
+      content: "If you drove past a field of cows, you wouldn't notice them. But a **purple cow** — that you'd stop for.\n\nSeth Godin's argument: in a world of infinite choices and zero attention, being safe is the riskiest strategy. The only marketing that works is building something **worth remarking about**.\n\n'Remarkable' literally means 'worth making a remark about.' If your customers don't talk about you, you're invisible.\n\n**Source**: Seth Godin, *Purple Cow*",
+      diagrams: [],
+    },
+    {
+      type: "multiple-choice",
+      question: "According to Godin, what's the riskiest strategy in a crowded market?",
+      options: [
+        "Being first to market",
+        "Being the cheapest option",
+        "Being safe and conventional",
+        "Targeting a niche audience",
+      ],
+      correctIndex: 2,
+      explanation: "Godin: 'In a crowded marketplace, fitting in is failing. In a busy marketplace, not standing out is the same as being invisible.' Safe products don't spread — they die quietly.",
+    },
+    {
+      type: "fill-blank",
+      template: "The goal is not to market TO {{everyone}} but to market FOR the {{sneezers}} who will spread your idea",
+      blanks: [
+        { key: "everyone", answer: "everyone", hint: "mass market" },
+        { key: "sneezers", answer: "sneezers", hint: "Godin's term for word-of-mouth spreaders" },
+      ],
+      explanation: "Sneezers are the early adopters who spread ideas. Your job is to make something so remarkable that sneezers can't help but tell people about it. Target the edges, not the middle.",
+    },
+    {
+      type: "reflection",
+      prompt: "What's the 'purple cow' in your business or project? If you don't have one, what would you need to change to make someone remark about it to a friend?",
+    },
+  ],
+  reviewCards: ["biz-rem-1", "biz-rem-2"],
+};
+```
+
+### Card Examples (standalone review cards generated from lessons)
+
+```typescript
+// Generated from biz-tactical-empathy lesson
+const bizCards = [
+  {
+    id: "biz-te-1",
+    lessonId: "biz-tactical-empathy",
+    category: "Business — Negotiation",
+    type: "basic",
+    front: "What is tactical empathy?",
+    back: "Understanding someone's feelings and worldview in the moment to increase your influence — without agreeing with them. (Chris Voss)",
+    keyPoints: ["Not sympathy", "Intelligence gathering through emotional attention", "Preserves negotiating position"],
+    diagrams: [],
+  },
+  {
+    id: "biz-te-2",
+    lessonId: "biz-tactical-empathy",
+    category: "Business — Negotiation",
+    type: "basic",
+    front: "What phrase pattern does Voss use for labeling emotions?",
+    back: "'It seems like...', 'It sounds like...', 'It looks like...' — never starting with 'I', which puts the other person's guard up.",
+    keyPoints: ["Avoid 'I' statements", "Downward inflection (statement, not question)", "Follow with silence"],
+    diagrams: [],
+  },
+  {
+    id: "biz-te-3",
+    lessonId: "biz-tactical-empathy",
+    category: "Business — Negotiation",
+    type: "basic",
+    front: "Your counterpart says 'That's a fair price.' What technique do you use?",
+    back: "Fair Statement Defense: Mirror the word ('Fair?') then label ('It seems like you want to walk me through your calculations...'). This forces them to justify rather than assert. (Voss)",
+    keyPoints: ["Mirror 'fair'", "Label to redirect", "Forces justification"],
+    diagrams: [],
+  },
+  {
+    id: "biz-ack-1",
+    lessonId: "biz-ackerman",
+    category: "Business — Negotiation",
+    type: "basic",
+    front: "What are the Ackerman Model percentages?",
+    back: "Open at 65% of target → raise to 85% → 95% → 100% (with non-monetary item). Decreasing increments signal you're reaching your limit. Always use odd, precise numbers.",
+    keyPoints: ["65/85/95/100", "Odd numbers signal precision", "Non-monetary item on final offer"],
+    diagrams: [],
+  },
+  {
+    id: "biz-rem-1",
+    lessonId: "biz-remarkable",
+    category: "Business — Marketing",
+    type: "basic",
+    front: "What is the 'Purple Cow' concept?",
+    back: "In a world of infinite choices and zero attention, being safe is the riskiest strategy. Build something worth remarking about — 'remarkable' literally means 'worth making a remark about.' Target the sneezers (early adopters who spread ideas), not the mass market. (Seth Godin)",
+    keyPoints: ["Safe = invisible", "Target sneezers not everyone", "Remarkable = worth remarking about"],
+    diagrams: [],
+  },
+  {
+    id: "biz-rem-2",
+    lessonId: "biz-remarkable",
+    category: "Business — Marketing",
+    type: "basic",
+    front: "What are 'sneezers' in Godin's framework?",
+    back: "Early adopters who spread ideas to their networks. Your product doesn't need to appeal to everyone — it needs to be so remarkable that sneezers can't help telling people about it.",
+    keyPoints: ["Word-of-mouth spreaders", "Target the edges not the middle", "Ideas spread through sneezers"],
+    diagrams: [],
+  },
+];
+```
+
+### Full Lesson Inventory (37 lessons across 6 domains)
+
+| Domain | # | Lessons | Primary Source |
+|--------|---|---------|----------------|
+| **1. Vision & Strategy** | 6 | Contrarian Question, Build a Monopoly, Start With Why, Be Remarkable, The Infinite Game, Strategic Positioning | Thiel, Sinek, Godin, Harnish |
+| **2. Marketing & Growth** | 6 | Permission vs Interruption, This Is Marketing, Stories & Worldview, Build-Measure-Learn, The Mom Test, The Dip | Godin, Ries, Fitzpatrick |
+| **3. Sales & Negotiation** | 8 | Tactical Empathy, Mirroring & Labeling, Calibrated Questions, Accusation Audit, Getting to "That's Right", Ackerman Model, Black Swans, Negotiator Styles | Voss |
+| **4. Execution & Operations** | 7 | Rockefeller Habits, Meeting Rhythms, Accountability Systems, One-Page Strategic Plan, Cash is King, EOS Foundations, Work ON the Business | Harnish, Wickman, Gerber |
+| **5. People & Leadership** | 6 | Tribes, The Linchpin, Circle of Safety, Radical Candor, Hiring & Core Values, Employee Feedback Loops | Godin, Sinek, Scott, Harnish |
+| **6. Mindset & Decision-Making** | 5 | Definite Optimism, Last Mover Advantage, Loss Aversion, Strategic Quitting, Anti-Trendslop Mindset | Thiel, Voss, Godin |
+| **Total** | **37** | | |
+
+**Estimated cards**: ~250 (5-8 review cards per lesson)
+**Estimated build time**: content authoring is the bottleneck — lessons need scenario-based steps, not just definitions
 
 ---
 
