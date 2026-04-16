@@ -4,9 +4,30 @@ interface Env {
   DB: D1Database;
 }
 
+async function ensureSchema(db: D1Database) {
+  await db.batch([
+    db.prepare(`CREATE TABLE IF NOT EXISTS cards (
+      id INTEGER PRIMARY KEY,
+      category TEXT NOT NULL,
+      front TEXT NOT NULL,
+      back TEXT NOT NULL,
+      key_points TEXT NOT NULL DEFAULT '[]'
+    )`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS app_state (
+      id INTEGER PRIMARY KEY,
+      data TEXT NOT NULL
+    )`),
+  ]);
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+
+    // Ensure tables exist on first API request
+    if (url.pathname.startsWith("/api/")) {
+      await ensureSchema(env.DB);
+    }
 
     if (url.pathname === "/api/cards" && request.method === "GET") {
       const { results } = await env.DB.prepare(
