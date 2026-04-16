@@ -517,7 +517,96 @@ export const SECTIONS: Section[] = [
     ],
   },
 
-  // === Section 9: Business Fundamentals ===
+  // === Section 9: Kahneman — Thinking & Decision-Making ===
+  {
+    id: "kahneman",
+    title: "Thinking & Decision-Making",
+    description: "Kahneman: heuristics, biases, prospect theory, noise",
+    icon: "&#129504;",
+    color: "#e53e3e",
+    lessons: [
+      {
+        id: "kah-system12",
+        sectionId: "kahneman",
+        title: "System 1 & System 2",
+        description: "Fast intuitive thinking vs slow deliberate thinking",
+        cards: [5000, 5001],
+        prerequisites: [],
+        concepts: [
+          "System 1: fast, automatic, effortless",
+          "System 2: slow, deliberate, effortful",
+          "Most errors come from System 1 substituting easy questions for hard ones",
+        ],
+      },
+      {
+        id: "kah-heuristics",
+        sectionId: "kahneman",
+        title: "Heuristics & Biases",
+        description: "Anchoring, availability, representativeness, and their traps",
+        cards: [5002, 5003, 5004],
+        prerequisites: ["kah-system12"],
+        concepts: [
+          "Anchoring: first number biases all subsequent estimates",
+          "Availability: ease of recall ≠ actual frequency",
+          "Representativeness: similarity to a stereotype ≠ probability",
+        ],
+      },
+      {
+        id: "kah-prospect",
+        sectionId: "kahneman",
+        title: "Prospect Theory & Loss Aversion",
+        description: "Why losses hurt 2x more than equivalent gains feel good",
+        cards: [5005, 5006],
+        prerequisites: ["kah-heuristics"],
+        concepts: [
+          "Loss aversion: losses weighted ~2x gains",
+          "Reference point determines whether an outcome feels like a gain or loss",
+          "Framing: same outcome described as gain vs loss changes decisions",
+        ],
+      },
+      {
+        id: "kah-noise",
+        sectionId: "kahneman",
+        title: "Noise vs. Bias",
+        description: "The hidden variability in human judgment",
+        cards: [5007, 5008, 5009],
+        prerequisites: [],
+        concepts: [
+          "Bias = systematic error, Noise = random scatter",
+          "Noise is often larger than bias but invisible without measurement",
+          "Occasion noise: the same person gives different judgments on different days",
+        ],
+      },
+      {
+        id: "kah-hygiene",
+        sectionId: "kahneman",
+        title: "Decision Hygiene",
+        description: "Practical protocols for reducing noise and bias",
+        cards: [5010, 5011, 5012],
+        prerequisites: ["kah-noise"],
+        concepts: [
+          "Structure replaces intuition: checklists, rubrics, independent judgments",
+          "Aggregate multiple opinions before discussing",
+          "Mediating assessments: break complex judgments into components",
+        ],
+      },
+      {
+        id: "kah-replication",
+        sectionId: "kahneman",
+        title: "Replication & Intellectual Honesty",
+        description: "What Kahneman got wrong and why that matters",
+        cards: [5013],
+        prerequisites: ["kah-heuristics"],
+        concepts: [
+          "Several priming studies from Thinking Fast & Slow failed to replicate",
+          "Kahneman publicly acknowledged the failures — a model of intellectual honesty",
+          "Replication crisis doesn't invalidate the core framework, but demands calibration",
+        ],
+      },
+    ],
+  },
+
+  // === Section 10: Business Fundamentals ===
   {
     id: "business",
     title: "Business Fundamentals",
