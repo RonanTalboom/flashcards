@@ -21,6 +21,7 @@ import { ConfidencePrompt } from "./components/ConfidencePrompt";
 import { ListeningCard } from "./components/ListeningCard";
 import { ConjugationCard } from "./components/ConjugationCard";
 import { PretestCard } from "./components/PretestCard";
+import { OrderingCard } from "./components/OrderingCard";
 import { SECTIONS, getSectionByLessonId } from "./data/lessons";
 import "./index.css";
 
@@ -192,6 +193,21 @@ export function App() {
             <>
               <SessionProgressBar current={fc.currentIndex} total={fc.queueLength} />
               <MCQCard
+                key={fc.currentCard.id}
+                card={fc.currentCard}
+                currentIndex={fc.currentIndex}
+                queueLength={fc.queueLength}
+                onAnswer={fc.answerCard}
+              />
+            </>
+          );
+        }
+
+        if (exerciseType === "ordering") {
+          return (
+            <>
+              <SessionProgressBar current={fc.currentIndex} total={fc.queueLength} />
+              <OrderingCard
                 key={fc.currentCard.id}
                 card={fc.currentCard}
                 currentIndex={fc.currentIndex}

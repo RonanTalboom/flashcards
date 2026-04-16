@@ -1068,6 +1068,119 @@ header h1 {
 }
 
 /* ========================================
+   Ordering
+   ======================================== */
+
+.ordering-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ordering-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  transition: all 0.15s;
+}
+
+.ordering-item--selected {
+  border-color: var(--accent);
+  background: rgba(56, 178, 172, 0.08);
+}
+
+.ordering-item--correct {
+  border-color: var(--green);
+  background: rgba(56, 161, 105, 0.1);
+}
+
+.ordering-item--incorrect {
+  border-color: var(--red);
+  background: rgba(229, 62, 62, 0.1);
+}
+
+.ordering-number {
+  font-weight: 700;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  width: 18px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.ordering-text {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+  padding: 0;
+}
+
+.ordering-text:disabled {
+  cursor: default;
+}
+
+.ordering-arrows {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.ordering-arrow {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-size: 0.6rem;
+  width: 24px;
+  height: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.1s;
+}
+
+.ordering-arrow:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.ordering-arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.ordering-correct-order {
+  margin-bottom: 12px;
+}
+
+.ordering-correct-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.ordering-correct-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  color: var(--green);
+}
+
+/* ========================================
    Pretest (diagnostic — amber theme)
    ======================================== */
 

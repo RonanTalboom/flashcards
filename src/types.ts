@@ -12,7 +12,7 @@ export interface Card {
   keyPoints: string[];
 
   // Exercise variants
-  exerciseType?: "flashcard" | "mcq" | "fill-blank" | "cloze" | "math" | "interactive" | "listening" | "conjugation" | "pretest";
+  exerciseType?: "flashcard" | "mcq" | "fill-blank" | "cloze" | "math" | "interactive" | "listening" | "conjugation" | "pretest" | "ordering";
   choices?: string[];
   correctAnswer?: number | string;
   image?: string;
