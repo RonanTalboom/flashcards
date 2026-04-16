@@ -102,18 +102,24 @@ function formatInterval(days: number): string {
 
 export function getSchedulingIntervals(
   state: CardState
-): Record<number, string> {
+): Record<number, string> | null {
+  // FSRS rejects new cards with stability=0 — return null so UI hides intervals
+  if (state.cardState === "new" && state.stability === 0) return null;
+
   const fsrsCard = toFSRSCard(state);
   const now = new Date();
-  const scheduling = f.repeat(fsrsCard, now);
-
-  const s = scheduling as unknown as Record<number, { card: FSRSCard }>;
-  return {
-    0: formatInterval(s[Rating.Again].card.scheduled_days),
-    2: formatInterval(s[Rating.Hard].card.scheduled_days),
-    4: formatInterval(s[Rating.Good].card.scheduled_days),
-    5: formatInterval(s[Rating.Easy].card.scheduled_days),
-  };
+  try {
+    const scheduling = f.repeat(fsrsCard, now);
+    const s = scheduling as unknown as Record<number, { card: FSRSCard }>;
+    return {
+      0: formatInterval(s[Rating.Again].card.scheduled_days),
+      2: formatInterval(s[Rating.Hard].card.scheduled_days),
+      4: formatInterval(s[Rating.Good].card.scheduled_days),
+      5: formatInterval(s[Rating.Easy].card.scheduled_days),
+    };
+  } catch {
+    return null;
+  }
 }
 
 // Migrate legacy SM-2 state to FSRS
