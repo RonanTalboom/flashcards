@@ -7,34 +7,17 @@ import type { Card } from "../types";
 export const BUSINESS_CARDS: Card[] = [
   // ================================================================
   // LESSON: Tactical Empathy (biz-tactical-empathy)
+  // Guided Discovery: Predict → Reveal → Predict → Reveal → Apply → Synthesize
   // ================================================================
 
-  // Step 1: Concept — "Empathy is not agreement"
+  // PREDICT 1: Supplier scenario
   {
     id: 3000,
     category: "Business — Negotiation",
-    front: "What is tactical empathy and how does it differ from sympathy or agreement?",
-    back: "Tactical empathy means understanding someone's feelings and worldview in the moment to increase your influence. It's not sympathy (feeling *for* them) or agreement (conceding their point). It's intelligence gathering through emotional attention.\n\n**Source**: Chris Voss, *Never Split the Difference*",
-    keyPoints: [
-      "Empathy ≠ agreement — you can understand without conceding",
-      "Empathy ≠ sympathy — sympathy creates emotional fusion, empathy maintains separation",
-      "Purpose: intelligence gathering through emotional attention",
-    ],
-    exerciseType: "flashcard",
-  },
-
-  // Step 2: MCQ — Supplier scenario
-  {
-    id: 3001,
-    category: "Business — Negotiation",
-    front: "Your supplier says 'This price increase is non-negotiable.' What's the tactical empathy response?",
-    back: "Labeling their emotion ('It seems like...') validates their position without conceding. It opens them up to explain *why*, which reveals leverage points. Asking for a cost breakdown is a good follow-up, but empathy comes first.",
-    keyPoints: [
-      "Label before you probe — empathy opens the door to information",
-      "'It seems like...' is non-threatening and invites elaboration",
-      "Understanding their pressure gives you leverage without confrontation",
-    ],
-    exerciseType: "mcq",
+    front: "Your supplier says 'This price increase is non-negotiable.' What would you say?",
+    back: "Most people either give in (A) or fight (C). The best negotiators do something counterintuitive — they acknowledge the other side's pressure first.",
+    keyPoints: [],
+    exerciseType: "pretest",
     choices: [
       "I understand, let's move on to other terms.",
       "It seems like you're under pressure from your costs going up.",
@@ -42,35 +25,70 @@ export const BUSINESS_CARDS: Card[] = [
       "Can you break down the cost increase for me?",
     ],
     correctAnswer: 1,
+    choiceExplanations: [
+      "Giving in skips past their emotion. You learn nothing and lose leverage.",
+      "This is a *label* — it names their feeling without agreeing. It makes them feel heard and opens them up.",
+      "Fairness claims trigger defensiveness. Now they're fighting you instead of explaining.",
+      "Good instinct to gather data, but jumping to logic skips the emotional layer. Empathy first, then questions.",
+    ],
   },
 
-  // Step 3: MCQ — Voss's formula
+  // REVEAL 1: Labeling (micro-concept, 2 sentences)
+  {
+    id: 3001,
+    category: "Business — Negotiation",
+    front: "What does labeling do in a negotiation?",
+    back: "Labeling their emotion ('It seems like...') validates their position without conceding yours. It opens them up to explain *why* — which reveals leverage points you can use.",
+    keyPoints: [
+      "'It seems like...' is non-threatening and invites elaboration",
+      "Never start with 'I' — it shifts focus to you",
+    ],
+    exerciseType: "flashcard",
+  },
+
+  // PREDICT 2: Follow-up scenario (builds on what you just learned)
+  {
+    id: 3007,
+    category: "Business — Negotiation",
+    front: "You labeled: 'It seems like costs are squeezing you.' They respond: 'Yeah, raw materials are up 30%.' What's your next move?",
+    back: "Calibrated questions shift the problem to them without confrontation. 'How can we...' makes it collaborative instead of adversarial.",
+    keyPoints: [],
+    exerciseType: "pretest",
+    choices: [
+      "Ask 'How can we make this work for both of us?'",
+      "Offer a 10% discount to split the difference",
+      "Say 'That's tough' and change the subject",
+      "Ask to see their supplier invoices",
+    ],
+    correctAnswer: 0,
+    choiceExplanations: [
+      "A *calibrated question* — open-ended, starts with 'how', shifts the pressure to them to solve the problem collaboratively.",
+      "Splitting the difference rewards their extreme position. You're negotiating against yourself.",
+      "Sympathetic but passive. You've lost the thread — they'll just restate their position.",
+      "Too aggressive too early. You haven't earned enough trust for this ask yet.",
+    ],
+  },
+
+  // REVEAL 2: Concept assembles (micro-concept)
   {
     id: 3002,
     category: "Business — Negotiation",
-    front: "Complete Voss's formula: Tactical empathy = understanding _____ + hearing what's _____ those feelings → increase your _____",
-    back: "Voss's formula: surface emotions → underlying needs → leverage. The sequence matters — you can't influence without first demonstrating understanding.",
+    front: "What is tactical empathy?",
+    back: "Tactical empathy = understand their feelings → label them ('It seems like...') → ask calibrated questions ('How can we...'). You never agree or concede — you *demonstrate understanding* to gain influence. (Chris Voss)",
     keyPoints: [
-      "Step 1: Identify the feeling",
-      "Step 2: Understand the motivation behind it",
-      "Step 3: Use that understanding to increase influence",
+      "Step 1: Identify the feeling behind their position",
+      "Step 2: Label it — 'It seems like...'",
+      "Step 3: Ask calibrated 'how' questions",
     ],
-    exerciseType: "mcq",
-    choices: [
-      "feelings → behind → influence",
-      "positions → beneath → credibility",
-      "arguments → driving → authority",
-      "demands → causing → rapport",
-    ],
-    correctAnswer: 0,
+    exerciseType: "flashcard",
   },
 
-  // Step 4: MCQ — empathy vs sympathy
+  // RETRIEVE: Empathy vs sympathy
   {
     id: 3003,
     category: "Business — Negotiation",
     front: "What's the difference between tactical empathy and sympathy?",
-    back: "Sympathy creates emotional fusion ('I feel your pain'). Tactical empathy maintains separation — you understand their world without inhabiting it. This separation is what preserves your negotiating position.",
+    back: "Sympathy creates emotional fusion ('I feel your pain'). Tactical empathy maintains separation — you understand their world without inhabiting it. This separation preserves your negotiating position.",
     keyPoints: [
       "Sympathy = feeling FOR them (emotional fusion)",
       "Empathy = understanding THEIR perspective (maintains separation)",
@@ -86,16 +104,16 @@ export const BUSINESS_CARDS: Card[] = [
     correctAnswer: 1,
   },
 
-  // Step 5: Reflection
+  // APPLY: Transfer to new context
   {
     id: 3004,
     category: "Business — Negotiation",
-    front: "Think of a recent disagreement at work or in life. What was the other person's underlying feeling behind their position? How would labeling that feeling ('It seems like...') have changed the conversation?",
-    back: "The goal of this reflection is to practice identifying emotions behind positions. Most disagreements have a hidden feeling driving the stated position — fear, frustration, pride, or uncertainty. Labeling it creates a moment of connection that opens the door to resolution.",
+    front: "Your cofounder says 'I'm done working on this feature.' Write a label using 'It seems like...' and a calibrated question.",
+    back: "Model answer: 'It seems like you're frustrated with how long this is taking. How can we scope it down so it ships this week?' — The label names the emotion, the calibrated question makes it collaborative.",
     keyPoints: [
-      "Positions mask feelings — identify the feeling first",
-      "Labeling creates connection without conceding",
-      "Practice: replay past conversations with empathy lens",
+      "Label: 'It seems like you're frustrated...'",
+      "Calibrated Q: 'How can we...' (collaborative, not confrontational)",
+      "Never: 'You need to finish this' (triggers defensiveness)",
     ],
     exerciseType: "flashcard",
   },
@@ -362,23 +380,6 @@ export const BUSINESS_CARDS: Card[] = [
   // PRETEST CARDS (diagnostic — no penalty, shown before concept)
   // ================================================================
 
-  // Pretest: Tactical Empathy
-  {
-    id: 3005,
-    category: "Business — Negotiation",
-    front: "Your supplier says 'This price increase is non-negotiable.' What would you do?",
-    back: "Interesting — most people either push back or give in. There's a third option that's more effective than both. Let's find out what it is...",
-    keyPoints: [],
-    exerciseType: "pretest",
-    choices: [
-      "Accept it and move on to other terms",
-      "Push back hard — 'That's not fair to us'",
-      "Ask for a detailed cost breakdown",
-      "Acknowledge their pressure and probe deeper",
-    ],
-    correctAnswer: 3,
-  },
-
   // Pretest: Ackerman
   {
     id: 3025,
@@ -394,6 +395,12 @@ export const BUSINESS_CARDS: Card[] = [
       "$110,000 — slightly below target",
     ],
     correctAnswer: 2,
+    choiceExplanations: [
+      "Opening at your target gives you zero room to concede. You'll end up below your goal.",
+      "Better instinct, but 8% above isn't extreme enough to shift the range meaningfully.",
+      "Feels crazy, but extreme anchors drag the negotiation toward your actual target through calibrated concessions.",
+      "Barely below target — you'll be negotiated down to $100k before you know it.",
+    ],
   },
 
   // Pretest: Be Remarkable
@@ -411,6 +418,12 @@ export const BUSINESS_CARDS: Card[] = [
       "Pricing significantly higher than competitors",
     ],
     correctAnswer: 2,
+    choiceExplanations: [
+      "Different is risky in a different way — but at least people notice you.",
+      "Niches are small but passionate. They can be the foundation of something big.",
+      "Safe means invisible. In a world of infinite choice, nobody talks about 'fine'. You die quietly.",
+      "Premium pricing signals quality and can work for the right audience — it's not the riskiest move.",
+    ],
   },
 
   // ================================================================
@@ -432,6 +445,12 @@ export const BUSINESS_CARDS: Card[] = [
       "Yes — if you raise prices to $60/month",
     ],
     correctAnswer: 1,
+    choiceExplanations: [
+      "$60 revenue vs $100 cost = -$40 per customer. You're literally paying people to use your product.",
+      "Exactly right. LTV ($60) < CAC ($100). Every customer you acquire destroys value.",
+      "Growth doesn't fix bad unit economics — it makes them worse. You lose more money faster.",
+      "Doubling prices might fix the math, but it assumes customers would still pay. Test that assumption.",
+    ],
   },
 
   // Concept
@@ -563,6 +582,12 @@ export const BUSINESS_CARDS: Card[] = [
       "Team conflict",
     ],
     correctAnswer: 0,
+    choiceExplanations: [
+      "Technically correct — 70% cite this. But it's almost always the *symptom* of a deeper problem, not the root cause.",
+      "This is the #1 *root* cause (43%), but it's cited less often because founders blame the money, not the product.",
+      "A real factor (29%) but founders often use it as an excuse for deeper issues.",
+      "Surprisingly less common than you'd think in the data. It matters, but it's not in the top 4.",
+    ],
   },
 
   // Concept
@@ -690,6 +715,12 @@ export const BUSINESS_CARDS: Card[] = [
       "Identify the lowest performers to cut first",
     ],
     correctAnswer: 1,
+    choiceExplanations: [
+      "Without emotional preparation, you'll communicate poorly. The message matters as much as the decision.",
+      "Horowitz: process it first. If you rush while emotional, you'll say the wrong things and damage trust permanently.",
+      "Process before paperwork. If HR leads, it feels corporate and impersonal. You need to own this.",
+      "Layoffs aren't performance management. You're cutting roles, not underperformers. Different lens entirely.",
+    ],
   },
 
   // Concept

@@ -110,6 +110,22 @@ export const SECTIONS: Section[] = [
           "Kappa > Lambda in modern architectures",
         ],
       },
+      {
+        id: "module-design",
+        sectionId: "architecture",
+        title: "Module Design",
+        description:
+          "Deep modules, information hiding, and complexity management",
+        cards: [4000, 4001, 4002, 4003, 4004, 4005, 4006, 4007, 4008],
+        prerequisites: ["domain-design"],
+        concepts: [
+          "Deep modules: simple interface, powerful implementation",
+          "Information hiding: encapsulate design decisions likely to change",
+          "Information leakage couples modules through shared decisions",
+          "Interface simplicity > implementation simplicity",
+          "Progressive disclosure helps AI agents navigate codebases",
+        ],
+      },
     ],
   },
 
@@ -494,12 +510,12 @@ export const SECTIONS: Section[] = [
         sectionId: "business",
         title: "Tactical Empathy",
         description: "Understand feelings to increase influence — without agreeing",
-        cards: [3005, 3000, 3001, 3002, 3003, 3004, 3010, 3011, 3012],
+        cards: [3000, 3001, 3007, 3002, 3003, 3004, 3010, 3011, 3012],
         prerequisites: [],
         concepts: [
-          "Tactical empathy = understanding + influence, not agreement",
+          "Tactical empathy = understand → label → calibrated questions",
           "Label emotions with 'It seems like...' — never 'I'",
-          "Empathy opens the door to information and leverage",
+          "Calibrated 'how' questions shift the problem collaboratively",
         ],
       },
       {
