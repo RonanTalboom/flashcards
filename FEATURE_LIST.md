@@ -97,6 +97,7 @@ interface Lesson {
 // === Interactive Steps (the Brilliant-style core) ===
 
 type Step =
+  | PretestStep                      // NEW: question BEFORE teaching — productive failure
   | ConceptStep                     // read concept + diagram
   | MultipleChoiceStep              // pick the right answer
   | FillBlankStep                   // type missing word/formula
@@ -104,6 +105,20 @@ type Step =
   | CalculationStep                 // solve a problem, enter number
   | ReflectionStep                  // "why does this matter?" free text
   | FlashcardStep;                  // embedded FSRS review card
+
+// NEW: Pretest step — tests before teaching (pretesting effect, d=0.35-0.75)
+// Framed as "What do you think?" not "Test yourself"
+// Wrong answers are expected and celebrated ("Good guess! Here's what actually happens...")
+// Must be followed by a ConceptStep that teaches the correct answer
+interface PretestStep {
+  type: 'pretest';
+  question: string;                  // "What do you think happens when..."
+  options?: string[];                // optional MCQ format (or free text if absent)
+  correctIndex?: number;             // if MCQ
+  curiosityHook: string;             // shown after answer: "Interesting! Let's find out..."
+  // No XP penalty for wrong answers — this is diagnostic, not assessment
+  // Track pretest accuracy for analytics (does pretesting improve lesson scores?)
+}
 
 interface ConceptStep {
   type: 'concept';
@@ -277,6 +292,7 @@ interface Settings {
 
 | Step Type | Component | Learning Principle |
 |---|---|---|
+| `pretest` | **NEW** — Question before teaching, "What do you think?" framing, no penalty for wrong answers | Pretesting effect (d=0.35-0.75, +10-15% retention) |
 | `concept` | Markdown renderer + inline diagram display | Dual coding (text + visual) |
 | `multiple-choice` | Options with tap-to-select, green/red feedback, explanation reveal | Practice testing + immediate feedback |
 | `fill-blank` | Input fields inline in template text, validate on submit | Generation effect |
@@ -288,6 +304,57 @@ interface Settings {
 - After each non-reflection step: show explanation + diagram (elaborated feedback)
 - Correct first try → full XP. Incorrect → show explanation → retry → half XP
 - Step progress bar at top of lesson view
+
+#### 2.5 Evidence-Based Lesson Flow (NEW — addresses "testing before teaching" problem)
+**Science**: The optimal learning sequence combines pretesting (d=0.35-0.75), concept instruction, retrieval practice (d=0.56), and spaced repetition (d=0.56). See vault: [[The optimal learning sequence is pretest then teach then retrieve then space]].
+
+**The problem**: Currently the app shows question → answer for material the user hasn't learned yet. This is a degenerate form of pretesting — it has the "fail" but not the "instruction" that makes failure productive.
+
+**The fix**: Lessons should follow the **Pretest → Teach → Retrieve → Space** flow:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  Lesson: "Tactical Empathy"                             │
+│                                                         │
+│  Step 1: PRETEST                                        │
+│  "Your supplier says 'This price is non-negotiable.'    │
+│   What would you do?"                                   │
+│  → User guesses (wrong answer expected & OK)            │
+│  → "Interesting! Let's find out what works..."          │
+│                                                         │
+│  Step 2: CONCEPT                                        │
+│  Tactical empathy explanation + diagram                 │
+│  (corrects pretest errors — feedback is essential)      │
+│                                                         │
+│  Step 3: RETRIEVE (multiple-choice / fill-blank)        │
+│  Test the same concept — now they should get it         │
+│  → Immediate feedback + explanation                     │
+│                                                         │
+│  Step 4: RETRIEVE (harder variation)                    │
+│  Different scenario, same technique                     │
+│  → XP awarded for correct answers                       │
+│                                                         │
+│  Step 5: REFLECTION                                     │
+│  "When would YOU use this technique?"                   │
+│                                                         │
+│  → Lesson complete! Cards enter FSRS for SPACING        │
+└─────────────────────────────────────────────────────────┘
+```
+
+**What to build**:
+- `PretestStep` component: renders like MCQ but with "What do you think?" header, no penalty for wrong answers, curiosity hook after answering
+- Lesson flow validation: if a lesson has a `pretest` step, it must be followed by a `concept` step (feedback is essential for pretesting to work)
+- Pretest analytics: track pretest accuracy vs. final retrieval accuracy per lesson (measures whether pretesting actually helps)
+- Two lesson templates for content authoring:
+  - **Pretest-first** (for scenarios, math, concepts): pretest → concept → retrieve → reflect
+  - **Teach-first** (for vocabulary, facts, procedures): concept → retrieve → retrieve harder → reflect
+- Visual differentiation: pretest steps use a distinct "curiosity" color (e.g., amber) vs. retrieval steps (green/red)
+
+**Design principles** (from research):
+- Pretest = low-stakes curiosity, NOT assessment. No hearts lost, no streak broken.
+- Wrong answers are *expected and celebrated*: "Good guess! 73% of people get this wrong the first time."
+- Concept step must directly address common pretest errors
+- Retrieval steps after concept should retest the same material at increasing difficulty
 
 #### 3. Excalidraw Diagram Integration
 **Science**: Dual coding theory — combining verbal and visual information produces stronger memory traces than either alone.
@@ -822,7 +889,9 @@ const evLesson: Lesson = {
 
 ## Content: Business Fundamentals Learning Path
 
-> A structured learning path covering the core frameworks for starting, scaling, and running a business. Sources: Seth Godin, Chris Voss, Verne Harnish, Simon Sinek, Eric Ries, Peter Thiel, Michael Gerber, Kim Scott.
+> A structured learning path for first-time founders and aspiring operators. 7 domains, 26 lessons, ~180 cards.
+> Sources: Thiel, Sinek, Godin, Voss, Harnish, Wickman, Gerber, Ries, Scott, Horowitz, CB Insights.
+> Red-team revised: added finance + failures domains, cut from 37→26 lessons, consolidated Godin, added practice bridges.
 > See vault note: [[Business Fundamentals — Learning Path]]
 
 ### Path Structure
@@ -831,22 +900,24 @@ const evLesson: Lesson = {
 const businessFundamentalsPath: LearningPath = {
   id: "biz",
   title: "Business Fundamentals",
-  description: "From idea to scale — strategy, marketing, negotiation, execution, leadership, and mindset",
+  description: "From idea to scale — strategy, marketing, negotiation, execution, leadership, finance, and failures",
   icon: "🏗️",
   lessons: [
-    // Domain 1: Vision & Strategy
-    "biz-contrarian", "biz-monopoly", "biz-why", "biz-remarkable", "biz-infinite", "biz-strategic-plan",
-    // Domain 2: Marketing & Growth
-    "biz-permission", "biz-this-is-marketing", "biz-stories", "biz-bml", "biz-mom-test", "biz-the-dip",
-    // Domain 3: Sales & Negotiation
-    "biz-tactical-empathy", "biz-mirror-label", "biz-calibrated-q", "biz-accusation-audit",
-    "biz-thats-right", "biz-ackerman", "biz-black-swans", "biz-negotiator-styles",
-    // Domain 4: Execution & Operations
-    "biz-rockefeller", "biz-meeting-rhythms", "biz-accountability", "biz-opsp", "biz-cash", "biz-eos", "biz-emyth",
-    // Domain 5: People & Leadership
-    "biz-tribes", "biz-linchpin", "biz-circle-safety", "biz-radical-candor", "biz-hiring", "biz-feedback-loops",
-    // Domain 6: Mindset & Decision-Making
-    "biz-definite-optimism", "biz-last-mover", "biz-loss-aversion", "biz-strategic-quitting", "biz-anti-trendslop",
+    // Domain 1: Vision & Strategy (4)
+    "biz-contrarian", "biz-monopoly", "biz-why", "biz-strategic-plan",
+    // Domain 2: Marketing & Growth (4)
+    "biz-remarkable", "biz-bml", "biz-the-dip", "biz-storytelling",
+    // Domain 3: Sales & Negotiation (5)
+    "biz-tactical-empathy", "biz-calibrated-q", "biz-accusation-audit",
+    "biz-ackerman", "biz-black-swans",
+    // Domain 4: Execution & Operations (4)
+    "biz-rockefeller", "biz-accountability", "biz-emyth", "biz-cash",
+    // Domain 5: People & Leadership (3)
+    "biz-radical-candor", "biz-tribes", "biz-wartime-ceo",
+    // Domain 6: Finance & Unit Economics (3) — NEW
+    "biz-unit-economics", "biz-cashflow-runway", "biz-fundraising",
+    // Domain 7: Failures & Post-Mortems (3) — NEW
+    "biz-why-startups-die", "biz-the-struggle", "biz-anti-trendslop",
   ],
   createdAt: "2026-04-16",
 };
@@ -1019,6 +1090,169 @@ const remarkableLesson: Lesson = {
 };
 ```
 
+#### Lesson: Unit Economics (NEW — Finance domain)
+
+```typescript
+const unitEconomicsLesson: Lesson = {
+  id: "biz-unit-economics",
+  pathId: "biz",
+  title: "Unit Economics",
+  description: "The numbers that tell you if your business model actually works",
+  prerequisites: [],
+  estimatedMinutes: 5,
+  steps: [
+    {
+      type: "concept",
+      title: "Two numbers that decide everything",
+      content: "**CAC** (Customer Acquisition Cost) = total sales & marketing spend ÷ new customers acquired.\n\n**LTV** (Lifetime Value) = average revenue per customer × average customer lifespan.\n\nIf LTV/CAC < 1, you lose money on every customer. If LTV/CAC > 3, you have a healthy business. Between 1-3, you're surviving but fragile.\n\nCB Insights found that 19% of startup failures come from unsustainable unit economics — the business *worked* but couldn't make money doing it.",
+      diagrams: [],
+    },
+    {
+      type: "calculation",
+      question: "You spend $50,000/month on marketing and acquire 500 customers. What's your CAC?",
+      answer: 100,
+      tolerance: 1,
+      unit: "$",
+      explanation: "CAC = $50,000 ÷ 500 = $100 per customer. Now you need to know: does each customer generate more than $100 in lifetime value?",
+    },
+    {
+      type: "calculation",
+      question: "Average customer pays $30/month and stays 18 months. What's the LTV?",
+      answer: 540,
+      tolerance: 5,
+      unit: "$",
+      explanation: "LTV = $30 × 18 = $540. With a CAC of $100, LTV/CAC = 5.4x — very healthy. But watch out: if churn increases and average lifespan drops to 6 months, LTV = $180 and LTV/CAC = 1.8x — danger zone.",
+    },
+    {
+      type: "multiple-choice",
+      question: "Your LTV/CAC ratio is 1.5x. What does this mean?",
+      options: [
+        "You're very profitable — keep scaling",
+        "You're surviving but fragile — improve retention or reduce acquisition costs",
+        "You're losing money on every customer",
+        "You need to raise prices immediately",
+      ],
+      correctIndex: 1,
+      explanation: "LTV/CAC between 1-3 means you're making money per customer but not enough margin to absorb shocks (churn spikes, competition, cost increases). Target >3x before scaling aggressively.",
+    },
+    {
+      type: "reflection",
+      prompt: "Calculate (or estimate) the CAC and LTV for a product you use or are building. Is the ratio >3x? If not, what's the weakest lever — acquisition cost or retention?",
+    },
+  ],
+  reviewCards: ["biz-ue-1", "biz-ue-2", "biz-ue-3"],
+};
+```
+
+#### Lesson: Why Startups Die (NEW — Failures domain)
+
+```typescript
+const whyStartupsDieLesson: Lesson = {
+  id: "biz-why-startups-die",
+  pathId: "biz",
+  title: "Why Startups Die",
+  description: "The empirical data on what actually kills companies — from 483 post-mortems",
+  prerequisites: ["biz-unit-economics"],
+  estimatedMinutes: 5,
+  steps: [
+    {
+      type: "concept",
+      title: "483 post-mortems, 4 killers",
+      content: "CB Insights analyzed 431 VC-backed shutdowns (2023+). The top reasons overlap — most failures cite multiple causes:\n\n1. **Ran out of capital** — 70% (the proximate cause, not the root cause)\n2. **No product-market fit** — 43% (two-thirds were early-stage)\n3. **Bad timing / macro conditions** — 29% (crypto winter, alt-protein collapse)\n4. **Unsustainable unit economics** — 19% (the business worked but couldn't make money)\n\nNotice: running out of capital is almost always the *effect*, not the *cause*. The real killers are the other three.",
+      diagrams: [],
+    },
+    {
+      type: "ordering",
+      question: "Rank these startup failure reasons from most common to least common (CB Insights data):",
+      items: [
+        "Ran out of capital (70%)",
+        "No product-market fit (43%)",
+        "Bad timing / macro conditions (29%)",
+        "Unsustainable unit economics (19%)",
+      ],
+      explanation: "Capital exhaustion is the proximate cause in 70% of failures, but it's usually a symptom. Product-market fit (43%) is the most common root cause — if nobody wants what you're building, no amount of runway saves you.",
+    },
+    {
+      type: "multiple-choice",
+      question: "Zume Pizza raised $446M and still failed. What was the primary cause?",
+      options: [
+        "Bad timing — the pandemic killed restaurants",
+        "No product-market fit — pivoted from robot pizza to packaging, never found a viable market",
+        "Founder conflict broke up the team",
+        "A competitor copied their approach",
+      ],
+      correctIndex: 1,
+      explanation: "Zume is a textbook product-market fit failure at scale. They pivoted from robot-made pizza to sustainable packaging but never found a market that wanted either product enough. $446M couldn't fix that.",
+    },
+    {
+      type: "multiple-choice",
+      question: "What separates 'ran out of capital' as a root cause vs. a symptom?",
+      options: [
+        "If you raised less than $10M, it's a root cause",
+        "If you had product-market fit but couldn't raise more, it's a root cause. If you couldn't raise because nothing was working, it's a symptom.",
+        "It's always a root cause — money solves everything",
+        "It's never a root cause — you can always bootstrap",
+      ],
+      correctIndex: 1,
+      explanation: "Capital exhaustion is a root cause only when external factors (funding market freeze, investor politics) kill an otherwise working business. In most cases, investors stop funding because the underlying business isn't working — making capital exhaustion a symptom of deeper problems.",
+    },
+    {
+      type: "reflection",
+      prompt: "Which of the 4 failure modes is your biggest current risk? What's one thing you could do this week to reduce it?",
+    },
+  ],
+  reviewCards: ["biz-wsd-1", "biz-wsd-2"],
+};
+```
+
+#### Lesson: Wartime vs Peacetime CEO (NEW — Leadership domain, Horowitz)
+
+```typescript
+const wartimeCeoLesson: Lesson = {
+  id: "biz-wartime-ceo",
+  pathId: "biz",
+  title: "Wartime vs Peacetime CEO",
+  description: "Different situations demand different leadership — know which mode you're in",
+  prerequisites: ["biz-radical-candor"],
+  estimatedMinutes: 5,
+  steps: [
+    {
+      type: "concept",
+      title: "Two modes, one leader",
+      content: "**Peacetime CEO** builds culture, develops people, expands markets, makes incremental improvements. Think: Google in 2006.\n\n**Wartime CEO** makes hard calls under existential threat — layoffs, pivots, firing executives, killing products. Think: Steve Jobs returning to Apple in 1997.\n\nMost founders default to peacetime mode because it's comfortable. The hard skill is recognizing when your situation has shifted to wartime and switching modes before it's too late.\n\n**Priority order in all modes**: People → Products → Profits (in that order). Get this wrong and nothing else matters.\n\n**Source**: Ben Horowitz, *The Hard Thing About Hard Things*",
+      diagrams: [],
+    },
+    {
+      type: "multiple-choice",
+      question: "You need to do layoffs. What's the first step in Horowitz's protocol?",
+      options: [
+        "Announce it to the whole company immediately",
+        "Get your own head right — process it emotionally before acting",
+        "Let HR handle it and stay out of the way",
+        "Find out who the lowest performers are",
+      ],
+      correctIndex: 1,
+      explanation: "Horowitz: get your head right first. If you're emotional, you'll rush, communicate poorly, and damage trust further. Then: don't delay, be clear on reasons, train managers to handle their own layoffs, address the whole company (staying employees need reassurance), and be visible.",
+    },
+    {
+      type: "ordering",
+      question: "Put Horowitz's priority hierarchy in order:",
+      items: [
+        "People",
+        "Products",
+        "Profits",
+      ],
+      explanation: "People → Products → Profits. If you have the right people, they build the right products. If you have the right products, profits follow. Optimizing profits first (cutting people or shipping bad products faster) inverts the chain and destroys the company.",
+    },
+    {
+      type: "reflection",
+      prompt: "Is your current work situation wartime or peacetime? What's the evidence? If it's wartime, what hard decision are you avoiding?",
+    },
+  ],
+  reviewCards: ["biz-wc-1", "biz-wc-2"],
+};
+```
+
 ### Card Examples (standalone review cards generated from lessons)
 
 ```typescript
@@ -1084,23 +1318,69 @@ const bizCards = [
     keyPoints: ["Word-of-mouth spreaders", "Target the edges not the middle", "Ideas spread through sneezers"],
     diagrams: [],
   },
+  // NEW — Finance domain
+  {
+    id: "biz-ue-1",
+    lessonId: "biz-unit-economics",
+    category: "Business — Finance",
+    type: "basic",
+    front: "What is the LTV/CAC ratio and what's a healthy target?",
+    back: "LTV (Lifetime Value) ÷ CAC (Customer Acquisition Cost). Target >3x. Between 1-3x = surviving but fragile. Below 1x = losing money on every customer.",
+    keyPoints: ["CAC = total spend ÷ new customers", "LTV = avg revenue × avg lifespan", ">3x before scaling"],
+    diagrams: [],
+  },
+  {
+    id: "biz-ue-2",
+    lessonId: "biz-unit-economics",
+    category: "Business — Finance",
+    type: "basic",
+    front: "What percentage of startup failures are caused by unsustainable unit economics?",
+    back: "19% (CB Insights, 431 shutdowns). The business worked but couldn't make money doing it. Often overlaps with running out of capital (70%) — which is the symptom, not the cause.",
+    keyPoints: ["19% unit economics", "70% ran out of capital (symptom)", "43% no product-market fit (top root cause)"],
+    diagrams: [],
+  },
+  // NEW — Failures domain
+  {
+    id: "biz-wsd-1",
+    lessonId: "biz-why-startups-die",
+    category: "Business — Failures",
+    type: "basic",
+    front: "What are the top 4 reasons startups fail? (CB Insights, 431 companies)",
+    back: "1. Ran out of capital — 70% (usually a symptom)\n2. No product-market fit — 43% (top root cause)\n3. Bad timing / macro conditions — 29%\n4. Unsustainable unit economics — 19%\n\nPercentages exceed 100% because most cite multiple reasons.",
+    keyPoints: ["Capital exhaustion is symptom not cause", "PMF is #1 root cause", "Multiple causes overlap"],
+    diagrams: [],
+  },
+  // NEW — Leadership domain (Horowitz)
+  {
+    id: "biz-wc-1",
+    lessonId: "biz-wartime-ceo",
+    category: "Business — Leadership",
+    type: "basic",
+    front: "What is Horowitz's priority hierarchy?",
+    back: "People → Products → Profits (in that order). Get the right people, they build the right products, profits follow. Inverting this chain (optimizing profits first) destroys the company.",
+    keyPoints: ["People first always", "Products second", "Profits are the result, not the input"],
+    diagrams: [],
+  },
 ];
 ```
 
-### Full Lesson Inventory (37 lessons across 6 domains)
+### Full Lesson Inventory (26 lessons across 7 domains — red-team revised)
 
 | Domain | # | Lessons | Primary Source |
 |--------|---|---------|----------------|
-| **1. Vision & Strategy** | 6 | Contrarian Question, Build a Monopoly, Start With Why, Be Remarkable, The Infinite Game, Strategic Positioning | Thiel, Sinek, Godin, Harnish |
-| **2. Marketing & Growth** | 6 | Permission vs Interruption, This Is Marketing, Stories & Worldview, Build-Measure-Learn, The Mom Test, The Dip | Godin, Ries, Fitzpatrick |
-| **3. Sales & Negotiation** | 8 | Tactical Empathy, Mirroring & Labeling, Calibrated Questions, Accusation Audit, Getting to "That's Right", Ackerman Model, Black Swans, Negotiator Styles | Voss |
-| **4. Execution & Operations** | 7 | Rockefeller Habits, Meeting Rhythms, Accountability Systems, One-Page Strategic Plan, Cash is King, EOS Foundations, Work ON the Business | Harnish, Wickman, Gerber |
-| **5. People & Leadership** | 6 | Tribes, The Linchpin, Circle of Safety, Radical Candor, Hiring & Core Values, Employee Feedback Loops | Godin, Sinek, Scott, Harnish |
-| **6. Mindset & Decision-Making** | 5 | Definite Optimism, Last Mover Advantage, Loss Aversion, Strategic Quitting, Anti-Trendslop Mindset | Thiel, Voss, Godin |
-| **Total** | **37** | | |
+| **1. Vision & Strategy** | 4 | Contrarian Question, Build a Monopoly, Start With Why + Infinite Game, Strategic Positioning | Thiel, Sinek, Harnish |
+| **2. Marketing & Growth** | 4 | Be Remarkable + Permission, Build-Measure-Learn + Mom Test, The Dip, Storytelling & Status | Godin, Ries, Fitzpatrick |
+| **3. Sales & Negotiation** | 5 | Tactical Empathy + Mirroring, Calibrated Questions + "No", Accusation Audit + "That's Right", Ackerman Model + Rule of Three, Black Swans + Styles | Voss |
+| **4. Execution & Operations** | 4 | Rockefeller Habits + OPSP, Accountability + EOS, Work ON the Business, Cash Conversion Cycle | Harnish, Wickman, Gerber |
+| **5. People & Leadership** | 3 | Radical Candor, Tribes + Linchpin, Wartime vs Peacetime CEO | Scott, Godin, Horowitz |
+| **6. Finance & Unit Economics** | 3 | Unit Economics (CAC/LTV), Cash Flow & Runway, Fundraising Mechanics | General, Graham, CB Insights |
+| **7. Failures & Post-Mortems** | 3 | Why Startups Die (top failure reasons), The Struggle (hard decisions), Anti-Trendslop Mindset | CB Insights, Horowitz, Vault |
+| **Total** | **26** | | |
 
-**Estimated cards**: ~250 (5-8 review cards per lesson)
-**Estimated build time**: content authoring is the bottleneck — lessons need scenario-based steps, not just definitions
+**Estimated cards**: ~180 (6-8 review cards per lesson)
+**Practice bridges**: 10 real-world exercises in domains 3, 5, 6, 7 (e.g., "mirror someone today", "calculate your CAC")
+**Target learner**: First-time founder / aspiring operator — practical literacy, not MBA depth
+**Remaining gap**: Non-Western business thought (Toyota/kaizen) — candidate for future Domain 8
 
 ---
 
