@@ -7,6 +7,8 @@ import { QUANT_INTERACTIVE_CARDS } from "../data/quant-interactive-cards";
 import { CONJUGATION_CARDS } from "../data/conjugation-cards";
 import { BUSINESS_CARDS } from "../data/business-cards";
 import { MODULE_DESIGN_CARDS } from "../data/module-design-cards";
+import { KAHNEMAN_CARDS } from "../data/kahneman-cards";
+import { DDIA_GLOSSARY_CARDS } from "../data/ddia-glossary-cards";
 import { ACHIEVEMENT_DEFINITIONS } from "./achievements";
 
 export async function loadCards(): Promise<Card[]> {
@@ -20,6 +22,8 @@ export async function loadCards(): Promise<Card[]> {
   const conjugationCards = CONJUGATION_CARDS.filter((c) => !apiIds.has(c.id));
   const businessCards = BUSINESS_CARDS.filter((c) => !apiIds.has(c.id));
   const moduleDesignCards = MODULE_DESIGN_CARDS.filter((c) => !apiIds.has(c.id));
+  const kahnemanCards = KAHNEMAN_CARDS.filter((c) => !apiIds.has(c.id));
+  const ddiaGlossaryCards = DDIA_GLOSSARY_CARDS.filter((c) => !apiIds.has(c.id));
 
   const allCards = [
     ...apiCards,
@@ -30,6 +34,8 @@ export async function loadCards(): Promise<Card[]> {
     ...conjugationCards,
     ...businessCards,
     ...moduleDesignCards,
+    ...kahnemanCards,
+    ...ddiaGlossaryCards,
   ];
 
   // Generate reverse cards for vocabulary cards
