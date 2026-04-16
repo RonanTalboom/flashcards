@@ -305,56 +305,95 @@ interface Settings {
 - Correct first try → full XP. Incorrect → show explanation → retry → half XP
 - Step progress bar at top of lesson view
 
-#### 2.5 Evidence-Based Lesson Flow (NEW — addresses "testing before teaching" problem)
+#### 2.5 Guided Discovery Lesson Pattern (NEW — the actual differentiator)
 **Science**: The optimal learning sequence combines pretesting (d=0.35-0.75), concept instruction, retrieval practice (d=0.56), and spaced repetition (d=0.56). See vault: [[The optimal learning sequence is pretest then teach then retrieve then space]].
 
-**The problem**: Currently the app shows question → answer for material the user hasn't learned yet. This is a degenerate form of pretesting — it has the "fail" but not the "instruction" that makes failure productive.
+**The problem**: A concept step (text) followed by a question step is just a textbook page with a quiz. It looks different but feels the same. The real differentiator isn't the step *sequence* — it's the **interaction pattern within each step**.
 
-**The fix**: Lessons should follow the **Pretest → Teach → Retrieve → Space** flow:
+**The key insight**: Concepts should never be dumped as text. They should **emerge from a series of predictions and reveals**. Each screen = ONE interaction, ONE idea. The user discovers the concept through guided trial-and-error (generation effect: +40% recall over reading, Slamecka & Graf 1978).
+
+**The pattern: Predict → Reveal → Predict → Reveal → Apply**
 
 ```
 ┌─────────────────────────────────────────────────────────┐
 │  Lesson: "Tactical Empathy"                             │
 │                                                         │
-│  Step 1: PRETEST                                        │
+│  Screen 1: PREDICT                                      │
 │  "Your supplier says 'This price is non-negotiable.'    │
-│   What would you do?"                                   │
-│  → User guesses (wrong answer expected & OK)            │
-│  → "Interesting! Let's find out what works..."          │
+│   What would you say?"                                  │
+│  [A] "I understand, let's move on"                      │
+│  [B] "It seems like you're under cost pressure"         │
+│  [C] "That's not fair to us"                            │
+│  → User picks (wrong = fine, no penalty)                │
+│  → "73% pick A. But B works best. Here's why..."       │
 │                                                         │
-│  Step 2: CONCEPT                                        │
-│  Tactical empathy explanation + diagram                 │
-│  (corrects pretest errors — feedback is essential)      │
+│  Screen 2: REVEAL (one insight, not a wall)             │
+│  "Labeling their emotion ('It seems like...')           │
+│   validates without conceding."                         │
+│  [2 sentences max. One diagram if needed.]              │
 │                                                         │
-│  Step 3: RETRIEVE (multiple-choice / fill-blank)        │
-│  Test the same concept — now they should get it         │
-│  → Immediate feedback + explanation                     │
+│  Screen 3: PREDICT (build on what you just learned)     │
+│  "They respond: 'Yeah, costs are up 30%.'               │
+│   What's your next move?"                               │
+│  [A] Ask "How can we make this work?"                   │
+│  [B] Offer a discount                                   │
+│  [C] Ask to see their cost breakdown                    │
+│  → "A is a calibrated question — it shifts pressure..." │
 │                                                         │
-│  Step 4: RETRIEVE (harder variation)                    │
-│  Different scenario, same technique                     │
-│  → XP awarded for correct answers                       │
+│  Screen 4: REVEAL (concept emerges)                     │
+│  "This is tactical empathy: understand feelings →       │
+│   label them → ask calibrated questions."               │
+│  [The concept assembled from the experience]            │
 │                                                         │
-│  Step 5: REFLECTION                                     │
-│  "When would YOU use this technique?"                   │
+│  Screen 5: APPLY (transfer to new context)              │
+│  "Your cofounder says 'I'm done with this feature.'     │
+│   Write a label using 'It seems like...'"               │
+│  [Free-text input, shown model answer after]            │
+│                                                         │
+│  Screen 6: SYNTHESIZE                                   │
+│  Fill in: "Tactical empathy = understand {{feelings}}   │
+│   + label with '{{It seems like}}...' + ask             │
+│   {{calibrated}} questions"                             │
 │                                                         │
 │  → Lesson complete! Cards enter FSRS for SPACING        │
 └─────────────────────────────────────────────────────────┘
 ```
 
-**What to build**:
-- `PretestStep` component: renders like MCQ but with "What do you think?" header, no penalty for wrong answers, curiosity hook after answering
-- Lesson flow validation: if a lesson has a `pretest` step, it must be followed by a `concept` step (feedback is essential for pretesting to work)
-- Pretest analytics: track pretest accuracy vs. final retrieval accuracy per lesson (measures whether pretesting actually helps)
-- Two lesson templates for content authoring:
-  - **Pretest-first** (for scenarios, math, concepts): pretest → concept → retrieve → reflect
-  - **Teach-first** (for vocabulary, facts, procedures): concept → retrieve → retrieve harder → reflect
-- Visual differentiation: pretest steps use a distinct "curiosity" color (e.g., amber) vs. retrieval steps (green/red)
+**How this differs from what you have now:**
 
-**Design principles** (from research):
-- Pretest = low-stakes curiosity, NOT assessment. No hearts lost, no streak broken.
-- Wrong answers are *expected and celebrated*: "Good guess! 73% of people get this wrong the first time."
-- Concept step must directly address common pretest errors
-- Retrieval steps after concept should retest the same material at increasing difficulty
+| Current lesson flow | Guided discovery flow |
+|---|---|
+| Concept step = wall of markdown text | No walls of text — concepts revealed in 1-2 sentences after each prediction |
+| Question step = test what you just read | Each question TEACHES a new piece — the concept assembles from the answers |
+| User reads passively then recalls | User predicts actively then discovers |
+| Concept → Test (textbook pattern) | Predict → Reveal → Predict → Reveal → Apply (Brilliant pattern) |
+| Steps are independent | Each step builds on the previous — a narrative arc |
+
+**What to build**:
+
+1. **Micro-concept reveals** — the `concept` step should be MAX 2 sentences + 1 diagram. Not a markdown article. If you need more text, split into multiple concept steps.
+
+2. **`PretestStep` component** — renders like MCQ but with:
+   - "What do you think?" header (curiosity framing)
+   - No XP penalty for wrong answers
+   - `curiosityHook` text shown after answering: "Interesting! Here's what actually happens..."
+   - Social proof optional: "68% of people get this wrong"
+   - Wrong answers trigger a targeted 1-2 sentence explanation of *why* that option fails
+
+3. **Predict-reveal pairing** — content authoring rule: every `pretest` step must be followed by a `concept` step that reveals the answer. The pair is the atomic unit, not the individual step.
+
+4. **Progressive concept assembly** — the final concept step in a lesson should be a `fill-blank` or `ordering` step that assembles the full framework from parts learned during the lesson. The user builds the summary, not reads it.
+
+5. **Apply step** — a new variation of `reflection` where the user applies the concept to a novel scenario and then sees a model answer. Different from pure reflection (no model answer) and different from MCQ (free-text, not options).
+
+6. **One screen, one idea** — design constraint: no step should require scrolling. If it does, split it.
+
+**Design principles**:
+- **Concrete before abstract**: show the scenario first, then the principle. Never "here's the rule, now apply it."
+- **Generation over reading**: every screen should require the user to DO something — predict, fill, order, type. Passive reading screens are a last resort.
+- **Narrative arc**: lessons tell a story. Steps connect causally ("They said X... so you did Y... and then Z happened").
+- **1-2 sentence reveals**: if your concept step is longer than a tweet, it's too long. Split it.
+- **Wrong answers teach**: each wrong option in a pretest should have its own explanation of why it fails. This is where teaching happens.
 
 #### 3. Excalidraw Diagram Integration
 **Science**: Dual coding theory — combining verbal and visual information produces stronger memory traces than either alone.
@@ -884,6 +923,51 @@ const evLesson: Lesson = {
 ```
 
 ---
+
+---
+
+## Content: Software Architecture — Module Design (NEW)
+
+> Extends the existing Architecture Patterns section with Ousterhout's module design principles.
+> Sources: Ousterhout (A Philosophy of Software Design, 2018), Parnas (1972), Pocock (2026), Codified Context (arXiv:2602.20478).
+> 9 cards covering deep modules, information hiding/leakage, and AI-readiness implications.
+
+### Lesson: Module Design (arch-module-design)
+
+```typescript
+{
+  id: "module-design",
+  sectionId: "architecture",
+  title: "Module Design",
+  description: "Deep modules, information hiding, and complexity management",
+  cards: [4000, 4001, 4002, 4003, 4004, 4005, 4006, 4007, 4008],
+  prerequisites: ["domain-design"],
+  concepts: [
+    "Deep modules: simple interface, powerful implementation",
+    "Information hiding: encapsulate design decisions likely to change",
+    "Information leakage couples modules through shared decisions",
+    "Interface simplicity > implementation simplicity",
+    "Progressive disclosure helps AI agents navigate codebases",
+  ],
+}
+```
+
+### Card inventory (IDs 4000–4008)
+
+| ID | Topic | Exercise Type | Source |
+|----|-------|---------------|--------|
+| 4000 | Deep vs shallow modules (core definition) | MCQ | Ousterhout |
+| 4001 | Unix file I/O as canonical deep module | fill-blank | Ousterhout |
+| 4002 | Information hiding principle | flashcard | Parnas 1972 |
+| 4003 | Information leakage definition | MCQ | Ousterhout |
+| 4004 | Temporal decomposition anti-pattern | MCQ | Ousterhout |
+| 4005 | Pass-through methods anti-pattern | flashcard | Ousterhout |
+| 4006 | Interface simplicity > implementation simplicity | MCQ | Ousterhout |
+| 4007 | Progressive disclosure for AI agents | flashcard | Pocock 2026 |
+| 4008 | Graybox modules / human-AI seams | flashcard | Pocock 2026 |
+
+### Data file
+- `src/data/module-design-cards.ts` — `MODULE_DESIGN_CARDS` (imported in `storage.ts`)
 
 ---
 
