@@ -42,6 +42,10 @@ const STRING_TO_STATE: Record<string, State> = {
 };
 
 function toFSRSCard(s: CardState): FSRSCard {
+  // FSRS rejects stability=0 with non-zero difficulty — treat as fresh card
+  if (s.stability === 0) {
+    return createEmptyCard(new Date(s.nextReviewDate + "T00:00:00"));
+  }
   const card = createEmptyCard(new Date(s.nextReviewDate + "T00:00:00"));
   card.stability = s.stability;
   card.difficulty = s.difficulty;
