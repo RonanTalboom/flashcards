@@ -44,19 +44,25 @@ export const BUSINESS_CARDS: Card[] = [
     correctAnswer: 1,
   },
 
-  // Step 3: Fill-blank
+  // Step 3: MCQ — Voss's formula
   {
     id: 3002,
     category: "Business — Negotiation",
-    front: "Tactical empathy = understanding _____ + hearing what's behind those feelings → increase your _____",
+    front: "Complete Voss's formula: Tactical empathy = understanding _____ + hearing what's _____ those feelings → increase your _____",
     back: "Voss's formula: surface emotions → underlying needs → leverage. The sequence matters — you can't influence without first demonstrating understanding.",
     keyPoints: [
       "Step 1: Identify the feeling",
       "Step 2: Understand the motivation behind it",
       "Step 3: Use that understanding to increase influence",
     ],
-    exerciseType: "fill-blank",
-    correctAnswer: "feelings",
+    exerciseType: "mcq",
+    choices: [
+      "feelings → behind → influence",
+      "positions → beneath → credibility",
+      "arguments → driving → authority",
+      "demands → causing → rapport",
+    ],
+    correctAnswer: 0,
   },
 
   // Step 4: MCQ — empathy vs sympathy
@@ -290,19 +296,25 @@ export const BUSINESS_CARDS: Card[] = [
     correctAnswer: 2,
   },
 
-  // Step 3: Fill-blank — sneezers
+  // Step 3: MCQ — sneezers
   {
     id: 3042,
     category: "Business — Marketing",
-    front: "The goal is not to market TO _____ but to market FOR the _____ who will spread your idea",
+    front: "According to Godin, who should you build your product for?",
     back: "Sneezers are the early adopters who spread ideas. Your job is to make something so remarkable that sneezers can't help but tell people about it. Target the edges, not the middle.",
     keyPoints: [
       "Everyone = mass market (ineffective in crowded markets)",
       "Sneezers = Godin's term for word-of-mouth spreaders",
       "Target the edges (early adopters), not the middle (mass market)",
     ],
-    exerciseType: "fill-blank",
-    correctAnswer: "everyone",
+    exerciseType: "mcq",
+    choices: [
+      "The mass market — reach as many people as possible",
+      "The sneezers — early adopters who spread ideas for you",
+      "Your competitors' customers — steal their market share",
+      "Investors — they'll fund your growth",
+    ],
+    correctAnswer: 1,
   },
 
   // Step 4: Reflection
