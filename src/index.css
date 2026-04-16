@@ -2238,6 +2238,7 @@ header h1 {
   .btn-review:active,
   .btn-start:active,
   .path-node:active:not(:disabled),
+  .path-next-up:active,
   .intro-start:active {
     transform: scale(0.97);
   }
@@ -2250,6 +2251,18 @@ header h1 {
 
   .vocab-sentence-text {
     word-break: break-word;
+  }
+
+  /* Section header shouldn't wrap awkwardly on small screens */
+  .path-section-info {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .path-section-title,
+  .path-section-desc {
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
@@ -2375,6 +2388,95 @@ header h1 {
     min-width: 32px;
     height: 34px;
     font-size: 0.85rem;
+  }
+
+  .path-next-up {
+    padding: 12px;
+  }
+
+  .path-next-up-arrow {
+    font-size: 1.2rem;
+  }
+
+  .path-section-progress {
+    font-size: 0.65rem;
+    padding: 2px 8px;
+  }
+}
+
+/* Tablet — give a touch more breathing room */
+@media (min-width: 600px) {
+  .container {
+    max-width: 540px;
+    padding: 32px 24px;
+    padding-top: calc(32px + var(--safe-top));
+    padding-bottom: calc(32px + var(--safe-bottom));
+  }
+
+  .study-modes {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .mode-stats {
+    grid-column: auto;
+  }
+
+  .achievements-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .rate-label {
+    font-size: 0.95rem;
+  }
+
+  .rate-btn {
+    padding: 16px 10px;
+  }
+}
+
+/* Desktop — wider container for the path overview, but cards stay focused */
+@media (min-width: 960px) {
+  body {
+    background:
+      radial-gradient(ellipse at top, rgba(56, 178, 172, 0.04), transparent 60%),
+      var(--bg);
+  }
+
+  .container {
+    max-width: 600px;
+  }
+
+  .card-front,
+  .card-back {
+    padding: 40px 32px;
+    min-height: 240px;
+  }
+
+  /* Path screen earns more horizontal space — content density is high */
+  .path-map {
+    overflow-y: visible;
+  }
+
+  /* Hover affordances that only make sense with a pointer */
+  .mcq-choice:not(:disabled):hover,
+  .quiz-option:not(:disabled):hover {
+    transform: translateX(2px);
+  }
+
+  .rate-btn:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* Honor reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
