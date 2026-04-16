@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useFlashcards } from "./hooks/useFlashcards";
 import { Dashboard } from "./components/Dashboard";
 import { StudyCard } from "./components/StudyCard";
@@ -24,6 +25,54 @@ import "./index.css";
 
 export function App() {
   const fc = useFlashcards();
+
+  // Global keyboard shortcuts
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+
+      switch (fc.view) {
+        case "dashboard":
+          if (e.key === "Enter" && fc.dueCount > 0) {
+            e.preventDefault();
+            fc.startStudy();
+          }
+          break;
+        case "path":
+          if (e.key === "Escape") fc.backToDashboard();
+          break;
+        case "lesson-intro":
+          if (e.key === "Enter") {
+            e.preventDefault();
+            fc.startLesson();
+          } else if (e.key === "Escape") {
+            fc.backToPath();
+          }
+          break;
+        case "lesson-complete":
+          if (e.key === "Enter") {
+            e.preventDefault();
+            fc.completeLesson();
+          }
+          break;
+        case "done":
+          if (e.key === "Enter" || e.key === "Escape") {
+            e.preventDefault();
+            fc.backToDashboard();
+          }
+          break;
+        case "speed-review":
+        case "match-game":
+        case "quiz-mode":
+        case "stats":
+          if (e.key === "Escape") fc.backToDashboard();
+          break;
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [fc.view, fc.dueCount, fc.startStudy, fc.backToDashboard, fc.startLesson, fc.completeLesson, fc.backToPath]);
 
   if (fc.loading) {
     return (

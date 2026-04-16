@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Card } from "../types";
 import { Latex } from "./Latex";
 
@@ -21,6 +21,27 @@ export function MCQCard({
   const correctIndex =
     typeof card.correctAnswer === "number" ? card.correctAnswer : -1;
   const choices = card.choices || [];
+
+  // Keyboard shortcuts: 1-4 to select, Enter/Space to continue
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+
+      if (!answered) {
+        const num = parseInt(e.key);
+        if (num >= 1 && num <= choices.length) {
+          setSelectedIndex(num - 1);
+          setAnswered(true);
+        }
+      } else if (e.key === "Enter" || e.code === "Space") {
+        e.preventDefault();
+        onAnswer(selectedIndex === correctIndex);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [answered, selectedIndex, correctIndex, choices.length, onAnswer]);
 
   function handleSelect(index: number) {
     if (answered) return;
