@@ -47,7 +47,7 @@ export const SECTIONS: Section[] = [
           6011, 6012, 6013, 6014, 6015, 6016, 6017, 6018, 6019, 6020, 6021,
           6022, 6023, 6024,
         ],
-        prerequisites: ["design-principles"],
+        prerequisites: [],
         concepts: [
           "Fault vs failure, linearizability vs serializability, and other key distinctions",
           "Core distributed systems definitions: replication, partitioning, consensus, quorum",
