@@ -1068,6 +1068,64 @@ header h1 {
 }
 
 /* ========================================
+   Pretest (diagnostic — amber theme)
+   ======================================== */
+
+.pretest-badge {
+  background: rgba(221, 107, 32, 0.15);
+  color: var(--orange);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.pretest-choice--selected {
+  border-color: var(--orange) !important;
+  background: rgba(221, 107, 32, 0.1);
+}
+
+.pretest-feedback {
+  margin-top: 20px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.pretest-hook {
+  padding: 16px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--orange);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.pretest-continue {
+  width: 100%;
+  padding: 16px;
+  margin-top: 16px;
+  background: var(--orange);
+  color: var(--bg);
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+
+.pretest-continue:hover {
+  background: #c05621;
+}
+
+.pretest-continue:active {
+  transform: scale(0.98);
+}
+
+/* ========================================
    Fill in the Blank
    ======================================== */
 

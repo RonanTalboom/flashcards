@@ -20,6 +20,7 @@ import { AchievementToast } from "./components/AchievementToast";
 import { ConfidencePrompt } from "./components/ConfidencePrompt";
 import { ListeningCard } from "./components/ListeningCard";
 import { ConjugationCard } from "./components/ConjugationCard";
+import { PretestCard } from "./components/PretestCard";
 import { SECTIONS, getSectionByLessonId } from "./data/lessons";
 import "./index.css";
 
@@ -152,6 +153,22 @@ export function App() {
       case "study": {
         if (!fc.currentCard) return null;
         const exerciseType = fc.currentCard.exerciseType ?? "flashcard";
+
+        // Pretest: diagnostic question before teaching (no penalty, no confidence prompt)
+        if (exerciseType === "pretest") {
+          return (
+            <>
+              <SessionProgressBar current={fc.currentIndex} total={fc.queueLength} />
+              <PretestCard
+                key={fc.currentCard.id}
+                card={fc.currentCard}
+                currentIndex={fc.currentIndex}
+                queueLength={fc.queueLength}
+                onAnswer={fc.answerCard}
+              />
+            </>
+          );
+        }
 
         // Confidence prompt before interactive/answer cards (not flashcards)
         if (
