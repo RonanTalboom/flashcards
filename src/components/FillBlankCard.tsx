@@ -114,7 +114,24 @@ export function FillBlankCard({
               Answer: <strong>{correctAnswer}</strong>
             </p>
           )}
-          <Latex text={card.back} className="fill-explanation" as="p" />
+          {card.back && (
+            <div className="theory-block">
+              <span className="theory-label">Why</span>
+              <Latex text={card.back} className="theory-body" as="p" />
+            </div>
+          )}
+          {card.keyPoints.length > 0 && (
+            <div className="theory-block">
+              <span className="theory-label">Key points</span>
+              <ul className="key-points">
+                {card.keyPoints.map((point, i) => (
+                  <li key={i}>
+                    <Latex text={point} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <button className="fill-continue" onClick={handleContinue}>
             Continue
           </button>

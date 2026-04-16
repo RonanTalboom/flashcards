@@ -1044,6 +1044,58 @@ header h1 {
   color: var(--text-muted);
 }
 
+/* ========================================
+   Theory blocks (Why + Key points)
+   Reusable across MCQ, FillBlank, Cloze, Pretest, Math
+   ======================================== */
+
+.theory-block {
+  margin-top: 12px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.theory-block + .theory-block {
+  margin-top: 10px;
+}
+
+.theory-label {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.theory-body {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.theory-block .key-points {
+  gap: 10px;
+}
+
+.theory-block .key-points li {
+  font-size: 0.88rem;
+  color: var(--text);
+  line-height: 1.55;
+  padding-left: 18px;
+}
+
+.theory-block .key-points li::before {
+  top: 9px;
+  width: 5px;
+  height: 5px;
+  background: var(--accent);
+}
+
 .mcq-continue {
   width: 100%;
   padding: 16px;

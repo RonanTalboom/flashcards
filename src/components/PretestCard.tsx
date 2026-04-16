@@ -92,6 +92,18 @@ export function PretestCard({
             />
           )}
           <Latex text={card.back} className="pretest-hook" as="p" />
+          {card.keyPoints.length > 0 && (
+            <div className="theory-block">
+              <span className="theory-label">Key points</span>
+              <ul className="key-points">
+                {card.keyPoints.map((point, i) => (
+                  <li key={i}>
+                    <Latex text={point} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <button className="pretest-continue" onClick={() => onAnswer(true)}>
             Let's find out &#8594;
           </button>

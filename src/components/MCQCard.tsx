@@ -104,7 +104,22 @@ export function MCQCard({
           >
             {selectedIndex === correctIndex ? "Correct" : "Incorrect"}
           </div>
-          <Latex text={card.back} className="mcq-explanation" as="p" />
+          <div className="theory-block">
+            <span className="theory-label">Why</span>
+            <Latex text={card.back} className="theory-body" as="p" />
+          </div>
+          {card.keyPoints.length > 0 && (
+            <div className="theory-block">
+              <span className="theory-label">Key points</span>
+              <ul className="key-points">
+                {card.keyPoints.map((point, i) => (
+                  <li key={i}>
+                    <Latex text={point} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <button className="mcq-continue" onClick={handleContinue}>
             Continue
           </button>
