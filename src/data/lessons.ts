@@ -36,6 +36,26 @@ export const SECTIONS: Section[] = [
           "Consistency ranges from eventual to linearizable",
         ],
       },
+      {
+        id: "ddia-glossary",
+        sectionId: "foundations",
+        title: "DDIA Glossary",
+        description:
+          "Key distinctions and core definitions from Designing Data-Intensive Applications",
+        cards: [
+          6000, 6001, 6002, 6003, 6004, 6005, 6006, 6007, 6008, 6009, 6010,
+          6011, 6012, 6013, 6014, 6015, 6016, 6017, 6018, 6019, 6020, 6021,
+          6022, 6023, 6024,
+        ],
+        prerequisites: ["design-principles"],
+        concepts: [
+          "Fault vs failure, linearizability vs serializability, and other key distinctions",
+          "Core distributed systems definitions: replication, partitioning, consensus, quorum",
+          "Storage tradeoffs: B-trees vs LSM-trees, OLTP vs OLAP",
+          "Event sourcing, CQRS, CDC, and the dual-write anti-pattern",
+          "Operational concerns: split brain, backpressure",
+        ],
+      },
     ],
   },
 
