@@ -196,21 +196,21 @@ export const BUSINESS_CARDS: Card[] = [
   {
     id: 3022,
     category: "Business — Negotiation",
-    front: "What is the correct order of the Ackerman concession steps?",
+    front: "Put the Ackerman concession steps in order:",
     back: "The decreasing increments (20% → 10% → 5%) signal diminishing capacity. Each concession 'costs' you visibly more, making the counterpart feel they're squeezing your limit.",
     keyPoints: [
       "Decreasing increments signal you're reaching your limit",
       "Each step feels harder — builds perceived scarcity",
       "Final non-monetary item = 'I literally have nothing left'",
     ],
-    exerciseType: "mcq",
+    exerciseType: "ordering",
     choices: [
-      "Open 65% → Raise 85% → Raise 95% → Raise 100% + non-monetary",
-      "Open 50% → Raise 75% → Raise 90% → Raise 100%",
-      "Open 80% → Raise 90% → Raise 95% → Raise 100% + non-monetary",
-      "Open 65% → Raise 80% → Raise 100% + non-monetary",
+      "Set your target price",
+      "Open at 65% of target",
+      "Raise to 85% of target",
+      "Raise to 95% of target",
+      "Raise to 100% + non-monetary item",
     ],
-    correctAnswer: 0,
   },
 
   // Step 4: MCQ — non-monetary item
@@ -608,21 +608,20 @@ export const BUSINESS_CARDS: Card[] = [
   {
     id: 3082,
     category: "Business — Failures",
-    front: "Which is the correct ranking of startup failure reasons from most to least common?",
+    front: "Rank startup failure reasons from most to least common (CB Insights):",
     back: "Capital exhaustion is the proximate cause in 70% of failures, but it's usually a symptom. Product-market fit (43%) is the most common root cause — if nobody wants what you're building, no amount of runway saves you.",
     keyPoints: [
       "Capital exhaustion = most cited but usually symptom",
       "PMF = most common root cause",
       "Percentages exceed 100% — multiple causes per failure",
     ],
-    exerciseType: "mcq",
+    exerciseType: "ordering",
     choices: [
-      "Capital (70%) → PMF (43%) → Timing (29%) → Unit economics (19%)",
-      "PMF (43%) → Capital (70%) → Unit economics (19%) → Timing (29%)",
-      "Timing (29%) → Capital (70%) → PMF (43%) → Unit economics (19%)",
-      "Capital (70%) → Timing (29%) → PMF (43%) → Unit economics (19%)",
+      "Ran out of capital (70%)",
+      "No product-market fit (43%)",
+      "Bad timing / macro conditions (29%)",
+      "Unsustainable unit economics (19%)",
     ],
-    correctAnswer: 0,
   },
 
   // MCQ: Zume Pizza
@@ -762,21 +761,19 @@ export const BUSINESS_CARDS: Card[] = [
   {
     id: 3103,
     category: "Business — Leadership",
-    front: "What is Horowitz's priority hierarchy for running a company?",
+    front: "Put Horowitz's priority hierarchy in order:",
     back: "People → Products → Profits. If you have the right people, they build the right products. If you have the right products, profits follow. Inverting this chain destroys the company.",
     keyPoints: [
       "People first — always",
       "Products second — built by the right people",
       "Profits are the result, not the input",
     ],
-    exerciseType: "mcq",
+    exerciseType: "ordering",
     choices: [
-      "Profits → Products → People",
-      "Products → People → Profits",
-      "People → Products → Profits",
-      "People → Profits → Products",
+      "People",
+      "Products",
+      "Profits",
     ],
-    correctAnswer: 2,
   },
 
   // Reflection
