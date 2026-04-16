@@ -7,6 +7,22 @@ interface LearningPathProps {
   onBack?: () => void;
 }
 
+const MASTERY_RANK: Record<MasteryLevel, number> = {
+  locked: 0,
+  available: 1,
+  familiar: 2,
+  proficient: 3,
+  mastered: 4,
+};
+
+function isStarted(m: MasteryLevel): boolean {
+  return MASTERY_RANK[m] >= MASTERY_RANK.familiar;
+}
+
+function isCompleted(m: MasteryLevel): boolean {
+  return MASTERY_RANK[m] >= MASTERY_RANK.proficient;
+}
+
 function MasteryNode({
   mastery,
   color,
@@ -107,6 +123,36 @@ export function LearningPath({
   onSelectLesson,
   onBack,
 }: LearningPathProps) {
+  const totalLessons = sections.reduce((sum, s) => sum + s.lessons.length, 0);
+  const completedLessons = sections.reduce(
+    (sum, s) =>
+      sum +
+      s.lessons.filter((l) => isCompleted(lessonMastery[l.id] ?? "locked")).length,
+    0
+  );
+  const overallPct =
+    totalLessons === 0 ? 0 : (completedLessons / totalLessons) * 100;
+
+  // Find next available lesson (prefer first "available", fall back to first not-mastered)
+  const nextLesson = (() => {
+    for (const s of sections) {
+      for (const l of s.lessons) {
+        if ((lessonMastery[l.id] ?? "locked") === "available") {
+          return { lesson: l, section: s };
+        }
+      }
+    }
+    for (const s of sections) {
+      for (const l of s.lessons) {
+        const m = lessonMastery[l.id] ?? "locked";
+        if (m !== "locked" && m !== "mastered") {
+          return { lesson: l, section: s };
+        }
+      }
+    }
+    return null;
+  })();
+
   return (
     <div className="container">
       <header>
@@ -119,60 +165,152 @@ export function LearningPath({
         <span />
       </header>
 
-      <div className="path-map">
-        {sections.map((section) => (
-          <div className="path-section" key={section.id}>
-            <div className="path-section-header">
-              <span
-                className="path-section-icon"
-                style={{ color: section.color }}
-                dangerouslySetInnerHTML={{ __html: section.icon }}
-              />
-              <span className="path-section-title">{section.title}</span>
-            </div>
+      <div className="path-overview">
+        <div className="path-overview-row">
+          <span className="path-overview-label">Overall progress</span>
+          <span className="path-overview-count">
+            {completedLessons} / {totalLessons} lessons
+          </span>
+        </div>
+        <div className="path-overview-track">
+          <div
+            className="path-overview-fill"
+            style={{ width: `${overallPct}%` }}
+          />
+        </div>
+      </div>
 
-            <div className="path-lessons">
-              {section.lessons.map((lesson, lessonIndex) => {
-                const mastery = lessonMastery[lesson.id] || "locked";
-                const isClickable = mastery !== "locked";
-                const isLast = lessonIndex === section.lessons.length - 1;
-
-                return (
-                  <div className="path-lesson" key={lesson.id}>
-                    <div className="path-node-col">
-                      <button
-                        className={`path-node path-node--${mastery}`}
-                        disabled={!isClickable}
-                        onClick={() => isClickable && onSelectLesson(lesson.id)}
-                        aria-label={`${lesson.title} - ${mastery}`}
-                      >
-                        <MasteryNode mastery={mastery} color={section.color} />
-                      </button>
-                      {!isLast && (
-                        <div
-                          className="path-line"
-                          style={{
-                            borderColor:
-                              mastery !== "locked"
-                                ? section.color
-                                : "#1a2332",
-                          }}
-                        />
-                      )}
-                    </div>
-                    <div
-                      className={`path-label ${!isClickable ? "path-label--locked" : ""}`}
-                      onClick={() => isClickable && onSelectLesson(lesson.id)}
-                    >
-                      <span className="path-lesson-title">{lesson.title}</span>
-                      <span className="path-lesson-desc">{lesson.description}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+      {nextLesson && (
+        <button
+          className="path-next-up"
+          onClick={() => onSelectLesson(nextLesson.lesson.id)}
+          style={{ borderColor: nextLesson.section.color }}
+        >
+          <div className="path-next-up-meta">
+            <span
+              className="path-next-up-tag"
+              style={{ color: nextLesson.section.color }}
+            >
+              Up next &middot; {nextLesson.section.title}
+            </span>
+            <span className="path-next-up-title">{nextLesson.lesson.title}</span>
+            <span className="path-next-up-desc">
+              {nextLesson.lesson.description}
+            </span>
           </div>
-        ))}
+          <span
+            className="path-next-up-arrow"
+            style={{ color: nextLesson.section.color }}
+          >
+            &#8594;
+          </span>
+        </button>
+      )}
+
+      <div className="path-map">
+        {sections.map((section) => {
+          const sectionTotal = section.lessons.length;
+          const sectionCompleted = section.lessons.filter((l) =>
+            isCompleted(lessonMastery[l.id] ?? "locked")
+          ).length;
+          const sectionStarted = section.lessons.filter((l) =>
+            isStarted(lessonMastery[l.id] ?? "locked")
+          ).length;
+          const sectionPct =
+            sectionTotal === 0 ? 0 : (sectionCompleted / sectionTotal) * 100;
+          const inProgress =
+            sectionStarted > 0 && sectionCompleted < sectionTotal;
+
+          return (
+            <div className="path-section" key={section.id}>
+              <div className="path-section-header">
+                <span
+                  className="path-section-icon"
+                  style={{ color: section.color }}
+                  dangerouslySetInnerHTML={{ __html: section.icon }}
+                />
+                <div className="path-section-info">
+                  <span className="path-section-title">{section.title}</span>
+                  <span className="path-section-desc">{section.description}</span>
+                </div>
+                <span
+                  className="path-section-progress"
+                  style={{
+                    color: section.color,
+                    borderColor: `${section.color}55`,
+                    background: `${section.color}14`,
+                  }}
+                >
+                  {sectionCompleted}/{sectionTotal}
+                </span>
+              </div>
+
+              <div
+                className="path-section-bar"
+                aria-hidden="true"
+                title={`${sectionCompleted} of ${sectionTotal} lessons completed`}
+              >
+                <div
+                  className="path-section-bar-fill"
+                  style={{
+                    width: `${sectionPct}%`,
+                    background: section.color,
+                  }}
+                />
+                {inProgress && (
+                  <span
+                    className="path-section-bar-marker"
+                    style={{
+                      left: `${(sectionStarted / sectionTotal) * 100}%`,
+                      borderColor: section.color,
+                    }}
+                  />
+                )}
+              </div>
+
+              <div className="path-lessons">
+                {section.lessons.map((lesson, lessonIndex) => {
+                  const mastery = lessonMastery[lesson.id] || "locked";
+                  const isClickable = mastery !== "locked";
+                  const isLast = lessonIndex === section.lessons.length - 1;
+
+                  return (
+                    <div className="path-lesson" key={lesson.id}>
+                      <div className="path-node-col">
+                        <button
+                          className={`path-node path-node--${mastery}`}
+                          disabled={!isClickable}
+                          onClick={() => isClickable && onSelectLesson(lesson.id)}
+                          aria-label={`${lesson.title} - ${mastery}`}
+                        >
+                          <MasteryNode mastery={mastery} color={section.color} />
+                        </button>
+                        {!isLast && (
+                          <div
+                            className="path-line"
+                            style={{
+                              borderColor:
+                                mastery !== "locked"
+                                  ? section.color
+                                  : "#1a2332",
+                            }}
+                          />
+                        )}
+                      </div>
+                      <div
+                        className={`path-label ${!isClickable ? "path-label--locked" : ""}`}
+                        onClick={() => isClickable && onSelectLesson(lesson.id)}
+                      >
+                        <span className="path-lesson-title">{lesson.title}</span>
+                        <span className="path-lesson-desc">{lesson.description}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
