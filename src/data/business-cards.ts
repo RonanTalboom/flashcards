@@ -357,4 +357,435 @@ export const BUSINESS_CARDS: Card[] = [
     ],
     exerciseType: "flashcard",
   },
+
+  // ================================================================
+  // PRETEST CARDS (diagnostic — no penalty, shown before concept)
+  // ================================================================
+
+  // Pretest: Tactical Empathy
+  {
+    id: 3005,
+    category: "Business — Negotiation",
+    front: "Your supplier says 'This price increase is non-negotiable.' What would you do?",
+    back: "Interesting — most people either push back or give in. There's a third option that's more effective than both. Let's find out what it is...",
+    keyPoints: [],
+    exerciseType: "pretest",
+    choices: [
+      "Accept it and move on to other terms",
+      "Push back hard — 'That's not fair to us'",
+      "Ask for a detailed cost breakdown",
+      "Acknowledge their pressure and probe deeper",
+    ],
+    correctAnswer: 3,
+  },
+
+  // Pretest: Ackerman
+  {
+    id: 3025,
+    category: "Business — Negotiation",
+    front: "You want to negotiate a $120,000 salary. What's your opening number?",
+    back: "Most people open at their target or slightly below. There's a counterintuitive strategy that research shows is far more effective...",
+    keyPoints: [],
+    exerciseType: "pretest",
+    choices: [
+      "$120,000 — start with what you want",
+      "$130,000 — aim high so you have room to come down",
+      "$78,000 — an extreme low anchor",
+      "$110,000 — slightly below target",
+    ],
+    correctAnswer: 2,
+  },
+
+  // Pretest: Be Remarkable
+  {
+    id: 3045,
+    category: "Business — Marketing",
+    front: "You're launching a product in a crowded market. What's the riskiest strategy?",
+    back: "The answer surprises most people. Let's explore why 'safe' might be the most dangerous choice you can make...",
+    keyPoints: [],
+    exerciseType: "pretest",
+    choices: [
+      "Being radically different from competitors",
+      "Targeting a tiny niche audience",
+      "Playing it safe with a proven formula",
+      "Pricing significantly higher than competitors",
+    ],
+    correctAnswer: 2,
+  },
+
+  // ================================================================
+  // LESSON: Unit Economics (biz-unit-economics)
+  // ================================================================
+
+  // Pretest
+  {
+    id: 3060,
+    category: "Business — Finance",
+    front: "Your startup acquires customers for $100 each. They pay $30/month but leave after 2 months. Is this business viable?",
+    back: "Good instinct to check the math. The answer depends on two numbers that every founder should know cold. Let's learn them...",
+    keyPoints: [],
+    exerciseType: "pretest",
+    choices: [
+      "Yes — you're making $60 per customer ($30 × 2)",
+      "No — you spend $100 to make $60, losing $40 per customer",
+      "It depends on how fast you're growing",
+      "Yes — if you raise prices to $60/month",
+    ],
+    correctAnswer: 1,
+  },
+
+  // Concept
+  {
+    id: 3061,
+    category: "Business — Finance",
+    front: "What are CAC and LTV, and why do they decide if your business model works?",
+    back: "**CAC** (Customer Acquisition Cost) = total sales & marketing spend ÷ new customers acquired.\n\n**LTV** (Lifetime Value) = average revenue per customer × average customer lifespan.\n\nIf LTV/CAC < 1, you lose money on every customer. If LTV/CAC > 3, you have a healthy business. Between 1-3, you're surviving but fragile.\n\nCB Insights found that 19% of startup failures come from unsustainable unit economics.",
+    keyPoints: [
+      "CAC = total spend ÷ new customers",
+      "LTV = avg revenue × avg lifespan",
+      "LTV/CAC > 3x = healthy, < 1x = losing money",
+    ],
+    exerciseType: "flashcard",
+  },
+
+  // Math: Calculate CAC
+  {
+    id: 3062,
+    category: "Business — Finance",
+    front: "You spend $50,000/month on marketing and acquire 500 customers. What's your CAC?",
+    back: "CAC = $50,000 ÷ 500 = $100 per customer. Now you need to know: does each customer generate more than $100 in lifetime value?",
+    keyPoints: [
+      "CAC = total marketing spend ÷ new customers",
+      "Include all acquisition costs: ads, sales team, content",
+      "Track CAC by channel — some are 10x more efficient",
+    ],
+    exerciseType: "math",
+    mathAnswer: 100,
+    tolerance: 1,
+    unit: "$",
+  },
+
+  // Math: Calculate LTV
+  {
+    id: 3063,
+    category: "Business — Finance",
+    front: "Average customer pays $30/month and stays 18 months. What's the LTV?",
+    back: "LTV = $30 × 18 = $540. With a CAC of $100, LTV/CAC = 5.4x — very healthy. But watch out: if churn increases and average lifespan drops to 6 months, LTV = $180 and LTV/CAC = 1.8x — danger zone.",
+    keyPoints: [
+      "LTV = avg monthly revenue × avg months retained",
+      "Small churn changes have massive LTV impact",
+      "5.4x is excellent; below 3x is warning territory",
+    ],
+    exerciseType: "math",
+    mathAnswer: 540,
+    tolerance: 5,
+    unit: "$",
+  },
+
+  // MCQ: LTV/CAC interpretation
+  {
+    id: 3064,
+    category: "Business — Finance",
+    front: "Your LTV/CAC ratio is 1.5x. What does this mean?",
+    back: "LTV/CAC between 1-3 means you're making money per customer but not enough margin to absorb shocks (churn spikes, competition, cost increases). Target >3x before scaling aggressively.",
+    keyPoints: [
+      ">3x = scale aggressively",
+      "1-3x = surviving but fragile",
+      "<1x = losing money on every customer",
+    ],
+    exerciseType: "mcq",
+    choices: [
+      "You're very profitable — keep scaling",
+      "You're surviving but fragile — improve retention or reduce acquisition costs",
+      "You're losing money on every customer",
+      "You need to raise prices immediately",
+    ],
+    correctAnswer: 1,
+  },
+
+  // Reflection
+  {
+    id: 3065,
+    category: "Business — Finance",
+    front: "Calculate (or estimate) the CAC and LTV for a product you use or are building. Is the ratio >3x? If not, what's the weakest lever — acquisition cost or retention?",
+    back: "The two levers: reduce CAC (better targeting, organic channels, referrals) or increase LTV (reduce churn, upsell, increase prices). Most startups focus on acquisition when retention is the bigger lever.",
+    keyPoints: [
+      "Retention is usually the bigger lever than acquisition",
+      "Reducing churn by 5% can double LTV",
+      "Referrals reduce CAC and increase LTV simultaneously",
+    ],
+    exerciseType: "flashcard",
+  },
+
+  // --- Unit Economics REVIEW CARDS ---
+
+  {
+    id: 3070,
+    category: "Business — Finance",
+    front: "What is the LTV/CAC ratio and what's a healthy target?",
+    back: "LTV (Lifetime Value) ÷ CAC (Customer Acquisition Cost). Target >3x. Between 1-3x = surviving but fragile. Below 1x = losing money on every customer.",
+    keyPoints: [
+      "CAC = total spend ÷ new customers",
+      "LTV = avg revenue × avg lifespan",
+      ">3x before scaling aggressively",
+    ],
+    exerciseType: "flashcard",
+  },
+  {
+    id: 3071,
+    category: "Business — Finance",
+    front: "Why is retention usually a bigger lever than acquisition for improving unit economics?",
+    back: "Reducing churn by 5% can double LTV (the denominator effect). Improving acquisition reduces CAC linearly, but retention compounds: each extra month a customer stays adds full-margin revenue.",
+    keyPoints: [
+      "Churn reduction compounds — each saved customer pays every month",
+      "Acquisition improvements are linear, retention is exponential",
+      "Referrals are the best of both: reduce CAC AND increase LTV",
+    ],
+    exerciseType: "flashcard",
+  },
+
+  // ================================================================
+  // LESSON: Why Startups Die (biz-why-startups-die)
+  // ================================================================
+
+  // Pretest
+  {
+    id: 3080,
+    category: "Business — Failures",
+    front: "What do you think is the #1 reason startups fail?",
+    back: "The data might surprise you. 'Running out of money' is the most cited reason — but is it really the cause, or just the symptom?",
+    keyPoints: [],
+    exerciseType: "pretest",
+    choices: [
+      "Running out of money",
+      "No product-market fit",
+      "Bad timing",
+      "Team conflict",
+    ],
+    correctAnswer: 0,
+  },
+
+  // Concept
+  {
+    id: 3081,
+    category: "Business — Failures",
+    front: "What are the top reasons startups fail, according to CB Insights' analysis of 431 shutdowns?",
+    back: "CB Insights analyzed 431 VC-backed shutdowns (2023+). The top reasons overlap — most cite multiple causes:\n\n1. **Ran out of capital** — 70% (usually a symptom, not root cause)\n2. **No product-market fit** — 43% (the top root cause)\n3. **Bad timing / macro conditions** — 29%\n4. **Unsustainable unit economics** — 19%\n\nRunning out of capital is almost always the *effect*. The real killers are the other three.",
+    keyPoints: [
+      "70% ran out of capital (symptom, not cause)",
+      "43% no product-market fit (top root cause)",
+      "Multiple causes overlap in most failures",
+    ],
+    exerciseType: "flashcard",
+  },
+
+  // MCQ: Ranking (converted from ordering)
+  {
+    id: 3082,
+    category: "Business — Failures",
+    front: "Which is the correct ranking of startup failure reasons from most to least common?",
+    back: "Capital exhaustion is the proximate cause in 70% of failures, but it's usually a symptom. Product-market fit (43%) is the most common root cause — if nobody wants what you're building, no amount of runway saves you.",
+    keyPoints: [
+      "Capital exhaustion = most cited but usually symptom",
+      "PMF = most common root cause",
+      "Percentages exceed 100% — multiple causes per failure",
+    ],
+    exerciseType: "mcq",
+    choices: [
+      "Capital (70%) → PMF (43%) → Timing (29%) → Unit economics (19%)",
+      "PMF (43%) → Capital (70%) → Unit economics (19%) → Timing (29%)",
+      "Timing (29%) → Capital (70%) → PMF (43%) → Unit economics (19%)",
+      "Capital (70%) → Timing (29%) → PMF (43%) → Unit economics (19%)",
+    ],
+    correctAnswer: 0,
+  },
+
+  // MCQ: Zume Pizza
+  {
+    id: 3083,
+    category: "Business — Failures",
+    front: "Zume Pizza raised $446M and still failed. What was the primary cause?",
+    back: "Zume is a textbook product-market fit failure at scale. They pivoted from robot-made pizza to sustainable packaging but never found a market that wanted either product enough. $446M couldn't fix that.",
+    keyPoints: [
+      "No amount of funding fixes lack of product-market fit",
+      "Multiple pivots without finding fit = the money runs out",
+      "$446M is the most expensive PMF lesson in recent history",
+    ],
+    exerciseType: "mcq",
+    choices: [
+      "Bad timing — the pandemic killed restaurants",
+      "No product-market fit — pivoted from robot pizza to packaging, never found a viable market",
+      "Founder conflict broke up the team",
+      "A competitor copied their approach",
+    ],
+    correctAnswer: 1,
+  },
+
+  // MCQ: Capital as root vs symptom
+  {
+    id: 3084,
+    category: "Business — Failures",
+    front: "What separates 'ran out of capital' as a root cause vs. a symptom?",
+    back: "Capital exhaustion is a root cause only when external factors (funding market freeze, investor politics) kill an otherwise working business. In most cases, investors stop funding because the underlying business isn't working.",
+    keyPoints: [
+      "Root cause: external factors killed a working business",
+      "Symptom: investors stopped funding because nothing was working",
+      "Ask: 'Would more money have fixed this?' If no, capital isn't the root cause",
+    ],
+    exerciseType: "mcq",
+    choices: [
+      "If you raised less than $10M, it's a root cause",
+      "If you had PMF but couldn't raise more, it's root cause. If you couldn't raise because nothing worked, it's symptom.",
+      "It's always a root cause — money solves everything",
+      "It's never a root cause — you can always bootstrap",
+    ],
+    correctAnswer: 1,
+  },
+
+  // Reflection
+  {
+    id: 3085,
+    category: "Business — Failures",
+    front: "Which of the 4 failure modes is your biggest current risk? What's one thing you could do this week to reduce it?",
+    back: "The most dangerous failure mode is the one you're not watching. PMF risk: talk to 5 customers this week. Capital risk: calculate runway. Timing risk: research market trends. Unit economics risk: calculate LTV/CAC.",
+    keyPoints: [
+      "Identify your #1 risk honestly",
+      "PMF risk → customer conversations",
+      "Capital risk → runway calculation",
+    ],
+    exerciseType: "flashcard",
+  },
+
+  // --- Why Startups Die REVIEW CARDS ---
+
+  {
+    id: 3090,
+    category: "Business — Failures",
+    front: "What are the top 4 reasons startups fail? (CB Insights, 431 companies)",
+    back: "1. Ran out of capital — 70% (usually a symptom)\n2. No product-market fit — 43% (top root cause)\n3. Bad timing / macro conditions — 29%\n4. Unsustainable unit economics — 19%\n\nPercentages exceed 100% because most cite multiple reasons.",
+    keyPoints: [
+      "Capital exhaustion is symptom not cause",
+      "PMF is #1 root cause",
+      "Multiple causes overlap in most failures",
+    ],
+    exerciseType: "flashcard",
+  },
+
+  // ================================================================
+  // LESSON: Wartime vs Peacetime CEO (biz-wartime-ceo)
+  // ================================================================
+
+  // Pretest
+  {
+    id: 3100,
+    category: "Business — Leadership",
+    front: "You need to lay off 30% of your company. What's the first thing you should do?",
+    back: "This is one of the hardest decisions in business. There's a specific protocol from someone who's done it multiple times. Let's learn it...",
+    keyPoints: [],
+    exerciseType: "pretest",
+    choices: [
+      "Call an all-hands meeting immediately",
+      "Get your own head right emotionally before acting",
+      "Have HR prepare the paperwork",
+      "Identify the lowest performers to cut first",
+    ],
+    correctAnswer: 1,
+  },
+
+  // Concept
+  {
+    id: 3101,
+    category: "Business — Leadership",
+    front: "What is the difference between a wartime and peacetime CEO?",
+    back: "**Peacetime CEO** builds culture, develops people, expands markets. Think: Google in 2006.\n\n**Wartime CEO** makes hard calls under existential threat — layoffs, pivots, killing products. Think: Steve Jobs returning to Apple in 1997.\n\nMost founders default to peacetime because it's comfortable. The hard skill is recognizing when to switch.\n\n**Priority order in all modes**: People → Products → Profits.\n\n**Source**: Ben Horowitz, *The Hard Thing About Hard Things*",
+    keyPoints: [
+      "Peacetime: build, expand, develop (comfortable)",
+      "Wartime: cut, pivot, survive (uncomfortable but necessary)",
+      "People → Products → Profits (always this order)",
+    ],
+    exerciseType: "flashcard",
+  },
+
+  // MCQ: Layoffs protocol
+  {
+    id: 3102,
+    category: "Business — Leadership",
+    front: "You need to do layoffs. What's the first step in Horowitz's protocol?",
+    back: "Horowitz: get your head right first. If you're emotional, you'll rush, communicate poorly, and damage trust further. Then: don't delay, be clear on reasons, train managers, address the whole company, be visible.",
+    keyPoints: [
+      "Process your emotions BEFORE acting",
+      "Rushing leads to poor communication and broken trust",
+      "After: don't delay, be clear, address everyone, stay visible",
+    ],
+    exerciseType: "mcq",
+    choices: [
+      "Announce it to the whole company immediately",
+      "Get your own head right — process it emotionally before acting",
+      "Let HR handle it and stay out of the way",
+      "Find out who the lowest performers are",
+    ],
+    correctAnswer: 1,
+  },
+
+  // MCQ: Priority hierarchy (converted from ordering)
+  {
+    id: 3103,
+    category: "Business — Leadership",
+    front: "What is Horowitz's priority hierarchy for running a company?",
+    back: "People → Products → Profits. If you have the right people, they build the right products. If you have the right products, profits follow. Inverting this chain destroys the company.",
+    keyPoints: [
+      "People first — always",
+      "Products second — built by the right people",
+      "Profits are the result, not the input",
+    ],
+    exerciseType: "mcq",
+    choices: [
+      "Profits → Products → People",
+      "Products → People → Profits",
+      "People → Products → Profits",
+      "People → Profits → Products",
+    ],
+    correctAnswer: 2,
+  },
+
+  // Reflection
+  {
+    id: 3104,
+    category: "Business — Leadership",
+    front: "Is your current work situation wartime or peacetime? What's the evidence? If wartime, what hard decision are you avoiding?",
+    back: "Signs of wartime: declining metrics, runway pressure, key people leaving, market shifting against you. The hardest part isn't making the decision — it's admitting you're in wartime when peacetime feels safer.",
+    keyPoints: [
+      "Wartime signs: declining metrics, runway pressure, key departures",
+      "The hardest part is admitting the mode has changed",
+      "Delaying wartime decisions makes them worse",
+    ],
+    exerciseType: "flashcard",
+  },
+
+  // --- Wartime CEO REVIEW CARDS ---
+
+  {
+    id: 3110,
+    category: "Business — Leadership",
+    front: "What is Horowitz's priority hierarchy?",
+    back: "People → Products → Profits (in that order). Get the right people, they build the right products, profits follow. Inverting this chain (optimizing profits first) destroys the company.",
+    keyPoints: [
+      "People first always",
+      "Products second",
+      "Profits are the result, not the input",
+    ],
+    exerciseType: "flashcard",
+  },
+  {
+    id: 3111,
+    category: "Business — Leadership",
+    front: "What's the first step when you need to do layoffs? (Horowitz)",
+    back: "Get your own head right — process the emotions before acting. If you rush, you'll communicate poorly and damage trust. Then: don't delay, be clear on reasons, train managers to handle their reports, address the whole company, and be visible afterward.",
+    keyPoints: [
+      "Emotional processing comes FIRST",
+      "Then: don't delay, be clear, address everyone",
+      "Managers must own their own conversations",
+    ],
+    exerciseType: "flashcard",
+  },
 ];
