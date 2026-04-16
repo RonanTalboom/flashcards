@@ -480,6 +480,56 @@ export const SECTIONS: Section[] = [
       },
     ],
   },
+
+  // === Section 9: Business Fundamentals ===
+  {
+    id: "business",
+    title: "Business Fundamentals",
+    description: "Strategy, marketing, negotiation — from Godin, Voss, and Thiel",
+    icon: "&#127959;",
+    color: "#8b5cf6",
+    lessons: [
+      {
+        id: "biz-tactical-empathy",
+        sectionId: "business",
+        title: "Tactical Empathy",
+        description: "Understand feelings to increase influence — without agreeing",
+        cards: [3000, 3001, 3002, 3003, 3004, 3010, 3011, 3012],
+        prerequisites: [],
+        concepts: [
+          "Tactical empathy = understanding + influence, not agreement",
+          "Label emotions with 'It seems like...' — never 'I'",
+          "Empathy opens the door to information and leverage",
+        ],
+      },
+      {
+        id: "biz-remarkable",
+        sectionId: "business",
+        title: "Be Remarkable",
+        description: "Why safe is risky and remarkable is the only marketing that works",
+        cards: [3040, 3041, 3042, 3043, 3050, 3051],
+        prerequisites: [],
+        concepts: [
+          "Purple Cow: safe is the riskiest strategy",
+          "Remarkable = worth making a remark about",
+          "Target sneezers (early adopters), not the mass market",
+        ],
+      },
+      {
+        id: "biz-ackerman",
+        sectionId: "business",
+        title: "The Ackerman Model",
+        description: "A structured anchoring and concession strategy",
+        cards: [3020, 3021, 3022, 3023, 3024, 3030, 3031],
+        prerequisites: ["biz-tactical-empathy"],
+        concepts: [
+          "65% → 85% → 95% → 100% with decreasing increments",
+          "Odd, precise numbers signal calculation, not guessing",
+          "Non-monetary item on final offer signals absolute limit",
+        ],
+      },
+    ],
+  },
 ];
 
 // All lessons flattened for easy lookup
