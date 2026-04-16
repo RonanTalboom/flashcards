@@ -19,6 +19,9 @@ export function PretestCard({
   const [answered, setAnswered] = useState(false);
 
   const choices = card.choices || [];
+  const correctIndex =
+    typeof card.correctAnswer === "number" ? card.correctAnswer : -1;
+  const explanations = card.choiceExplanations || [];
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -46,6 +49,10 @@ export function PretestCard({
     setAnswered(true);
   }
 
+  const isCorrect = selectedIndex === correctIndex;
+  const selectedExplanation =
+    selectedIndex !== null ? explanations[selectedIndex] : null;
+
   return (
     <div className="container">
       <header>
@@ -63,7 +70,7 @@ export function PretestCard({
         {choices.map((choice, i) => (
           <button
             key={i}
-            className={`mcq-choice${answered && i === selectedIndex ? " pretest-choice--selected" : ""}${answered && i !== selectedIndex ? " mcq-choice--dimmed" : ""}`}
+            className={`mcq-choice${answered && i === selectedIndex ? (isCorrect ? " pretest-choice--correct" : " pretest-choice--selected") : ""}${answered && i === correctIndex && i !== selectedIndex ? " pretest-choice--reveal" : ""}${answered && i !== selectedIndex && i !== correctIndex ? " mcq-choice--dimmed" : ""}`}
             onClick={() => handleSelect(i)}
             disabled={answered}
           >
@@ -77,6 +84,13 @@ export function PretestCard({
 
       {answered && (
         <div className="pretest-feedback">
+          {selectedExplanation && (
+            <Latex
+              text={selectedExplanation}
+              className={`pretest-explanation${isCorrect ? " pretest-explanation--correct" : ""}`}
+              as="p"
+            />
+          )}
           <Latex text={card.back} className="pretest-hook" as="p" />
           <button className="pretest-continue" onClick={() => onAnswer(true)}>
             Let's find out &#8594;

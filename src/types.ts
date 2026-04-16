@@ -23,6 +23,9 @@ export interface Card {
   unit?: string;
   hints?: string[];
 
+  // Pretest per-option explanations (why each wrong answer fails)
+  choiceExplanations?: string[];
+
   // Interactive plot fields
   plotType?: "kelly-curve" | "ev-calculator" | "bayes-updater" | "brier-score" | "vpin-gauge";
 
