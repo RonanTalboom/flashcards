@@ -10,7 +10,7 @@ const LEECH_THRESHOLD = 8;
 const DIFFICULT_DIFFICULTY_THRESHOLD = 7;
 const DIFFICULT_LAPSE_THRESHOLD = 4;
 
-export type View = "dashboard" | "path" | "lesson-intro" | "study" | "lesson-complete" | "done" | "speed-review" | "match-game" | "quiz-mode" | "stats";
+export type View = "dashboard" | "paths" | "path" | "lesson-intro" | "study" | "lesson-complete" | "done" | "speed-review" | "match-game" | "quiz-mode" | "stats";
 
 // --- Mastery helpers ---
 
@@ -249,6 +249,11 @@ export function useFlashcards() {
   // --- Learning path flow ---
 
   const viewPath = useCallback(() => {
+    setView("paths");
+  }, []);
+
+  const selectPath = useCallback((sectionId: string) => {
+    setCurrentSection(sectionId);
     setView("path");
   }, []);
 
@@ -500,6 +505,15 @@ export function useFlashcards() {
     setCurrentLesson(null);
   }, []);
 
+  const backToPaths = useCallback(() => {
+    setView("paths");
+    setQueue([]);
+    setCurrentIndex(0);
+    setIsFlipped(false);
+    setCurrentLesson(null);
+    setCurrentSection(null);
+  }, []);
+
   // --- Study modes ---
 
   const getDifficultCards = useCallback(() => {
@@ -742,10 +756,12 @@ export function useFlashcards() {
 
     // Learning path actions
     viewPath,
+    selectPath,
     selectLesson,
     startLesson,
     completeLesson,
     backToPath,
+    backToPaths,
 
     // Study mode actions
     startDifficultReview,

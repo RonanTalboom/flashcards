@@ -4,6 +4,7 @@ import { Dashboard } from "./components/Dashboard";
 import { StudyCard } from "./components/StudyCard";
 import { DoneScreen } from "./components/DoneScreen";
 import { LearningPath } from "./components/LearningPath";
+import { PathsLanding } from "./components/PathsLanding";
 import { LessonIntro } from "./components/LessonIntro";
 import { MCQCard } from "./components/MCQCard";
 import { FillBlankCard } from "./components/FillBlankCard";
@@ -41,8 +42,11 @@ export function App() {
             fc.startStudy();
           }
           break;
-        case "path":
+        case "paths":
           if (e.key === "Escape") fc.backToDashboard();
+          break;
+        case "path":
+          if (e.key === "Escape") fc.backToPaths();
           break;
         case "lesson-intro":
           if (e.key === "Enter") {
@@ -74,7 +78,7 @@ export function App() {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [fc.view, fc.dueCount, fc.startStudy, fc.backToDashboard, fc.startLesson, fc.completeLesson, fc.backToPath]);
+  }, [fc.view, fc.dueCount, fc.startStudy, fc.backToDashboard, fc.startLesson, fc.completeLesson, fc.backToPath, fc.backToPaths]);
 
   if (fc.loading) {
     return (
@@ -125,15 +129,28 @@ export function App() {
           />
         );
 
-      case "path":
+      case "paths":
         return (
-          <LearningPath
+          <PathsLanding
             sections={SECTIONS}
             lessonMastery={fc.lessonMastery}
-            onSelectLesson={fc.selectLesson}
+            onSelectPath={fc.selectPath}
             onBack={fc.backToDashboard}
           />
         );
+
+      case "path": {
+        const section =
+          SECTIONS.find((s) => s.id === fc.currentSection) ?? SECTIONS[0];
+        return (
+          <LearningPath
+            section={section}
+            lessonMastery={fc.lessonMastery}
+            onSelectLesson={fc.selectLesson}
+            onBack={fc.backToPaths}
+          />
+        );
+      }
 
       case "lesson-intro": {
         if (!fc.currentLesson) return null;
