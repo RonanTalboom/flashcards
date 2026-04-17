@@ -7,6 +7,7 @@ interface MCQCardProps {
   currentIndex: number;
   queueLength: number;
   onAnswer: (correct: boolean) => void;
+  onBack?: () => void;
 }
 
 export function MCQCard({
@@ -14,6 +15,7 @@ export function MCQCard({
   currentIndex,
   queueLength,
   onAnswer,
+  onBack,
 }: MCQCardProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [answered, setAnswered] = useState(false);
@@ -71,9 +73,16 @@ export function MCQCard({
   return (
     <div className="container">
       <header>
-        <span className="progress">
-          {currentIndex + 1} / {queueLength}
-        </span>
+        <div className="header-left">
+          {onBack && (
+            <button className="back-btn" onClick={onBack} aria-label="Back">
+              &#8592;
+            </button>
+          )}
+          <span className="progress">
+            {currentIndex + 1} / {queueLength}
+          </span>
+        </div>
         <span className="category-badge">{card.category}</span>
       </header>
 

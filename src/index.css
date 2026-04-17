@@ -102,6 +102,12 @@ header h1 {
   color: var(--text);
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* Stats */
 
 .stats-row {

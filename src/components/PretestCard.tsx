@@ -7,6 +7,7 @@ interface PretestCardProps {
   currentIndex: number;
   queueLength: number;
   onAnswer: (correct: boolean) => void;
+  onBack?: () => void;
 }
 
 export function PretestCard({
@@ -14,6 +15,7 @@ export function PretestCard({
   currentIndex,
   queueLength,
   onAnswer,
+  onBack,
 }: PretestCardProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [answered, setAnswered] = useState(false);
@@ -56,9 +58,16 @@ export function PretestCard({
   return (
     <div className="container">
       <header>
-        <span className="progress">
-          {currentIndex + 1} / {queueLength}
-        </span>
+        <div className="header-left">
+          {onBack && (
+            <button className="back-btn" onClick={onBack} aria-label="Back">
+              &#8592;
+            </button>
+          )}
+          <span className="progress">
+            {currentIndex + 1} / {queueLength}
+          </span>
+        </div>
         <span className="pretest-badge">What do you think?</span>
       </header>
 

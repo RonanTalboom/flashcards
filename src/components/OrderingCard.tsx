@@ -7,6 +7,7 @@ interface OrderingCardProps {
   currentIndex: number;
   queueLength: number;
   onAnswer: (correct: boolean) => void;
+  onBack?: () => void;
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -23,6 +24,7 @@ export function OrderingCard({
   currentIndex,
   queueLength,
   onAnswer,
+  onBack,
 }: OrderingCardProps) {
   const correctOrder = card.choices || [];
   const [items, setItems] = useState<string[]>([]);
@@ -91,9 +93,16 @@ export function OrderingCard({
   return (
     <div className="container">
       <header>
-        <span className="progress">
-          {currentIndex + 1} / {queueLength}
-        </span>
+        <div className="header-left">
+          {onBack && (
+            <button className="back-btn" onClick={onBack} aria-label="Back">
+              &#8592;
+            </button>
+          )}
+          <span className="progress">
+            {currentIndex + 1} / {queueLength}
+          </span>
+        </div>
         <span className="category-badge">{card.category}</span>
       </header>
 

@@ -8,6 +8,7 @@ interface ClozeCardProps {
   currentIndex: number;
   queueLength: number;
   onAnswer: (correct: boolean) => void;
+  onBack?: () => void;
 }
 
 function parseCloze(text: string): { before: string; answer: string; after: string } {
@@ -30,6 +31,7 @@ export function ClozeCard({
   currentIndex,
   queueLength,
   onAnswer,
+  onBack,
 }: ClozeCardProps) {
   const [input, setInput] = useState("");
   const [answered, setAnswered] = useState(false);
@@ -73,9 +75,16 @@ export function ClozeCard({
   return (
     <div className="container">
       <header>
-        <span className="progress">
-          {currentIndex + 1} / {queueLength}
-        </span>
+        <div className="header-left">
+          {onBack && (
+            <button className="back-btn" onClick={onBack} aria-label="Back">
+              &#8592;
+            </button>
+          )}
+          <span className="progress">
+            {currentIndex + 1} / {queueLength}
+          </span>
+        </div>
         <div className="header-badges">
           {card.cefrLevel && (
             <span className="cefr-badge">{card.cefrLevel}</span>

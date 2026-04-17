@@ -8,6 +8,7 @@ interface ConjugationCardProps {
   currentIndex: number;
   queueLength: number;
   onAnswer: (correct: boolean) => void;
+  onBack?: () => void;
 }
 
 function normalizeAccents(s: string): string {
@@ -18,7 +19,7 @@ function normalizeAccents(s: string): string {
     .trim();
 }
 
-export function ConjugationCard({ card, currentIndex, queueLength, onAnswer }: ConjugationCardProps) {
+export function ConjugationCard({ card, currentIndex, queueLength, onAnswer, onBack }: ConjugationCardProps) {
   const [userInput, setUserInput] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -76,7 +77,14 @@ export function ConjugationCard({ card, currentIndex, queueLength, onAnswer }: C
   return (
     <div className="container">
       <header>
-        <span className="progress">{currentIndex + 1} / {queueLength}</span>
+        <div className="header-left">
+          {onBack && (
+            <button className="back-btn" onClick={onBack} aria-label="Back">
+              &#8592;
+            </button>
+          )}
+          <span className="progress">{currentIndex + 1} / {queueLength}</span>
+        </div>
         <div className="header-badges">
           {card.cefrLevel && <span className="cefr-badge">{card.cefrLevel}</span>}
           <span className="category-badge">Conjugation</span>

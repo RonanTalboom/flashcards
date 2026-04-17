@@ -7,6 +7,7 @@ interface MathCardProps {
   currentIndex: number;
   queueLength: number;
   onAnswer: (correct: boolean) => void;
+  onBack?: () => void;
 }
 
 export function MathCard({
@@ -14,6 +15,7 @@ export function MathCard({
   currentIndex,
   queueLength,
   onAnswer,
+  onBack,
 }: MathCardProps) {
   const [input, setInput] = useState("");
   const [negative, setNegative] = useState(false);
@@ -62,9 +64,16 @@ export function MathCard({
   return (
     <div className="container">
       <header>
-        <span className="progress">
-          {currentIndex + 1} / {queueLength}
-        </span>
+        <div className="header-left">
+          {onBack && (
+            <button className="back-btn" onClick={onBack} aria-label="Back">
+              &#8592;
+            </button>
+          )}
+          <span className="progress">
+            {currentIndex + 1} / {queueLength}
+          </span>
+        </div>
         <span className="category-badge">{card.category}</span>
       </header>
 

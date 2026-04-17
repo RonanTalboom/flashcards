@@ -166,6 +166,7 @@ export function App() {
                 currentIndex={fc.currentIndex}
                 queueLength={fc.queueLength}
                 onAnswer={fc.answerCard}
+                onBack={fc.isLessonMode ? fc.backToPath : undefined}
               />
             </>
           );
@@ -198,6 +199,7 @@ export function App() {
                 currentIndex={fc.currentIndex}
                 queueLength={fc.queueLength}
                 onAnswer={fc.answerCard}
+                onBack={fc.isLessonMode ? fc.backToPath : undefined}
               />
             </>
           );
@@ -213,6 +215,7 @@ export function App() {
                 currentIndex={fc.currentIndex}
                 queueLength={fc.queueLength}
                 onAnswer={fc.answerCard}
+                onBack={fc.isLessonMode ? fc.backToPath : undefined}
               />
             </>
           );
@@ -228,6 +231,7 @@ export function App() {
                 currentIndex={fc.currentIndex}
                 queueLength={fc.queueLength}
                 onAnswer={fc.answerCard}
+                onBack={fc.isLessonMode ? fc.backToPath : undefined}
               />
             </>
           );
@@ -243,6 +247,7 @@ export function App() {
                 currentIndex={fc.currentIndex}
                 queueLength={fc.queueLength}
                 onAnswer={fc.answerCard}
+                onBack={fc.isLessonMode ? fc.backToPath : undefined}
               />
             </>
           );
@@ -258,6 +263,7 @@ export function App() {
                 currentIndex={fc.currentIndex}
                 queueLength={fc.queueLength}
                 onAnswer={fc.answerCard}
+                onBack={fc.isLessonMode ? fc.backToPath : undefined}
               />
             </>
           );
@@ -271,6 +277,7 @@ export function App() {
               currentIndex={fc.currentIndex}
               queueLength={fc.queueLength}
               onRate={fc.rateCard}
+              onBack={fc.isLessonMode ? fc.backToPath : undefined}
             />
           );
         }
@@ -283,6 +290,7 @@ export function App() {
               currentIndex={fc.currentIndex}
               queueLength={fc.queueLength}
               onAnswer={fc.answerCard}
+              onBack={fc.isLessonMode ? fc.backToPath : undefined}
             />
           );
         }
@@ -295,6 +303,7 @@ export function App() {
               currentIndex={fc.currentIndex}
               queueLength={fc.queueLength}
               onAnswer={fc.answerCard}
+              onBack={fc.isLessonMode ? fc.backToPath : undefined}
             />
           );
         }

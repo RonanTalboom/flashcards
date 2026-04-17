@@ -8,9 +8,10 @@ interface ListeningCardProps {
   currentIndex: number;
   queueLength: number;
   onAnswer: (correct: boolean) => void;
+  onBack?: () => void;
 }
 
-export function ListeningCard({ card, currentIndex, queueLength, onAnswer }: ListeningCardProps) {
+export function ListeningCard({ card, currentIndex, queueLength, onAnswer, onBack }: ListeningCardProps) {
   const [revealed, setRevealed] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1.0);
   const [userAnswer, setUserAnswer] = useState("");
@@ -56,7 +57,14 @@ export function ListeningCard({ card, currentIndex, queueLength, onAnswer }: Lis
   return (
     <div className="container">
       <header>
-        <span className="progress">{currentIndex + 1} / {queueLength}</span>
+        <div className="header-left">
+          {onBack && (
+            <button className="back-btn" onClick={onBack} aria-label="Back">
+              &#8592;
+            </button>
+          )}
+          <span className="progress">{currentIndex + 1} / {queueLength}</span>
+        </div>
         <div className="header-badges">
           {card.cefrLevel && <span className="cefr-badge">{card.cefrLevel}</span>}
           <span className="category-badge">Listening</span>

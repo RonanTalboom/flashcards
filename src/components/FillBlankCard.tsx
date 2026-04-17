@@ -8,6 +8,7 @@ interface FillBlankCardProps {
   currentIndex: number;
   queueLength: number;
   onAnswer: (correct: boolean) => void;
+  onBack?: () => void;
 }
 
 function normalizeAccents(s: string): string {
@@ -19,6 +20,7 @@ export function FillBlankCard({
   currentIndex,
   queueLength,
   onAnswer,
+  onBack,
 }: FillBlankCardProps) {
   const [input, setInput] = useState("");
   const [answered, setAnswered] = useState(false);
@@ -63,9 +65,16 @@ export function FillBlankCard({
   return (
     <div className="container">
       <header>
-        <span className="progress">
-          {currentIndex + 1} / {queueLength}
-        </span>
+        <div className="header-left">
+          {onBack && (
+            <button className="back-btn" onClick={onBack} aria-label="Back">
+              &#8592;
+            </button>
+          )}
+          <span className="progress">
+            {currentIndex + 1} / {queueLength}
+          </span>
+        </div>
         <div className="header-badges">
           {card.cefrLevel && (
             <span className="cefr-badge">{card.cefrLevel}</span>

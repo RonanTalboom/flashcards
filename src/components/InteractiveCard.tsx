@@ -14,6 +14,7 @@ interface InteractiveCardProps {
   currentIndex: number;
   queueLength: number;
   onRate: (grade: number) => void;
+  onBack?: () => void;
 }
 
 const PLOT_COMPONENTS: Record<string, React.FC> = {
@@ -29,6 +30,7 @@ export function InteractiveCard({
   currentIndex,
   queueLength,
   onRate,
+  onBack,
 }: InteractiveCardProps) {
   const [explored, setExplored] = useState(false);
 
@@ -37,9 +39,16 @@ export function InteractiveCard({
   return (
     <div className="container">
       <header>
-        <span className="progress">
-          {currentIndex + 1} / {queueLength}
-        </span>
+        <div className="header-left">
+          {onBack && (
+            <button className="back-btn" onClick={onBack} aria-label="Back">
+              &#8592;
+            </button>
+          )}
+          <span className="progress">
+            {currentIndex + 1} / {queueLength}
+          </span>
+        </div>
         <span className="category-badge">{card.category}</span>
       </header>
 
