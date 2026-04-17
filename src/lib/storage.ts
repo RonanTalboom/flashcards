@@ -9,6 +9,7 @@ import { BUSINESS_CARDS } from "../data/business-cards";
 import { MODULE_DESIGN_CARDS } from "../data/module-design-cards";
 import { KAHNEMAN_CARDS } from "../data/kahneman-cards";
 import { DDIA_GLOSSARY_CARDS } from "../data/ddia-glossary-cards";
+import { THEORY_DEMO_CARDS } from "../data/theory-demo-cards";
 import { ACHIEVEMENT_DEFINITIONS } from "./achievements";
 
 export async function loadCards(): Promise<Card[]> {
@@ -24,6 +25,7 @@ export async function loadCards(): Promise<Card[]> {
   const moduleDesignCards = MODULE_DESIGN_CARDS.filter((c) => !apiIds.has(c.id));
   const kahnemanCards = KAHNEMAN_CARDS.filter((c) => !apiIds.has(c.id));
   const ddiaGlossaryCards = DDIA_GLOSSARY_CARDS.filter((c) => !apiIds.has(c.id));
+  const theoryDemoCards = THEORY_DEMO_CARDS.filter((c) => !apiIds.has(c.id));
 
   const allCards = [
     ...apiCards,
@@ -36,6 +38,7 @@ export async function loadCards(): Promise<Card[]> {
     ...moduleDesignCards,
     ...kahnemanCards,
     ...ddiaGlossaryCards,
+    ...theoryDemoCards,
   ];
 
   // Generate reverse cards for vocabulary cards

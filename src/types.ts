@@ -12,7 +12,19 @@ export interface Card {
   keyPoints: string[];
 
   // Exercise variants
-  exerciseType?: "flashcard" | "mcq" | "fill-blank" | "cloze" | "math" | "interactive" | "listening" | "conjugation" | "pretest" | "ordering";
+  exerciseType?:
+    | "flashcard"
+    | "mcq"
+    | "fill-blank"
+    | "cloze"
+    | "math"
+    | "interactive"
+    | "listening"
+    | "conjugation"
+    | "pretest"
+    | "ordering"
+    | "concept"
+    | "reflection";
   choices?: string[];
   correctAnswer?: number | string;
   image?: string;
@@ -25,6 +37,16 @@ export interface Card {
 
   // Pretest per-option explanations (why each wrong answer fails)
   choiceExplanations?: string[];
+
+  // Theory-learning fields
+  // ConceptStep: a non-graded teaching screen. `front` = title, `back` = 1-2 sentence body (markdown).
+  // ReflectionStep: free-text prompt. `front` = prompt; `modelAnswer` (optional) revealed after submit.
+  // SynthesisStep: a fill-blank or ordering card flagged as the lesson's assembled-framework summary.
+  diagram?: string;              // path to SVG/PNG (e.g. "/diagrams/ev-tree.svg")
+  diagramCaption?: string;
+  modelAnswer?: string;          // shown after reflection submit (markdown)
+  minLength?: number;            // optional min chars for reflection
+  synthesis?: boolean;           // visual flag for lesson-end assembly cards
 
   // Interactive plot fields
   plotType?: "kelly-curve" | "ev-calculator" | "bayes-updater" | "brier-score" | "vpin-gauge";

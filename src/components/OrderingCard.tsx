@@ -94,7 +94,10 @@ export function OrderingCard({
         <span className="progress">
           {currentIndex + 1} / {queueLength}
         </span>
-        <span className="category-badge">{card.category}</span>
+        <div className="header-badges">
+          {card.synthesis && <span className="synthesis-badge">Synthesis</span>}
+          <span className="category-badge">{card.category}</span>
+        </div>
       </header>
 
       <div className="mcq-question">

@@ -22,6 +22,8 @@ import { ListeningCard } from "./components/ListeningCard";
 import { ConjugationCard } from "./components/ConjugationCard";
 import { PretestCard } from "./components/PretestCard";
 import { OrderingCard } from "./components/OrderingCard";
+import { ConceptCard } from "./components/ConceptCard";
+import { ReflectionCard } from "./components/ReflectionCard";
 import { SECTIONS, getSectionByLessonId } from "./data/lessons";
 import "./index.css";
 
@@ -154,6 +156,38 @@ export function App() {
       case "study": {
         if (!fc.currentCard) return null;
         const exerciseType = fc.currentCard.exerciseType ?? "flashcard";
+
+        // Concept: non-graded teaching screen (1-2 sentences + optional diagram)
+        if (exerciseType === "concept") {
+          return (
+            <>
+              <SessionProgressBar current={fc.currentIndex} total={fc.queueLength} />
+              <ConceptCard
+                key={fc.currentCard.id}
+                card={fc.currentCard}
+                currentIndex={fc.currentIndex}
+                queueLength={fc.queueLength}
+                onContinue={fc.advanceCard}
+              />
+            </>
+          );
+        }
+
+        // Reflection / Apply: free-text prompt with optional model answer reveal
+        if (exerciseType === "reflection") {
+          return (
+            <>
+              <SessionProgressBar current={fc.currentIndex} total={fc.queueLength} />
+              <ReflectionCard
+                key={fc.currentCard.id}
+                card={fc.currentCard}
+                currentIndex={fc.currentIndex}
+                queueLength={fc.queueLength}
+                onContinue={fc.advanceCard}
+              />
+            </>
+          );
+        }
 
         // Pretest: diagnostic question before teaching (no penalty, no confidence prompt)
         if (exerciseType === "pretest") {

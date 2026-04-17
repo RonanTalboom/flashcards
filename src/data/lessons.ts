@@ -271,6 +271,20 @@ export const SECTIONS: Section[] = [
     color: "#e53e3e",
     lessons: [
       {
+        id: "active-recall-guided",
+        sectionId: "learning",
+        title: "Active Recall (Guided)",
+        description:
+          "A guided-discovery lesson on why testing beats re-reading",
+        cards: [7000, 7001, 7002, 7003, 7004, 7005],
+        prerequisites: [],
+        concepts: [
+          "Retrieval, not exposure, is what builds memory",
+          "Fluency \u2260 knowing: re-reading creates an illusion of competence",
+          "The loop: expose \u2192 retrieve \u2192 correct \u2192 repeat",
+        ],
+      },
+      {
         id: "core-techniques",
         sectionId: "learning",
         title: "Core Techniques",

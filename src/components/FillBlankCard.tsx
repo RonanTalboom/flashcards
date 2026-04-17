@@ -67,6 +67,7 @@ export function FillBlankCard({
           {currentIndex + 1} / {queueLength}
         </span>
         <div className="header-badges">
+          {card.synthesis && <span className="synthesis-badge">Synthesis</span>}
           {card.cefrLevel && (
             <span className="cefr-badge">{card.cefrLevel}</span>
           )}

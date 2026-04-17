@@ -9,8 +9,19 @@ const MAX_NEW_PER_SESSION = 10;
 const LEECH_THRESHOLD = 8;
 const DIFFICULT_DIFFICULTY_THRESHOLD = 7;
 const DIFFICULT_LAPSE_THRESHOLD = 4;
+const XP_CONCEPT = 3;
+const XP_REFLECTION = 8;
 
 export type View = "dashboard" | "path" | "lesson-intro" | "study" | "lesson-complete" | "done" | "speed-review" | "match-game" | "quiz-mode" | "stats";
+
+/**
+ * Concept and reflection steps are non-graded teaching screens. They only live inside
+ * lessons — they should never show up in review queues, stats, or mastery calculations.
+ */
+function isGraded(card: Card): boolean {
+  const t = card.exerciseType;
+  return t !== "concept" && t !== "reflection";
+}
 
 // --- Mastery helpers ---
 
@@ -18,6 +29,7 @@ function getLessonMastery(
   lesson: Lesson,
   cardStates: Record<number, CardState>,
   lessonProgress: Record<string, LessonProgress>,
+  allCards: Card[],
   _visited?: Set<string>
 ): MasteryLevel {
   const visited = _visited ?? new Set<string>();
@@ -27,20 +39,25 @@ function getLessonMastery(
   for (const prereqId of lesson.prerequisites) {
     const prereq = getLessonById(prereqId);
     if (!prereq) continue;
-    const prereqMastery = getLessonMastery(prereq, cardStates, lessonProgress, visited);
+    const prereqMastery = getLessonMastery(prereq, cardStates, lessonProgress, allCards, visited);
     if (prereqMastery === "locked" || prereqMastery === "available") return "locked";
   }
 
   const progress = lessonProgress[lesson.id];
   if (!progress || !progress.completed) return "available";
 
-  const cardMasteries: number[] = lesson.cards.map((id) => {
-    const s = cardStates[id];
-    if (!s || s.reps === 0) return 0;
-    if (s.reps >= 3 && s.difficulty <= 4) return 3; // mastered (low difficulty = easy)
-    if (s.reps >= 2) return 2; // proficient
-    return 1; // familiar
-  });
+  // Exclude non-graded theory steps from mastery calculation — they're not reviewed,
+  // so they'd always pull the average toward "familiar" regardless of real retention.
+  const cardMasteries: number[] = lesson.cards
+    .map((id) => allCards.find((c) => c.id === id))
+    .filter((c): c is Card => !!c && isGraded(c))
+    .map((c) => {
+      const s = cardStates[c.id];
+      if (!s || s.reps === 0) return 0;
+      if (s.reps >= 3 && s.difficulty <= 4) return 3; // mastered (low difficulty = easy)
+      if (s.reps >= 2) return 2; // proficient
+      return 1; // familiar
+    });
 
   const avg =
     cardMasteries.length > 0
@@ -53,11 +70,12 @@ function getLessonMastery(
 
 function computeAllMastery(
   cardStates: Record<number, CardState>,
-  lessonProgress: Record<string, LessonProgress>
+  lessonProgress: Record<string, LessonProgress>,
+  allCards: Card[]
 ): Record<string, MasteryLevel> {
   const result: Record<string, MasteryLevel> = {};
   for (const lesson of ALL_LESSONS) {
-    result[lesson.id] = getLessonMastery(lesson, cardStates, lessonProgress);
+    result[lesson.id] = getLessonMastery(lesson, cardStates, lessonProgress, allCards);
   }
   return result;
 }
@@ -154,18 +172,21 @@ export function useFlashcards() {
 
   const lessonMastery = useMemo<Record<string, MasteryLevel>>(() => {
     if (!state) return {};
-    return computeAllMastery(state.cards, state.lessonProgress);
-  }, [state]);
+    return computeAllMastery(state.cards, state.lessonProgress, cards);
+  }, [state, cards]);
 
   const getDueCards = useCallback(() => {
     if (!state) return [];
     const t = today();
-    return cards.filter((card) => state.cards[card.id]?.nextReviewDate <= t);
+    return cards.filter(
+      (card) => isGraded(card) && state.cards[card.id]?.nextReviewDate <= t
+    );
   }, [cards, state]);
 
   const getNewCards = useCallback(() => {
     if (!state) return [];
     return cards.filter((card) => {
+      if (!isGraded(card)) return false;
       const s = state.cards[card.id];
       return s && s.cardState === "new";
     });
@@ -173,7 +194,9 @@ export function useFlashcards() {
 
   const getLearnedCount = useCallback(() => {
     if (!state) return 0;
-    return cards.filter((card) => state.cards[card.id]?.reps > 0).length;
+    return cards.filter(
+      (card) => isGraded(card) && state.cards[card.id]?.reps > 0
+    ).length;
   }, [cards, state]);
 
   const getCategoryBreakdown = useCallback(() => {
@@ -181,6 +204,7 @@ export function useFlashcards() {
     const t = today();
     const cats: Record<string, { total: number; learned: number; due: number }> = {};
     for (const card of cards) {
+      if (!isGraded(card)) continue;
       if (!cats[card.category]) cats[card.category] = { total: 0, learned: 0, due: 0 };
       cats[card.category].total++;
       if (state.cards[card.id]?.reps > 0) cats[card.category].learned++;
@@ -447,6 +471,37 @@ export function useFlashcards() {
     [queue, currentIndex, state, comboCount, bestCombo, pendingConfidence]
   );
 
+  /**
+   * Advance past a non-graded theory step (concept / reflection). No FSRS update,
+   * doesn't count toward lesson accuracy — just awards a small engagement XP and moves on.
+   */
+  const advanceCard = useCallback(() => {
+    if (!state) return;
+    const card = queue[currentIndex];
+    if (!card) return;
+
+    const earned = card.exerciseType === "reflection" ? XP_REFLECTION : XP_CONCEPT;
+    const newState: AppState = {
+      ...state,
+      stats: { ...state.stats, xp: state.stats.xp + earned },
+    };
+    saveState(newState);
+    setState(newState);
+    setSessionXp((prev) => prev + earned);
+
+    const nextIndex = currentIndex + 1;
+    if (nextIndex >= queue.length) {
+      if (isLessonMode) {
+        setView("lesson-complete");
+      } else {
+        setView("done");
+      }
+    } else {
+      setCurrentIndex(nextIndex);
+      setIsFlipped(false);
+    }
+  }, [queue, currentIndex, state, isLessonMode]);
+
   const completeLesson = useCallback(() => {
     if (!state || !currentLesson) return;
 
@@ -505,6 +560,7 @@ export function useFlashcards() {
   const getDifficultCards = useCallback(() => {
     if (!state) return [];
     return cards.filter((card) => {
+      if (!isGraded(card)) return false;
       const s = state.cards[card.id];
       if (!s) return false;
       return (
@@ -586,6 +642,7 @@ export function useFlashcards() {
       const date = addDays(today(), d);
       let count = 0;
       for (const card of cards) {
+        if (!isGraded(card)) continue;
         const s = state.cards[card.id];
         if (s && s.nextReviewDate === date) count++;
       }
@@ -596,30 +653,35 @@ export function useFlashcards() {
 
   const getRetentionRate = useCallback(() => {
     if (!state) return 0;
-    const reviewed = Object.values(state.cards).filter((s) => s.reps > 0);
+    const gradedIds = new Set(cards.filter(isGraded).map((c) => c.id));
+    const reviewed = Object.entries(state.cards).filter(
+      ([id, s]) => gradedIds.has(Number(id)) && s.reps > 0
+    );
     if (reviewed.length === 0) return 0;
-    const good = reviewed.filter((s) => s.difficulty <= 6);
+    const good = reviewed.filter(([, s]) => s.difficulty <= 6);
     return Math.round((good.length / reviewed.length) * 100);
-  }, [state]);
+  }, [state, cards]);
 
   const getHardestCards = useCallback(() => {
     if (!state) return [];
     return cards
-      .filter((c) => state.cards[c.id]?.reps > 0)
+      .filter((c) => isGraded(c) && state.cards[c.id]?.reps > 0)
       .sort((a, b) => state.cards[b.id].difficulty - state.cards[a.id].difficulty)
       .slice(0, 5);
   }, [cards, state]);
 
   const getCardStateCounts = useCallback(() => {
     if (!state) return { newCount: 0, learning: 0, mature: 0 };
+    const gradedIds = new Set(cards.filter(isGraded).map((c) => c.id));
     let newCount = 0, learning = 0, mature = 0;
-    for (const s of Object.values(state.cards)) {
+    for (const [id, s] of Object.entries(state.cards)) {
+      if (!gradedIds.has(Number(id))) continue;
       if (s.cardState === "new") newCount++;
       else if (s.cardState === "learning" || s.cardState === "relearning") learning++;
       else mature++;
     }
     return { newCount, learning, mature };
-  }, [state]);
+  }, [state, cards]);
 
   const updateMatchBestTime = useCallback((time: number) => {
     if (!state) return;
@@ -738,6 +800,7 @@ export function useFlashcards() {
     flipCard,
     rateCard,
     answerCard,
+    advanceCard,
     backToDashboard,
 
     // Learning path actions
