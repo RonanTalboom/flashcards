@@ -35,17 +35,19 @@ The app has **two modes** that reinforce each other:
 
 ## Current State (what's already built)
 
-- **Stack**: React + TypeScript + Vite, no backend
-- **Algorithm**: SM-2 spaced repetition (classic Anki algorithm)
-- **Cards**: 21 software architecture + 40 quant flashcards in `src/data/`
-- **Card model**: `{ id, category, front, back, keyPoints[] }`
-- **State model**: `{ easeFactor, interval, repetitions, nextReviewDate }` per card
-- **Gamification**: XP system (grade-based), levels (quadratic scaling), streak counter
-- **Interleaving**: Shuffle within chunks of 4 cards, harder cards first
-- **Active recall**: Self-answer textarea on card front, shown alongside correct answer on flip
+- **Stack**: React + TypeScript + Vite, deployed to Cloudflare Workers as a static SPA
+- **Algorithm**: FSRS (v4.5) — superseded SM-2; stability + difficulty per card
+- **Content**: 11 sections / ~55 lessons spanning DDIA, Distributed Systems, Architecture, SRE, Quant, Learning Science, Prediction Markets, French A1, Kahneman, Business Fundamentals, Finetuning & Serving
+- **Card model**: `{ id, category, front, back, keyPoints[], exerciseType?, ... }` — supports flashcard, MCQ, fill-blank, cloze, math, interactive, listening, conjugation, pretest, ordering
+- **Exercise types**: 10 interactive variants for lesson-mode steps
+- **Gamification**: XP + quadratic levels, streaks (with freezes), daily-goal ring, achievements, combo counter, activity heatmap
+- **Interleaving**: Shuffle within chunks of 4, difficulty-ordered review queue
+- **Active recall**: Self-answer textarea on flashcards; typed/selected answers on exercise cards
 - **Session**: Max 10 new cards per session, failed cards re-queued
-- **Storage**: localStorage
-- **Views**: Dashboard → Study → Done
+- **Storage**: localStorage (`AppState` with FSRS state + lesson progress + stats)
+- **Navigation**: Dashboard → Paths (per-section landing) → Path (one section's lessons) → Lesson Intro → Study → Lesson Complete → back to Path. Back buttons on every level, including all exercise card variants.
+- **Study modes**: Speed Review, Match Game, Quiz Mode, Difficult cards, Statistics view
+- **Learning path mastery**: per-lesson mastery (locked/available/familiar/proficient/mastered) derived from FSRS state, with prerequisite gating and cross-section "Up Next" suggestions
 
 ---
 
@@ -823,33 +825,45 @@ No charting libraries, no drag-and-drop libraries (use native HTML drag events +
 ### Navigation flow
 
 ```
-┌──────────────────────────────────────────┐
-│                 HOME                      │
-│  ┌────────────┐  ┌─────────────────────┐ │
-│  │ Learn      │  │ Review              │ │
-│  │ [Paths]    │  │ [12 cards due]      │ │
-│  │ ▸ Quant    │  │ [Start Review →]    │ │
-│  │ ▸ Arch     │  │                     │ │
-│  └─────┬──────┘  └──────────┬──────────┘ │
-│        │                    │             │
-│  ┌─────▾──────┐  ┌──────────▾──────────┐ │
-│  │ PATH VIEW  │  │ REVIEW SESSION      │ │
-│  │ Lesson 1 ✓ │  │ Card → Flip → Rate  │ │
-│  │ Lesson 2 ● │  │ → Next → ... → Done │ │
-│  │ Lesson 3 🔒│  └─────────────────────┘ │
-│  └─────┬──────┘                           │
-│        │                                  │
-│  ┌─────▾──────────────────────────────┐  │
-│  │ LESSON VIEW                         │  │
-│  │ Step 1/6: [Concept + Diagram]       │  │
-│  │ Step 2/6: [Multiple Choice]         │  │
-│  │ Step 3/6: [Calculate EV]            │  │
-│  │ Step 4/6: [Fill in Kelly formula]   │  │
-│  │ Step 5/6: [Reflection: why?]        │  │
-│  │ Step 6/6: [Flashcard review]        │  │
-│  │ → Lesson Complete! +45 XP           │  │
-│  └────────────────────────────────────┘  │
-└──────────────────────────────────────────┘
+┌────────────────────────────────────────────────┐
+│                   HOME                          │
+│  ┌────────────┐  ┌───────────────────────────┐ │
+│  │ Learn      │  │ Review                    │ │
+│  │ [→ Paths]  │  │ [12 cards due]            │ │
+│  │            │  │ [Start Review →]          │ │
+│  └─────┬──────┘  └─────────────┬─────────────┘ │
+│        │                       │                │
+│  ┌─────▾───────────────┐       │                │
+│  │ PATHS LANDING       │       │                │
+│  │ ▸ Foundations       │       │                │
+│  │ ▸ Distributed Sys.  │       │                │
+│  │ ▸ Quant Finance     │       │                │
+│  │ ▸ French A1         │       │                │
+│  │ ▸ Kahneman          │       │                │
+│  │ ▸ ... (10 paths)    │       │                │
+│  └─────┬───────────────┘       │                │
+│        │                       │                │
+│  ┌─────▾─────────┐  ┌──────────▾──────────────┐│
+│  │ PATH DETAIL   │  │ REVIEW SESSION          ││
+│  │ Lesson 1 ✓    │  │ Card → Flip → Rate      ││
+│  │ Lesson 2 ●    │  │ → Next → ... → Done     ││
+│  │ Lesson 3 🔒   │  └─────────────────────────┘│
+│  └─────┬─────────┘                              │
+│        │                                         │
+│  ┌─────▾──────────────────────────────┐        │
+│  │ LESSON VIEW                         │        │
+│  │ Step 1/6: [Concept + Diagram]       │        │
+│  │ Step 2/6: [Multiple Choice]         │        │
+│  │ Step 3/6: [Calculate EV]            │        │
+│  │ Step 4/6: [Fill in Kelly formula]   │        │
+│  │ Step 5/6: [Reflection: why?]        │        │
+│  │ Step 6/6: [Flashcard review]        │        │
+│  │ → Lesson Complete! +45 XP           │        │
+│  └─────────────────────────────────────┘        │
+└────────────────────────────────────────────────┘
+
+Back button at every level: lesson exercise → path detail →
+paths landing → dashboard. Esc works as a keyboard shortcut.
 ```
 
 ---
