@@ -694,6 +694,228 @@ export const SECTIONS: Section[] = [
       },
     ],
   },
+
+  // === Section: Polymarket Trading Discipline ===
+  {
+    id: "polymarket-discipline",
+    title: "Polymarket Trading Discipline",
+    description: "Anti-patterns from killed affiliate theses + where solo edge actually lives",
+    icon: "&#127919;",
+    color: "#f56565",
+    lessons: [
+      {
+        id: "pm-bot-redflags",
+        sectionId: "polymarket-discipline",
+        title: "Bot-Pitch Red Flags",
+        description:
+          "How to kill a promotional bot thread before paper-trading it",
+        cards: [7040, 7041, 7042, 7043, 7044, 7045, 7046],
+        prerequisites: [],
+        concepts: [
+          "Affiliate threads overstate wallet PnL by 2–5× vs leaderboard ground truth",
+          "Polymarket ?r= referral codes signal material undisclosed incentive",
+          "Markov persistence on 5-min crypto fails because returns have 7–9 steps of memory",
+          "Kelly f* > 0.5 signals overconfident probability estimation; Thorp's default is 0.5×",
+          "1.80% taker fee at 50¢ midpoint + 0.3% median spread = structurally negative delta-neutral arb",
+          "2.7-second arb windows + 73% sub-100ms HFT capture — TypeScript/Workers cannot compete",
+          "The 92.4% loss rate is survivor-math; conditioning on discipline flips the base rate",
+        ],
+      },
+      {
+        id: "pm-solo-edge",
+        sectionId: "polymarket-discipline",
+        title: "What Solo Edge Actually Looks Like",
+        description:
+          "The paths left open — and why the existing repo + tracker don't fit execution",
+        cards: [7047, 7048, 7049, 7050, 7051],
+        prerequisites: ["pm-bot-redflags"],
+        concepts: [
+          "Documented solo edge: information + patience + tail-liquidity + closing-line-value",
+          "The polymarket-pipeline is 713 LOC of lead tracker; execution = new repo, ~5–10K LOC",
+          "Thesis tracker measures Brier; bot tracker measures Sharpe/drawdown/capacity — different disciplines",
+          "The 10-thesis gate prevents premature optimisation of unproven edge",
+          "Five-check pre-research kill heuristic for promotional bot threads",
+        ],
+      },
+    ],
+  },
+
+  // === Section: Austrian Deflationism ===
+  {
+    id: "austrian-deflationism",
+    title: "Austrian Deflationism",
+    description:
+      "The scale-conflation critique + mainstream counter-mechanisms from the \"Number Go Down\" research",
+    icon: "&#128181;",
+    color: "#38a169",
+    lessons: [
+      {
+        id: "austrian-scale-conflation",
+        sectionId: "austrian-deflationism",
+        title: "The Scale-Conflation Core",
+        description:
+          "Why micro productivity deflation does not entail macro price-level deflation being benign",
+        cards: [7052, 7053, 7054, 7055, 7056, 7057, 7058],
+        prerequisites: [],
+        concepts: [
+          "Specific goods deflating under competition ≠ aggregate price level deflation being benign",
+          "Fisher-Bernanke debt-deflation: nominal debt + aggregate deflation = mechanical creditor wealth transfer",
+          "Krugman ZLB: expected deflation raises real rates even at nominal zero — asymmetric monetary offset",
+          "Downward nominal wage rigidity is rational (reference-point psychology), not institutional fragility",
+          "Classic Moore's Law broke ~2005 with the end of Dennard scaling; single-thread gains now 10–15%/year",
+          "Wright's Law generalises: costs fall 10–25% per cumulative-production doubling across 60+ technologies",
+          "Koo balance-sheet recession: Japan post-1995 is a third category — debt-overhang without credit crunch",
+        ],
+      },
+      {
+        id: "austrian-historical-record",
+        sectionId: "austrian-deflationism",
+        title: "Historical Record & Steelman",
+        description:
+          "What the empirical record actually shows — and Selgin's rigorous version of the argument",
+        cards: [7059, 7060, 7061, 7062, 7063],
+        prerequisites: ["austrian-scale-conflation"],
+        concepts: [
+          "The canonical 1873–96 \"good deflation\" had regional losers (German real wages fell) and was politically hated",
+          "Atkeson-Kehoe inversion: the 1930s exception is precisely the regime sound money cannot structurally prevent",
+          "Selgin's productivity norm (Less Than Zero, 1997) is the rigorous steelman — targets stable NGDP, not stable prices",
+          "Paradox of Thrift: fails as a universal law, survives as ZLB-conditioned rational response to deflation expectations",
+          "Cantillon effects: mainstream concedes existence, disputes magnitude — post-1971 productivity growth is the empirical pushback",
+        ],
+      },
+    ],
+  },
+
+  // === Section: AI Engineering — Finetuning & Serving ===
+  {
+    id: "finetuning",
+    title: "Finetuning & Serving",
+    description: "SFT, LoRA/QLoRA, RLHF, GRPO, and production inference",
+    icon: "&#129504;",
+    color: "#9f7aea",
+    lessons: [
+      {
+        id: "ft-pipeline",
+        sectionId: "finetuning",
+        title: "Training Pipeline & SFT",
+        description:
+          "What SFT actually does, where reasoning really comes from, and how finetuning forgets",
+        cards: [7000, 7001, 7002, 7003, 7004],
+        prerequisites: [],
+        concepts: [
+          "LIMA: 1K curated examples unlock instruction-following; superficial-alignment partially walked back",
+          "Reasoning emerges in RL, not SFT — SFT seeds the distribution",
+          "Loss masking trains on assistant tokens only",
+          "Catastrophic forgetting scales with model size in 1B-7B range",
+          "Chat templates are a training-time semantic contract — mismatch fails silently",
+        ],
+      },
+      {
+        id: "ft-peft",
+        sectionId: "finetuning",
+        title: "LoRA & QLoRA",
+        description:
+          "Low-rank adaptation, NF4 quantization, and when PEFT breaks down",
+        cards: [7010, 7011, 7012, 7013, 7014, 7015],
+        prerequisites: ["ft-pipeline"],
+        concepts: [
+          "Low-intrinsic-rank hypothesis fails on coding and math",
+          "NF4 is optimal only under a Gaussian prior that real weights violate",
+          "RSLoRA's alpha/sqrt(r) decouples LR from rank",
+          "DoRA decomposes into magnitude + direction with zero inference cost",
+          "LoRA forgets less than full-FT — capacity constraint as feature",
+        ],
+      },
+      {
+        id: "ft-alignment",
+        sectionId: "finetuning",
+        title: "Alignment Algorithms",
+        description:
+          "PPO, DPO, KTO, GRPO, and the reward-hacking scaling law",
+        cards: [7020, 7021, 7022, 7023, 7024, 7025, 7026],
+        prerequisites: ["ft-pipeline"],
+        concepts: [
+          "DPO is a closed-form reward model — simple but inherits length bias",
+          "GRPO eliminates the critic via group-relative baselines (~50% compute vs PPO)",
+          "DeepSeek-R1's AIME jump credits the full recipe, not GRPO alone",
+          "Reward-model overoptimization follows a power law; KL does not fully contain it",
+          "Online (PPO) beats offline (DPO) on code/STEM; data composition dominates both",
+          "Constitutional AI complements RLHF, not replaces",
+        ],
+      },
+      {
+        id: "ft-serving",
+        sectionId: "finetuning",
+        title: "Inference Serving",
+        description:
+          "PagedAttention, continuous batching, prefill-decode disaggregation, and quantization tradeoffs",
+        cards: [7030, 7031, 7032, 7033, 7034, 7035, 7036, 7037],
+        prerequisites: ["ft-pipeline"],
+        concepts: [
+          "Prefill is compute-bound; decode is memory-bandwidth-bound — the root of every serving optimization",
+          "PagedAttention cuts fragmentation 60-80% → <4% but pays 20-26% kernel overhead",
+          "Continuous batching: 23-37x throughput, head-of-line blocking blows p99 tail latency",
+          "Prefill-decode disaggregation wins only under the right workload shape",
+          "Speculative decoding collapses at long contexts and batch sizes over 32",
+          "4-bit weight quantization hurts reasoning ~4x more than easy tasks",
+        ],
+      },
+    ],
+  },
+
+  // === Section: LLM Papers — Foundations (2017-2023) ===
+  {
+    id: "llm-papers",
+    title: "LLM Papers — Foundations",
+    description: "The foundational 2017-2023 LLM research papers: architecture, scaling, alignment, techniques — with red-team counter-claims and a deliberate gap card flagging what this list misses for 2026.",
+    icon: "&#128218;",
+    color: "#60a5fa",
+    lessons: [
+      {
+        id: "papers-architecture",
+        sectionId: "llm-papers",
+        title: "Architecture foundations",
+        description: "Transformer, BERT, GPT-3, LLaMA, FlashAttention — with videos by Yannic Kilcher and Stanford MLSys.",
+        cards: [7100, 7101, 7102, 7103, 7104, 7105, 7106, 7107, 7108, 7109, 7110, 7111, 7113, 7114],
+        prerequisites: [],
+        concepts: [
+          "Self-attention replaced recurrence; O(n²) time and space is its central constraint",
+          "BERT: MLM is load-bearing, NSP was ceremonial (RoBERTa ablation)",
+          "GPT-3 demonstrated in-context few-shot learning; scaling is brittle to prompt format",
+          "LLaMA: data quality + scale, not architectural breakthrough; RMSNorm + SwiGLU + RoPE",
+          "FlashAttention: IO-aware tiling + log-sum-exp; exact not approximate",
+        ],
+      },
+      {
+        id: "papers-scaling-alignment",
+        sectionId: "llm-papers",
+        title: "Scaling + Alignment",
+        description: "Kaplan scaling laws (historically wrong), Chinchilla correction (still imperfect), InstructGPT RLHF recipe, LoRA with its Biderman counter-claim, DPO with its production reality check.",
+        cards: [7120, 7121, 7123, 7124, 7126, 7127, 7128, 7130, 7131, 7133, 7134],
+        prerequisites: ["papers-architecture"],
+        concepts: [
+          "Kaplan (2020): asymmetric allocation — systematically wrong by ~5×",
+          "Chinchilla (2022): ~20 tokens/param — Epoch AI can't replicate the ratio exactly; frontier labs train with fewer",
+          "InstructGPT SFT→RM→PPO: legacy at the frontier; DPO / GRPO / CAI superseded it",
+          "LoRA: matches full-FT on style tasks, underperforms on math/code (Biderman 2024)",
+          "DPO: simpler and more stable; PPO variants still dominate production reasoning",
+        ],
+      },
+      {
+        id: "papers-techniques-gaps",
+        sectionId: "llm-papers",
+        title: "Techniques + 2026 Gaps",
+        description: "CoT and RAG (both dated in important ways) — then the deliberate gap card flagging MoE, reasoning models, tool use, multimodal, Constitutional AI, speculative decoding as the 6+ classes of paper missing from the original list.",
+        cards: [7140, 7141, 7142, 7143, 7144, 7150],
+        prerequisites: ["papers-architecture"],
+        concepts: [
+          "CoT prompting: emerges at ~100B+ scale; Turpin 2023 shows steps are often post-hoc rationalizations",
+          "RAG 2020 architecture is dated; evergreen lesson is 'separate parametric from non-parametric memory'",
+          "The 12-paper list itself is a 2023-frozen X-thread — missing MoE, reasoning models, tool use, multimodal, CAI, speculative decoding",
+        ],
+      },
+    ],
+  },
 ];
 
 // All lessons flattened for easy lookup

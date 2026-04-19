@@ -11,7 +11,8 @@ async function ensureSchema(db: D1Database) {
       category TEXT NOT NULL,
       front TEXT NOT NULL,
       back TEXT NOT NULL,
-      key_points TEXT NOT NULL DEFAULT '[]'
+      key_points TEXT NOT NULL DEFAULT '[]',
+      data TEXT
     )`),
     db.prepare(`CREATE TABLE IF NOT EXISTS app_state (
       id INTEGER PRIMARY KEY,
@@ -24,7 +25,6 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
-    // Ensure tables exist on first API request
     if (url.pathname.startsWith("/api/")) {
       await ensureSchema(env.DB);
     }
@@ -33,13 +33,23 @@ export default {
       const { results } = await env.DB.prepare(
         "SELECT * FROM cards ORDER BY id"
       ).all();
-      const cards = results.map((row: Record<string, unknown>) => ({
-        id: row.id,
-        category: row.category,
-        front: row.front,
-        back: row.back,
-        keyPoints: JSON.parse(row.key_points as string),
-      }));
+      const cards = results.map((row: Record<string, unknown>) => {
+        // Prefer full-fidelity JSON if the row was seeded by sync-decks.
+        if (row.data) {
+          try {
+            return JSON.parse(row.data as string);
+          } catch {
+            // Fall through to legacy shape on parse error.
+          }
+        }
+        return {
+          id: row.id,
+          category: row.category,
+          front: row.front,
+          back: row.back,
+          keyPoints: JSON.parse((row.key_points as string) ?? "[]"),
+        };
+      });
       return Response.json(cards);
     }
 

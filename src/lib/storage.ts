@@ -9,6 +9,10 @@ import { BUSINESS_CARDS } from "../data/business-cards";
 import { MODULE_DESIGN_CARDS } from "../data/module-design-cards";
 import { KAHNEMAN_CARDS } from "../data/kahneman-cards";
 import { DDIA_GLOSSARY_CARDS } from "../data/ddia-glossary-cards";
+import { FINETUNING_CARDS } from "../data/finetuning-cards";
+import { POLYMARKET_DISCIPLINE_CARDS } from "../data/polymarket-discipline-cards";
+import { AUSTRIAN_DEFLATIONISM_CARDS } from "../data/austrian-deflationism-cards";
+import { LLM_PAPERS_CARDS } from "../data/llm-papers-cards";
 import { ACHIEVEMENT_DEFINITIONS } from "./achievements";
 
 export async function loadCards(): Promise<Card[]> {
@@ -24,6 +28,10 @@ export async function loadCards(): Promise<Card[]> {
   const moduleDesignCards = MODULE_DESIGN_CARDS.filter((c) => !apiIds.has(c.id));
   const kahnemanCards = KAHNEMAN_CARDS.filter((c) => !apiIds.has(c.id));
   const ddiaGlossaryCards = DDIA_GLOSSARY_CARDS.filter((c) => !apiIds.has(c.id));
+  const finetuningCards = FINETUNING_CARDS.filter((c) => !apiIds.has(c.id));
+  const polymarketDisciplineCards = POLYMARKET_DISCIPLINE_CARDS.filter((c) => !apiIds.has(c.id));
+  const austrianDeflationismCards = AUSTRIAN_DEFLATIONISM_CARDS.filter((c) => !apiIds.has(c.id));
+  const llmPapersCards = LLM_PAPERS_CARDS.filter((c) => !apiIds.has(c.id));
 
   const allCards = [
     ...apiCards,
@@ -36,6 +44,10 @@ export async function loadCards(): Promise<Card[]> {
     ...moduleDesignCards,
     ...kahnemanCards,
     ...ddiaGlossaryCards,
+    ...finetuningCards,
+    ...polymarketDisciplineCards,
+    ...austrianDeflationismCards,
+    ...llmPapersCards,
   ];
 
   // Generate reverse cards for vocabulary cards

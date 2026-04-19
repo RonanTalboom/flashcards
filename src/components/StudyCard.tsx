@@ -4,6 +4,7 @@ import { speak } from "../lib/tts";
 import { Latex } from "./Latex";
 import { ComboCounter } from "./ComboCounter";
 import { SessionProgressBar } from "./SessionProgressBar";
+import { YouTubeEmbed } from "./YouTubeEmbed";
 
 interface StudyCardProps {
   card: Card;
@@ -153,6 +154,10 @@ export function StudyCard({
                 ))}
               </ul>
             )}
+            {card.image && (
+              <img src={card.image} alt="" className="card-image" loading="lazy" />
+            )}
+            {card.videoUrl && <YouTubeEmbed url={card.videoUrl} />}
           </div>
         )}
       </div>

@@ -16,6 +16,7 @@ export interface Card {
   choices?: string[];
   correctAnswer?: number | string;
   image?: string;
+  videoUrl?: string;
 
   // Math exercise fields
   mathAnswer?: number;

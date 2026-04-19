@@ -29,4 +29,22 @@ Plain CSS in `src/index.css` with CSS custom properties (dark theme). No CSS fra
 
 ### Adding cards
 
-Use `/add-cards` or manually add to the `CARDS` array in `src/data/cards.ts`. Each card needs: `id` (next sequential), `category`, `front`, `back`, `keyPoints` (3-4 items).
+**Content is split into multiple per-topic deck files** under `src/data/*.ts`. Each deck exports a named `Card[]` (e.g. `AUSTRIAN_DEFLATIONISM_CARDS`) and uses a reserved ID range. Do not add new cards to the legacy `CARDS` array in `src/data/cards.ts` — that file is the bootstrap deck; new content goes in a new file.
+
+Canonical procedure (or run `/add-cards`):
+
+1. **Pick an ID range.** Find the current maximum ID with `grep -rh "^    id: " src/data/*.ts | grep -oE "[0-9]+" | sort -n | tail -1`. Start the new deck at the next round hundred.
+2. **Write `src/data/<topic>-cards.ts`.** Header comment naming the source, date, and ID range. Export `export const <TOPIC>_CARDS: Card[] = [...]`.
+3. **Wire into `src/lib/storage.ts`**: add an `import`, a filter line (`... .filter((c) => !apiIds.has(c.id))`), and a spread in `allCards`.
+4. **Wire into `src/data/lessons.ts`**: add a Section entry with one or more lessons whose `cards: [ids]` reference the deck.
+5. **Typecheck**: `npx tsc --noEmit`. Confirm no ID collisions: `grep -rh "    id: " src/data/*.ts | grep -oE "id: [0-9]+" | sort | uniq -d` should output nothing.
+6. **Sync to D1** (optional, for offline/cross-device): `npm run sync-decks` regenerates `migrations/cards-seed.sql` from all TS decks and applies it to the remote D1 instance via `wrangler d1 execute --remote`. The TS files remain the source of truth; D1 is a mirror consumed by the Worker's `/api/cards` endpoint.
+
+### D1 schema
+
+Two tables managed by `worker/index.ts`:
+
+- `cards` — `(id, category, front, back, key_points, data)`. The `data` column holds the full `JSON.stringify(card)` so rich fields (MCQ choices, vocab gender, exerciseType, etc.) round-trip. Worker's `GET /api/cards` returns `JSON.parse(row.data)` when present, falling back to the legacy 5-column shape for rows without `data`.
+- `app_state` — single-row `(id=1, data TEXT)` storing the full `AppState` (FSRS per-card + streak + XP + lessonProgress).
+
+The TS-over-D1 filter pattern in `storage.ts` means D1-resident IDs override the TS spread. Practical implication: after running `npm run sync-decks`, editing a TS deck won't take effect in the browser until either D1 is re-synced or the TS ID is removed from D1. Treat D1 as downstream of TS, not parallel to it.
