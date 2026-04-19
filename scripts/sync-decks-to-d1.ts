@@ -29,6 +29,7 @@ import { DDIA_GLOSSARY_CARDS } from "../src/data/ddia-glossary-cards";
 import { FINETUNING_CARDS } from "../src/data/finetuning-cards";
 import { POLYMARKET_DISCIPLINE_CARDS } from "../src/data/polymarket-discipline-cards";
 import { AUSTRIAN_DEFLATIONISM_CARDS } from "../src/data/austrian-deflationism-cards";
+import { LLM_PAPERS_CARDS } from "../src/data/llm-papers-cards";
 
 import type { Card } from "../src/types";
 
@@ -46,6 +47,7 @@ const DECKS: { name: string; cards: Card[] }[] = [
   { name: "FINETUNING_CARDS", cards: FINETUNING_CARDS },
   { name: "POLYMARKET_DISCIPLINE_CARDS", cards: POLYMARKET_DISCIPLINE_CARDS },
   { name: "AUSTRIAN_DEFLATIONISM_CARDS", cards: AUSTRIAN_DEFLATIONISM_CARDS },
+  { name: "LLM_PAPERS_CARDS", cards: LLM_PAPERS_CARDS },
 ];
 
 // SQLite single-quote escape.
