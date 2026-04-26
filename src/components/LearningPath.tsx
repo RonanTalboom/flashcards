@@ -23,93 +23,47 @@ function isCompleted(m: MasteryLevel): boolean {
   return MASTERY_RANK[m] >= MASTERY_RANK.proficient;
 }
 
-function MasteryNode({
+function NodeGlyph({
   mastery,
+  index,
   color,
 }: {
   mastery: MasteryLevel;
+  index: number;
   color: string;
 }) {
-  const size = 40;
-  const cx = size / 2;
-  const cy = size / 2;
-  const r = 14;
-
-  if (mastery === "locked") {
-    return (
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        <circle cx={cx} cy={cy} r={r} fill="#1a2332" stroke="#7a8a99" strokeWidth="2" />
-        <rect x="15" y="19" width="10" height="8" rx="1.5" fill="#7a8a99" />
-        <path
-          d="M17 19v-3a3 3 0 0 1 6 0v3"
-          fill="none"
-          stroke="#7a8a99"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-      </svg>
-    );
-  }
-
-  if (mastery === "available") {
+  if (isCompleted(mastery)) {
     return (
       <svg
-        className="path-node-pulse"
-        width={size}
-        height={size}
-        viewBox={`0 0 ${size} ${size}`}
+        className="lp-ico lp-ico-sm"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       >
-        <circle cx={cx} cy={cy} r={r} fill="transparent" stroke={color} strokeWidth="2.5" />
-        <circle cx={cx} cy={cy} r="4" fill={color} />
+        <path d="M5 12l4.5 4.5L20 6" />
       </svg>
     );
   }
-
-  if (mastery === "familiar") {
+  if (mastery === "locked") {
     return (
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        <circle cx={cx} cy={cy} r={r} fill="transparent" stroke={color} strokeWidth="2" />
-        <clipPath id="half-clip">
-          <rect x="0" y={cy} width={size} height={cy} />
-        </clipPath>
-        <circle
-          cx={cx}
-          cy={cy}
-          r={r - 1}
-          fill={color}
-          opacity="0.6"
-          clipPath="url(#half-clip)"
-        />
+      <svg
+        className="lp-ico lp-ico-sm"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <rect x="5" y="11" width="14" height="9" rx="2" />
+        <path d="M8 11V7a4 4 0 0 1 8 0v4" />
       </svg>
     );
   }
-
-  if (mastery === "proficient") {
-    return (
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        <circle cx={cx} cy={cy} r={r} fill={color} stroke={color} strokeWidth="2" />
-        <path
-          d="M14 20l4 4 8-8"
-          fill="none"
-          stroke="#070b0d"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    );
-  }
-
-  return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      <circle cx={cx} cy={cy} r={r + 3} fill="transparent" stroke="#d4a843" strokeWidth="2.5" />
-      <circle cx={cx} cy={cy} r={r} fill={color} stroke={color} strokeWidth="2" />
-      <path
-        d="M20 13l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9-3.6 1.9.7-4-2.9-2.8 4-.6z"
-        fill="#d4a843"
-      />
-    </svg>
-  );
+  return <span className="lp-node-num">{index + 1}</span>;
 }
 
 export function LearningPath({
@@ -125,11 +79,7 @@ export function LearningPath({
   const sectionStarted = section.lessons.filter((l) =>
     isStarted(lessonMastery[l.id] ?? "locked")
   ).length;
-  const sectionPct =
-    sectionTotal === 0 ? 0 : (sectionCompleted / sectionTotal) * 100;
-  const inProgress = sectionStarted > 0 && sectionCompleted < sectionTotal;
 
-  // Find next lesson within this section
   const nextLesson = (() => {
     for (const l of section.lessons) {
       if ((lessonMastery[l.id] ?? "locked") === "available") return l;
@@ -141,124 +91,142 @@ export function LearningPath({
     return null;
   })();
 
+  const hue = section.color;
+  const tint = `color-mix(in oklch, ${hue} 14%, transparent)`;
+  const ring = `color-mix(in oklch, ${hue} 22%, transparent)`;
+  const nextBorder = `color-mix(in oklch, ${hue} 50%, var(--border))`;
+
   return (
-    <div className="container">
-      <header>
-        <button className="back-btn" onClick={onBack} aria-label="Back">
-          &#8592;
+    <div className="container lp-container">
+      <header className="lp-topbar">
+        <button className="lp-icon-btn" onClick={onBack} aria-label="Back">
+          <svg
+            className="lp-ico"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M19 12H5M11 6l-6 6 6 6" />
+          </svg>
         </button>
-        <h1>{section.title}</h1>
-        <span />
+        <span className="lp-brand">{section.title}</span>
+        <span className="lp-topbar-spacer" />
       </header>
 
-      <div className="path-overview">
-        <div className="path-overview-row">
-          <span className="path-overview-label" style={{ color: section.color }}>
-            <span
-              className="path-overview-icon"
-              dangerouslySetInnerHTML={{ __html: section.icon }}
-            />
+      <div className="lp-context">
+        <div
+          className="lp-context-glyph"
+          style={{ color: hue, background: tint }}
+        >
+          <span
+            className="lp-context-icon"
+            dangerouslySetInnerHTML={{ __html: section.icon }}
+          />
+        </div>
+        <div className="lp-context-body">
+          <span className="lp-eyebrow" style={{ color: hue }}>
             {section.description}
           </span>
-          <span className="path-overview-count">
-            {sectionCompleted} / {sectionTotal} lessons
+          <span className="lp-context-meta">
+            {sectionCompleted} of {sectionTotal} lessons
+            {sectionStarted > sectionCompleted
+              ? ` · ${sectionStarted - sectionCompleted} in progress`
+              : ""}
           </span>
-        </div>
-        <div className="path-overview-track">
-          <div
-            className="path-overview-fill"
-            style={{ width: `${sectionPct}%`, background: section.color }}
-          />
         </div>
       </div>
 
       {nextLesson && (
         <button
-          className="path-next-up"
+          className="lp-next"
           onClick={() => onSelectLesson(nextLesson.id)}
-          style={{ borderColor: section.color }}
+          style={{ borderColor: nextBorder }}
         >
-          <div className="path-next-up-meta">
-            <span
-              className="path-next-up-tag"
-              style={{ color: section.color }}
-            >
+          <div className="lp-next-body">
+            <span className="lp-eyebrow" style={{ color: hue }}>
               Up next
             </span>
-            <span className="path-next-up-title">{nextLesson.title}</span>
-            <span className="path-next-up-desc">{nextLesson.description}</span>
+            <span className="lp-next-title">{nextLesson.title}</span>
+            <span className="lp-next-desc">{nextLesson.description}</span>
           </div>
-          <span
-            className="path-next-up-arrow"
-            style={{ color: section.color }}
+          <svg
+            className="lp-ico lp-next-arrow"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           >
-            &#8594;
-          </span>
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
         </button>
       )}
 
-      <div className="path-map">
-        <div className="path-section">
-          <div
-            className="path-section-bar"
-            aria-hidden="true"
-            title={`${sectionCompleted} of ${sectionTotal} lessons completed`}
-          >
-            <div
-              className="path-section-bar-fill"
-              style={{ width: `${sectionPct}%`, background: section.color }}
-            />
-            {inProgress && (
-              <span
-                className="path-section-bar-marker"
-                style={{
-                  left: `${(sectionStarted / sectionTotal) * 100}%`,
-                  borderColor: section.color,
-                }}
-              />
-            )}
-          </div>
+      <div className="lp-divider" />
 
-          <div className="path-lessons">
-            {section.lessons.map((lesson, lessonIndex) => {
-              const mastery = lessonMastery[lesson.id] || "locked";
-              const isClickable = mastery !== "locked";
-              const isLast = lessonIndex === section.lessons.length - 1;
+      <ol className="lp-list">
+        {section.lessons.map((lesson, i) => {
+          const mastery = lessonMastery[lesson.id] ?? "locked";
+          const isLocked = mastery === "locked";
+          const isAvailable = mastery === "available";
+          const completed = isCompleted(mastery);
+          const isLast = i === section.lessons.length - 1;
 
-              return (
-                <div className="path-lesson" key={lesson.id}>
-                  <div className="path-node-col">
-                    <button
-                      className={`path-node path-node--${mastery}`}
-                      disabled={!isClickable}
-                      onClick={() => isClickable && onSelectLesson(lesson.id)}
-                      aria-label={`${lesson.title} - ${mastery}`}
-                    >
-                      <MasteryNode mastery={mastery} color={section.color} />
-                    </button>
-                    {!isLast && (
-                      <div
-                        className="path-line"
-                        style={{
-                          borderColor:
-                            mastery !== "locked" ? section.color : "#1a2332",
-                        }}
-                      />
-                    )}
-                  </div>
-                  <div
-                    className={`path-label ${!isClickable ? "path-label--locked" : ""}`}
-                    onClick={() => isClickable && onSelectLesson(lesson.id)}
-                  >
-                    <span className="path-lesson-title">{lesson.title}</span>
-                    <span className="path-lesson-desc">{lesson.description}</span>
-                  </div>
+          const nodeStyle =
+            !isLocked && (isAvailable || completed)
+              ? {
+                  borderColor: hue,
+                  color: hue,
+                  boxShadow: isAvailable ? `0 0 0 4px ${ring}` : undefined,
+                  background: completed ? tint : undefined,
+                }
+              : undefined;
+
+          return (
+            <li
+              key={lesson.id}
+              className={`lp-item lp-item--${mastery} ${isLocked ? "is-locked" : ""}`}
+            >
+              <div className="lp-spine">
+                <div
+                  className={`lp-node lp-node--${mastery}`}
+                  style={nodeStyle}
+                >
+                  <NodeGlyph mastery={mastery} index={i} color={hue} />
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+                {!isLast && <div className="lp-spine-line" />}
+              </div>
+              <button
+                className="lp-row"
+                disabled={isLocked}
+                onClick={() => !isLocked && onSelectLesson(lesson.id)}
+              >
+                <div className="lp-row-body">
+                  <span className="lp-row-title">{lesson.title}</span>
+                  <span className="lp-row-desc">{lesson.description}</span>
+                </div>
+                {!isLocked && (
+                  <svg
+                    className="lp-ico lp-row-arrow"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                  </svg>
+                )}
+              </button>
+            </li>
+          );
+        })}
+      </ol>
     </div>
   );
 }

@@ -3762,3 +3762,256 @@ header h1 {
   border-radius: 4px;
   padding: 1px 6px;
 }
+
+/* ============================================================
+   Learning path — redesign (calm, typographic, single accent)
+   Scoped to .lp-* so the rest of the app is unaffected.
+   ============================================================ */
+
+.lp-container {
+  max-width: 720px;
+  padding: 32px 24px 48px;
+  padding-top: calc(32px + var(--safe-top));
+}
+
+.lp-container .lp-ico {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+.lp-container .lp-ico-sm { width: 14px; height: 14px; }
+
+.lp-topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.lp-topbar-spacer { flex: 1; }
+
+.lp-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-family: inherit;
+  transition: 120ms ease;
+  flex-shrink: 0;
+}
+.lp-icon-btn:hover { color: var(--text); border-color: #2a3a4a; }
+
+.lp-brand {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 500;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.lp-context {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.lp-context-glyph {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.lp-context-icon { display: block; line-height: 1; }
+
+.lp-context-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+
+.lp-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  display: block;
+}
+
+.lp-context-meta {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  display: block;
+}
+
+/* Up next — singular hero */
+
+.lp-next {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  text-align: left;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  color: var(--text);
+  margin-bottom: 24px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: 160ms ease;
+}
+.lp-next:hover { transform: translateY(-1px); }
+
+.lp-next-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.lp-next-title {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 500;
+  font-size: 22px;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+  color: var(--text);
+}
+
+.lp-next-desc {
+  color: var(--text-muted);
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+
+.lp-next-arrow { color: var(--text-muted); flex-shrink: 0; }
+.lp-next:hover .lp-next-arrow { color: var(--text); transform: translateX(2px); transition: 160ms; }
+
+/* Divider */
+
+.lp-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 8px 0 24px;
+}
+
+/* Lesson list — typographic spine */
+
+.lp-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.lp-item {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.lp-spine {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  padding-top: 14px;
+}
+
+.lp-node {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+  position: relative;
+  transition: 200ms;
+}
+
+.lp-item.is-locked .lp-node { opacity: 0.55; }
+
+.lp-node-num {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.lp-spine-line {
+  width: 1.5px;
+  flex: 1;
+  background: var(--border);
+  margin: 4px 0;
+  min-height: 24px;
+}
+
+.lp-row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 8px;
+  background: transparent;
+  border: 0;
+  text-align: left;
+  color: var(--text);
+  font-family: inherit;
+  cursor: pointer;
+  transition: 120ms;
+  border-radius: 12px;
+}
+
+.lp-row:disabled { color: var(--text-muted); cursor: not-allowed; opacity: 0.55; }
+.lp-row:not(:disabled):hover { background: var(--surface); }
+.lp-row:not(:disabled):hover .lp-row-arrow { color: var(--text); transform: translateX(2px); }
+
+.lp-row-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.lp-row-title {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 500;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.lp-row-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.lp-row-arrow {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: 160ms;
+}
+
+@media (max-width: 480px) {
+  .lp-container { padding: 24px 20px 32px; padding-top: calc(24px + var(--safe-top)); }
+  .lp-context-glyph { width: 48px; height: 48px; font-size: 20px; }
+  .lp-next-title { font-size: 20px; }
+  .lp-row-title { font-size: 16px; }
+}
+
