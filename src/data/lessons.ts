@@ -1,4 +1,6 @@
 import type { Section } from "../types";
+import { FINANCE_FUNDAMENTALS_SECTION } from "./finance-fundamentals";
+import { BUSINESS_CENTRAL_SUBSCRIPTIONS_SECTION } from "./business-central-subscriptions-path";
 
 export const SECTIONS: Section[] = [
   // === Section 1: Foundations ===
@@ -416,19 +418,22 @@ export const SECTIONS: Section[] = [
   },
 
   // === Section 8: French A1 ===
+  // Mirrors the 16-lesson CEFR sequence in flashcards-school
+  // (school/curriculum/french-a1.yaml) so both apps share one learning path.
+  // Lesson IDs and order match the school yaml exactly.
   {
     id: "french-a1",
     title: "French A1",
-    description: "Survival French — greetings to everyday communication",
+    description: "Survival French — 16-lesson CEFR path",
     icon: "&#127467;&#127479;",
     color: "#2563eb",
     lessons: [
       {
         id: "fr-greetings",
         sectionId: "french-a1",
-        title: "Greetings & Politeness",
+        title: "Salutations et politesse",
         description: "Hello, goodbye, please, thank you — the essentials",
-        cards: [1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014],
+        cards: [1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1009, 1010, 1011, 1012, 1013, 1014],
         prerequisites: [],
         concepts: [
           "Bonjour, bonsoir, au revoir, salut",
@@ -437,81 +442,198 @@ export const SECTIONS: Section[] = [
         ],
       },
       {
-        id: "fr-numbers",
+        id: "fr-pronouns",
         sectionId: "french-a1",
-        title: "Numbers & Time",
-        description: "Counting, days, months, and telling time",
-        cards: [1015, 1016, 1017, 1018, 1019, 1020, 1021, 1022, 1023, 1024, 1025],
+        title: "Les pronoms personnels",
+        description: "Subject pronouns and the tu/vous decision",
+        cards: [],
         prerequisites: ["fr-greetings"],
         concepts: [
-          "Numbers 1-100 (including 70, 80, 90 — the tricky ones)",
-          "Days of the week and months",
-          "Asking and telling time",
+          "je, tu, il/elle, nous, vous, ils/elles",
+          "tu (informal singular) vs vous (formal/plural)",
+          "On — the everyday 'we'",
         ],
       },
       {
-        id: "fr-food",
+        id: "fr-articles",
         sectionId: "french-a1",
-        title: "Food & Restaurant",
-        description: "Ordering food, drinks, and asking for the check",
-        cards: [1026, 1027, 1028, 1029, 1030, 1031, 1032, 1033, 1034, 1035, 1036, 1037, 1038, 1039, 1040],
-        prerequisites: ["fr-greetings"],
+        title: "Les articles définis et indéfinis",
+        description: "le/la/les and un/une/des — gender and number",
+        cards: [1036],
+        prerequisites: ["fr-pronouns"],
         concepts: [
-          "Common food vocabulary with gender (le/la)",
-          "Ordering: je voudrais..., s'il vous plaît",
-          "Asking for the check: l'addition",
+          "Definite: le, la, l', les",
+          "Indefinite: un, une, des",
+          "Every noun has a gender — memorise it with the article",
+        ],
+      },
+      {
+        id: "fr-numbers",
+        sectionId: "french-a1",
+        title: "Les nombres et l'heure",
+        description: "Counting 1–100 and telling the time",
+        cards: [1015, 1016, 1017, 1018, 1019, 1025],
+        prerequisites: ["fr-articles"],
+        concepts: [
+          "Numbers 1–100 (including 70, 80, 90 — the tricky ones)",
+          "Quelle heure est-il ? — telling the time",
+        ],
+      },
+      {
+        id: "fr-er-verbs",
+        sectionId: "french-a1",
+        title: "Les verbes en -er au présent",
+        description: "Regular -er conjugation: parler, manger, habiter…",
+        cards: [1063, 1064, 1069, 1070, 1071],
+        prerequisites: ["fr-pronouns"],
+        concepts: [
+          "-e, -es, -e, -ons, -ez, -ent endings",
+          "70 % of French verbs follow this pattern",
+          "Spelling tweaks: manger → nous mangeons",
+        ],
+      },
+      {
+        id: "fr-etre-avoir",
+        sectionId: "french-a1",
+        title: "Être et avoir",
+        description: "The two indispensable irregular verbs",
+        cards: [1059, 1060, 1072],
+        prerequisites: ["fr-er-verbs"],
+        concepts: [
+          "être — je suis, tu es, il est, nous sommes, vous êtes, ils sont",
+          "avoir — j'ai, tu as, il a, nous avons, vous avez, ils ont",
+          "avoir for age: j'ai 30 ans (not je suis)",
+        ],
+      },
+      {
+        id: "fr-adjectives",
+        sectionId: "french-a1",
+        title: "Les adjectifs et leurs accords",
+        description: "Adjective agreement in gender and number",
+        cards: [1090, 1091, 1092, 1093, 1094, 1095, 1096, 1097, 1098],
+        prerequisites: ["fr-etre-avoir"],
+        concepts: [
+          "Add -e for feminine, -s for plural",
+          "Irregular pairs: beau/belle, vieux/vieille, nouveau/nouvelle",
+          "Most adjectives follow the noun (a few precede it)",
+        ],
+      },
+      {
+        id: "fr-negation",
+        sectionId: "french-a1",
+        title: "La négation",
+        description: "ne … pas and its everyday variants",
+        cards: [1074, 1075, 1080, 1086, 1087],
+        prerequisites: ["fr-etre-avoir"],
+        concepts: [
+          "ne … pas wraps the verb",
+          "Spoken French often drops 'ne'",
+          "ne … jamais / plus / rien",
+        ],
+      },
+      {
+        id: "fr-days-weather",
+        sectionId: "french-a1",
+        title: "Les jours, mois, et la météo",
+        description: "Days, months, and talking about the weather",
+        cards: [1021, 1022, 1023, 1024],
+        prerequisites: ["fr-numbers"],
+        concepts: [
+          "Days lundi–dimanche, months janvier–décembre",
+          "aujourd'hui / demain / hier",
+          "il fait beau / il pleut / il neige",
         ],
       },
       {
         id: "fr-family",
         sectionId: "french-a1",
-        title: "Family & People",
-        description: "Family members, describing people",
+        title: "La famille et les possessifs",
+        description: "Family members and possessive adjectives",
         cards: [1041, 1042, 1043, 1044, 1045, 1046, 1047, 1048, 1049, 1050],
-        prerequisites: ["fr-greetings"],
+        prerequisites: ["fr-articles"],
         concepts: [
-          "Family members: père, mère, frère, sœur",
-          "Gender pairs: un ami / une amie",
-          "Possessives: mon, ma, mes",
+          "père, mère, frère, sœur, fils, fille",
+          "Possessives: mon/ma/mes, ton/ta/tes, son/sa/ses",
+          "Possessive agrees with the THING owned, not the owner",
         ],
       },
       {
-        id: "fr-directions",
+        id: "fr-aller-futur",
         sectionId: "french-a1",
-        title: "Directions & Transport",
-        description: "Getting around — where is...?, left, right, metro",
-        cards: [1051, 1052, 1053, 1054, 1055, 1056, 1057, 1058],
-        prerequisites: ["fr-numbers"],
+        title: "Aller et le futur proche",
+        description: "Aller (to go) and the near-future construction",
+        cards: [1061, 1073],
+        prerequisites: ["fr-etre-avoir"],
         concepts: [
-          "Asking: où est... ?",
-          "Directions: à gauche, à droite, tout droit",
-          "Transport: le métro, la gare, un billet",
+          "aller — je vais, tu vas, il va, nous allons, vous allez, ils vont",
+          "Futur proche: aller + infinitive (je vais manger)",
+          "Like English 'going to' — for any imminent action",
         ],
       },
       {
-        id: "fr-verbs",
+        id: "fr-food",
         sectionId: "french-a1",
-        title: "Essential Verbs",
-        description: "être, avoir, aller, faire — the foundation verbs",
-        cards: [1059, 1060, 1061, 1062, 1063, 1064, 1065, 1066, 1067, 1068, 1069, 1070, 1071, 1072, 1073, 1074],
-        prerequisites: ["fr-greetings"],
+        title: "Nourriture et restaurant",
+        description: "Ordering food, drinks, and asking for the check",
+        cards: [1026, 1027, 1028, 1029, 1030, 1031, 1032, 1033, 1034, 1035, 1037, 1038, 1039, 1040],
+        prerequisites: ["fr-articles", "fr-etre-avoir"],
         concepts: [
-          "être (to be) and avoir (to have) — full present tense",
-          "aller (to go) and faire (to do/make)",
-          "Regular -er verbs: parler, manger, aimer, habiter",
+          "Common food vocabulary with gender (le/la)",
+          "Ordering: je voudrais…, s'il vous plaît",
+          "Asking for the check: l'addition",
         ],
       },
       {
-        id: "fr-phrases",
+        id: "fr-shopping",
         sectionId: "french-a1",
-        title: "Essential Phrases & Adjectives",
-        description: "Survival phrases, descriptions, and everyday expressions",
-        cards: [1075, 1076, 1077, 1078, 1079, 1080, 1081, 1082, 1083, 1084, 1085, 1086, 1087, 1088, 1089, 1090, 1091, 1092, 1093, 1094, 1095, 1096, 1097, 1098, 1099, 1100, 1101, 1102, 1103, 1104, 1105, 1106],
-        prerequisites: ["fr-verbs", "fr-food", "fr-directions"],
+        title: "Faire les courses",
+        description: "Shopping vocabulary, prices, quantities",
+        cards: [1078, 1079, 1101, 1102, 1104],
+        prerequisites: ["fr-numbers", "fr-food"],
         concepts: [
-          "Survival: je ne comprends pas, parlez-vous anglais ?",
-          "Descriptions: grand/petit, bon/mauvais, beau/belle",
-          "Places: la maison, la boulangerie, le supermarché",
+          "Combien ça coûte ? / C'est combien ?",
+          "le supermarché, la boulangerie, la pharmacie",
+          "j'ai besoin de…",
+        ],
+      },
+      {
+        id: "fr-questions",
+        sectionId: "french-a1",
+        title: "Poser des questions",
+        description: "Three ways to ask questions: intonation, est-ce que, inversion",
+        cards: [1008, 1020, 1076, 1083, 1085],
+        prerequisites: ["fr-etre-avoir", "fr-er-verbs"],
+        concepts: [
+          "Intonation (informal): Tu parles français ?",
+          "est-ce que (neutral): Est-ce que tu parles français ?",
+          "Inversion (formal): Parlez-vous français ?",
+          "Question words: qui, quoi, où, quand, comment, pourquoi, combien",
+        ],
+      },
+      {
+        id: "fr-daily-routine",
+        sectionId: "french-a1",
+        title: "La vie quotidienne et les verbes pronominaux",
+        description: "Daily routine and reflexive verbs (se laver, se lever…)",
+        cards: [1062, 1065, 1066, 1067, 1068, 1082, 1084, 1089],
+        prerequisites: ["fr-er-verbs", "fr-negation"],
+        concepts: [
+          "Reflexive pronouns: me, te, se, nous, vous, se",
+          "se lever, se coucher, se laver, s'habiller",
+          "Daily-routine verbs: faire, boire, comprendre, vouloir, pouvoir",
+        ],
+      },
+      {
+        id: "fr-places-directions",
+        sectionId: "french-a1",
+        title: "Lieux et directions",
+        description: "Places around town and getting around",
+        cards: [1051, 1052, 1053, 1054, 1055, 1056, 1057, 1058, 1077, 1081, 1088, 1099, 1100, 1103, 1105, 1106],
+        prerequisites: ["fr-numbers", "fr-articles"],
+        concepts: [
+          "Où est… ? — asking for locations",
+          "à gauche, à droite, tout droit, près de, loin de",
+          "la maison, le restaurant, le travail, l'hôpital, la gare, le métro",
         ],
       },
     ],
@@ -916,6 +1038,64 @@ export const SECTIONS: Section[] = [
       },
     ],
   },
+
+  // === Section: Avoidance Loop — stop dreaming big and doing nothing ===
+  {
+    id: "avoidance-loop",
+    title: "Avoidance Loop",
+    description:
+      "Pychyl's emotion-regulation framework for procrastination — mechanism, disguises, and concrete interrupts. Applied to actual Ronan-shaped patterns.",
+    icon: "&#128126;",
+    color: "#f59e0b",
+    lessons: [
+      {
+        id: "avoid-mechanism",
+        sectionId: "avoidance-loop",
+        title: "The mechanism",
+        description:
+          "Why procrastination is emotion regulation, not time management — the four-stage loop, the amygdala hijack, TMT, and the dread-vs-doing gap.",
+        cards: [7200, 7201, 7202, 7203, 7204],
+        prerequisites: [],
+        concepts: [
+          "Procrastination is emotion regulation, not time management (Pychyl)",
+          "Four-stage loop: hard task → negative emotion → avoidance → relief (which reinforces)",
+          "Amygdala hijack — the threat system overrides the dorsal ACC action system",
+          "Each cycle physically strengthens the procrastination circuit; discipline atrophies",
+          "TMT: M = (E × V) / (I × D) — every intervention targets one of the four variables",
+        ],
+      },
+      {
+        id: "avoid-practice",
+        sectionId: "avoidance-loop",
+        title: "Breaking the loop in practice",
+        description:
+          "The two-step interrupt, implementation intentions, the two disguises (perfectionism + productive procrastination), self-compassion, and one applied case on thesis #1.",
+        cards: [7205, 7206, 7207, 7208, 7209, 7210, 7211],
+        prerequisites: ["avoid-mechanism"],
+        concepts: [
+          "Two-step interrupt: name the emotion, then shrink the first step until dread can't gate it",
+          "Implementation intentions (Gollwitzer d ≈ 0.65) delegate starting to an environmental cue",
+          "Perfectionism inflates predicted failure cost — output drops even at constant effort",
+          "Productive procrastination swaps the scary task for a safer one that still feels like work",
+          "You're avoiding a predicted feeling your brain almost always gets wrong — not the task",
+          "Self-compassion after a slip reduces future procrastination; self-blame feeds the loop",
+          "Applied: thesis #1 avoidance is productive procrastination with a perfectionism trigger",
+        ],
+      },
+    ],
+  },
+
+  // === Section 11: Finance Fundamentals (imported) ===
+  // Source: src/data/finance-fundamentals.ts; cards in src/data/finance-cards.ts (8000-series)
+  // Path note: learning/Finance Fundamentals — Learning Path.md
+  FINANCE_FUNDAMENTALS_SECTION,
+
+  // === Section 12: Business Central Subscriptions (imported) ===
+  // Source: src/data/business-central-subscriptions-path.ts
+  // Cards: src/data/business-central-subscriptions-cards.ts (9200-9349)
+  // Path note: learning/Business Central Subscriptions — Learning Path.md
+  // Source brief: learning/Business Central Subscriptions — Source Material.md
+  BUSINESS_CENTRAL_SUBSCRIPTIONS_SECTION,
 ];
 
 // All lessons flattened for easy lookup
